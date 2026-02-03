@@ -25,7 +25,7 @@ public class VisionConstants {
 
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark); // FRC NE
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark); // FRC NE
   // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // Worlds
   //     AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -34,24 +34,25 @@ public class VisionConstants {
   public static final int INVALID_APRIL_TAG = -1;
 
   // Camera names, must match names configured on coprocessor
-  public static String leftChassisApriltag = "leftChassisApriltag";
-  public static String rightChassisApriltag = "rightChassisApriltag";
+  public static String CenterApriltag = "Arducam3";
+  //  public static String rightChassisApriltag = "rightChassisApriltag";
 
   // Robot to camera transforms - Need to be configured relative to gyro
   // These values are centered on the "robot center"
   // Gyro will be offset from this.
   public static Transform3d robotToCamera0 = // left camera - white
       new Transform3d(
-          Units.inchesToMeters(8),
-          Units.inchesToMeters(-12.25),
-          Units.inchesToMeters(27.75),
-          new Rotation3d(0.0, 0, 180));
-  public static Transform3d robotToCamera1 = // right camera - black/blue
-      new Transform3d(
-          Units.inchesToMeters(8),
-          Units.inchesToMeters(12.25),
-          Units.inchesToMeters(19.75),
-          new Rotation3d(0.0, 0, 0.0));
+          Units.inchesToMeters(13.75),
+          Units.inchesToMeters(14.5),
+          Units.inchesToMeters(10.375),
+          new Rotation3d(0.0, 0, 0));
+  /*  public static Transform3d robotToCamera1 = // right camera - black/blue
+  new Transform3d(
+      Units.inchesToMeters(8),
+      Units.inchesToMeters(12.25),
+      Units.inchesToMeters(19.75),
+      new Rotation3d(0.0, 0, 0.0));
+      */
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
