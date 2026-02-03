@@ -70,27 +70,27 @@ public class Vision extends SubsystemBase {
 
   public boolean poseIsReliable() {
     return false;
-    //return !(camera0Disabled && camera1Disabled);
+    // return !(camera0Disabled && camera1Disabled);
   }
 
   @Override
   public void periodic() {
-   //SmartDashboard.putData("DisableBlackCamera", camera0Disabled);
-    
+    // SmartDashboard.putData("DisableBlackCamera", camera0Disabled);
+
     for (int i = 0; i < io.length; i++) {
       if (missedUpdateCount[i] < missedUpdateLimit) {
-        if(i == 0 && camera0Disabled)
-          missedUpdateCount[0] = missedUpdateLimit;
-        if(i == 1 && camera1Disabled)
-          missedUpdateCount[1] = missedUpdateLimit;
+        if (i == 0 && camera0Disabled) missedUpdateCount[0] = missedUpdateLimit;
+        if (i == 1 && camera1Disabled) missedUpdateCount[1] = missedUpdateLimit;
 
         io[i].updateInputs(inputs[i]);
 
         if (!inputs[i].connected) {
           missedUpdateCount[i]++;
-        }
-        else {
-          missedUpdateCount[i] = Math.max(0,missedUpdateCount[i] - 1); // Forgive missing updates that only last a short time
+        } else {
+          missedUpdateCount[i] =
+              Math.max(
+                  0,
+                  missedUpdateCount[i] - 1); // Forgive missing updates that only last a short time
         }
 
         // Update disconnected alert
@@ -102,9 +102,9 @@ public class Vision extends SubsystemBase {
       else if (missedUpdateCount[i] == missedUpdateLimit) {
         // Update disconnected alert
         disconnectedAlerts[i].set(true);
-        missedUpdateCount[i]++; // Increase to prevent multiple alert triggers after the camera has failed
-      }
-      else { // Stop alerts after the camera has failed
+        missedUpdateCount[
+            i]++; // Increase to prevent multiple alert triggers after the camera has failed
+      } else { // Stop alerts after the camera has failed
         disconnectedAlerts[i].set(false);
       }
     }
@@ -119,8 +119,8 @@ public class Vision extends SubsystemBase {
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
 
       // Skip camera processing if it has been disconnected too long
-      if (missedUpdateCount[cameraIndex] >= missedUpdateLimit ) {
-         continue; // Skip this camera.
+      if (missedUpdateCount[cameraIndex] >= missedUpdateLimit) {
+        continue; // Skip this camera.
       }
 
       // Initialize logging values
@@ -184,10 +184,8 @@ public class Vision extends SubsystemBase {
         consumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
-              VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
-        }
-
-
+            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+      }
 
       // Log camera datadata
       Logger.recordOutput(
@@ -230,9 +228,7 @@ public class Vision extends SubsystemBase {
   }
 
   public void disableCamera(int index) {
-    if(index == 0)
-      camera0Disabled = true;
-    else
-      camera1Disabled = true;
+    if (index == 0) camera0Disabled = true;
+    else camera1Disabled = true;
   }
 }

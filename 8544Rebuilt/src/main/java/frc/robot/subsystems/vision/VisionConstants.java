@@ -22,12 +22,12 @@ import edu.wpi.first.math.util.Units;
 public class VisionConstants {
 
   public static final int missedUpdateLimit = 500; // 250 updates per second
-  
+
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
-     AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark); // FRC NE
-     //AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // Worlds
- //     AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark); // FRC NE
+  // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // Worlds
+  //     AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // TODO Define custom school field tag setup... and a way to switch??
 
@@ -35,18 +35,18 @@ public class VisionConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String leftChassisApriltag = "leftChassisApriltag";
-  public static String rightChassisApriltag = "rightChassisApriltag"; 
+  public static String rightChassisApriltag = "rightChassisApriltag";
 
   // Robot to camera transforms - Need to be configured relative to gyro
   // These values are centered on the "robot center"
   // Gyro will be offset from this.
-  public static Transform3d robotToCamera0 = //left camera - white
-  new Transform3d(
-      Units.inchesToMeters(8),
-      Units.inchesToMeters(-12.25),
-      Units.inchesToMeters(27.75),
-      new Rotation3d(0.0, 0, 180));
-  public static Transform3d robotToCamera1 = //right camera - black/blue
+  public static Transform3d robotToCamera0 = // left camera - white
+      new Transform3d(
+          Units.inchesToMeters(8),
+          Units.inchesToMeters(-12.25),
+          Units.inchesToMeters(27.75),
+          new Rotation3d(0.0, 0, 180));
+  public static Transform3d robotToCamera1 = // right camera - black/blue
       new Transform3d(
           Units.inchesToMeters(8),
           Units.inchesToMeters(12.25),
