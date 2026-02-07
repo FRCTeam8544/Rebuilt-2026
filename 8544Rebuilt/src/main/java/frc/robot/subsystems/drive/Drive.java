@@ -95,15 +95,9 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
-  private Supplier<Pose2d> robotPoseSupplier =
+  public Supplier<Pose2d> robotPoseSupplier =
       () -> {
         return poseEstimator.getEstimatedPosition();
-      };
-
-  private Navigation nav = new Navigation(robotPoseSupplier);
-  public Supplier<Rotation2d> hubrotationSupplier =
-      () -> {
-        return nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
       };
 
   public Drive(
@@ -363,10 +357,5 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
-  }
-
-  public Supplier<Rotation2d> getHubRotation() {
-
-    return hubrotationSupplier;
   }
 }

@@ -24,10 +24,13 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.*;
 
@@ -38,10 +41,12 @@ public class Vision extends SubsystemBase {
   private final Alert[] disconnectedAlerts;
   private final Integer[] missedUpdateCount;
   private boolean camera0Disabled = false, camera1Disabled = false;
+  private Navigation nav;
 
-  public Vision(VisionConsumer consumer, VisionIO... io) {
+  public Vision(Supplier<Pose2d> robotPoseSupplier, VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
+    this.nav = new Navigation(robotPoseSupplier);
 
     missedUpdateCount = new Integer[io.length];
     // Initialize inputs
@@ -231,5 +236,12 @@ public class Vision extends SubsystemBase {
   public void disableCamera(int index) {
     if (index == 0) camera0Disabled = true;
     else camera1Disabled = true;
+  }
+
+  public Supplier<Rotation2d> getHubRotation() {
+
+    return () -> {
+      return nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
+    };
   }
 }

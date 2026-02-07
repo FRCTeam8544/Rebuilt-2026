@@ -55,6 +55,7 @@ public class RobotContainer {
 
         vision =
             new Vision(
+                drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
                     VisionConstants.CenterApriltag, VisionConstants.robotToCamera0));
@@ -73,6 +74,7 @@ public class RobotContainer {
 
         vision =
             new Vision(
+                drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
                     VisionConstants.CenterApriltag,
@@ -90,7 +92,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        vision =
+            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
 
@@ -140,7 +143,7 @@ public class RobotContainer {
                 drive,
                 () -> -maverick.getLeftY(),
                 () -> -maverick.getLeftX(),
-                drive.hubrotationSupplier));
+                vision.getHubRotation()));
 
     // Switch to X pattern when X button is pressed
     maverick.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
