@@ -55,15 +55,15 @@ public class Navigation {
   public Rotation2d getAnglefromHub(DriverStation.Alliance alliance) {
     // This method will be called once per scheduler run
     // navigationIO.updateInputs(climberInOutData);
-    Translation2d HubTargetpose;
+    Translation2d HubTargetCentroid;
     final Translation2d currentPose = robotPoseSupplier.get().getTranslation();
     if (alliance == Alliance.Blue) {
-      HubTargetpose = blueHubCentroid;
+      HubTargetCentroid = blueHubCentroid;
 
     } else {
-      HubTargetpose = redHubCentroid;
+      HubTargetCentroid = redHubCentroid;
     }
-    Translation2d clockVector = redHubCentroid.minus(currentPose);
+    Translation2d clockVector = HubTargetCentroid.minus(currentPose);
     return clockVector.getAngle();
 
     // Log summary data
