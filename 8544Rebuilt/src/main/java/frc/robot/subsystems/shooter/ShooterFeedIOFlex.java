@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -16,12 +17,14 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
 
     private final SparkFlex motorController;
 
-    //private static RelativeEncoder encoder = leaderMotorController.getExternalEncoder();
+    
+    private final RelativeEncoder motorEncoder;
     //private static SparkClosedLoopController closedLoop = leftMotorController.getClosedLoopController();
     private final SparkFlexConfig motorConfig;
 
   public ShooterFeedIOFlex(int canId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
+    motorEncoder = motorController.getEncoder();
 
     motorConfig = new SparkFlexConfig();
 
@@ -38,7 +41,7 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
   public void updateInputs(ShooterFeedIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.velocity = 0;// TODO need encoder;
+    inOutData.velocity = (float) motorEncoder.getVelocity();
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
 
     // Fault codes

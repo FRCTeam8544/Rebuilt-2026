@@ -7,8 +7,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
-import frc.robot.subsystems.shooter.ShooterIO;
+import com.revrobotics.RelativeEncoder;
 
 public class ShooterIOFlex implements ShooterIO {
   
@@ -17,7 +16,7 @@ public class ShooterIOFlex implements ShooterIO {
     private final SparkFlex leaderMotorController;
     private final SparkFlex followMotorController;
 
-    //private static RelativeEncoder encoder = leaderMotorController.getExternalEncoder();
+    private final RelativeEncoder leaderEncoder;
     //private static SparkClosedLoopController closedLoop = leftMotorController.getClosedLoopController();
     private final SparkFlexConfig leaderMotorConfig;
     private final SparkFlexConfig followMotorConfig;
@@ -25,6 +24,8 @@ public class ShooterIOFlex implements ShooterIO {
   public ShooterIOFlex(int leaderCanId, int followCanId) {
     leaderMotorController = new SparkFlex(leaderCanId, MotorType.kBrushless);
     followMotorController = new SparkFlex(followCanId, MotorType.kBrushless);
+
+    leaderEncoder = leaderMotorController.getEncoder();
 
     leaderMotorConfig = new SparkFlexConfig();
     followMotorConfig = new SparkFlexConfig();
@@ -51,7 +52,7 @@ public class ShooterIOFlex implements ShooterIO {
   public void updateInputs(ShooterIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.velocity = 0;// TODO need encoder;
+    inOutData.velocity = (float) leaderEncoder.getVelocity();
     inOutData.leaderMotorTemperature = (float) leaderMotorController.getMotorTemperature();
     inOutData.followMotorTemperature = (float) followMotorController.getMotorTemperature();
 

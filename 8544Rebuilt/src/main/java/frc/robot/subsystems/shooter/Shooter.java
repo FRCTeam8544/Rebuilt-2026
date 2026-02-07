@@ -30,11 +30,12 @@ public class Shooter extends SubsystemBase{
 
     public void runVoltage(double volts)
     {
-        if ((volts >= -12.0) && (volts <= 12.0))
-        {
-            shooterIO.setVoltage(volts * 12);
-            shooterFeedIO.setVoltage(volts * 12);
-        }
+      double scaledNominalVoltage = 12.0 * volts;
+      if ((volts >= -12.0) && (volts <= 12.0))
+      {
+          shooterIO.setVoltage(scaledNominalVoltage);
+          shooterFeedIO.setVoltage(scaledNominalVoltage);
+      }
     }
     public void stop() {
         runVoltage(0.0);
