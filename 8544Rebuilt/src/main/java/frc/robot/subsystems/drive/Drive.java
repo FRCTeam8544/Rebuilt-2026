@@ -45,11 +45,6 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
 
-  public Supplier<Rotation2d> hubrotationSupplier =
-      () -> {
-        return Rotation2d.k180deg;
-      };
-
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
   public static final double DRIVE_BASE_RADIUS =
@@ -96,8 +91,20 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
+
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+
+  private Supplier<Pose2d> robotPoseSupplier =
+      () -> {
+        return poseEstimator.getEstimatedPosition();
+      };
+
+  private Navigation nav = new Navigation(robotPoseSupplier);
+  public Supplier<Rotation2d> hubrotationSupplier =
+      () -> {
+        return nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
+      };
 
   public Drive(
       GyroIO gyroIO,
