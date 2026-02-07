@@ -1,44 +1,45 @@
 package frc.robot.subsystems.shooter;
 
-public class ShooterIOSim implements ShooterIO{
- 
+
+public class ShooterFeedIOSim implements ShooterFeedIO {
   
-  public ShooterIOSim() {
+
+
+  public ShooterFeedIOSim() {
   }
 
-  public void updateInputs(ShooterIOInputs inOutData)
+  @Override
+  public void updateInputs(ShooterFeedIOInputs inOutData)
   {
-    inOutData.connected = false;
-    inOutData.velocity = 0;
-    inOutData.leaderMotorTemperature = 0;
-    inOutData.followMotorTemperature = 0;
+    inOutData.connected = true;
+    inOutData.velocity = 0;// TODO need encoder;
+    inOutData.motorTemperature = 42;
 
     // Fault codes
-    inOutData.faultSensor = false;
     inOutData.faultCan = false;
     inOutData.faultTemperature = false;
+    inOutData.faultSensor = false;
     inOutData.faultGateDriver = false;
     inOutData.faultEscEeprom = false;
     inOutData.faultFirmware = false;
-    
+
     // Outputs
-    inOutData.busVoltage = 0.0f;
-    inOutData.outputDuty = 0.0f; // -1 to 1 percent applied of bus voltage
-    inOutData.outputCurrent = 0.0f;
-    inOutData.outputVoltage = 0.0f;
+    inOutData.busVoltage = 0;
+    inOutData.outputDuty = 0; // -1 to 1 percent applied of bus voltage
+    inOutData.outputCurrent = 0;
+
     inOutData.velocitySetPoint = 0.0f; // Percent of max motor speed (0...1)
     inOutData.voltageSetPoint = 0.0f; // Motor voltage, usually not directly controlled
-    
   }
 
-  
   @Override
   public void setVelocity(double rpm) {
-
+    // TODO, using closed loop controller
   }
 
   @Override
   public void setVoltage(double volts) {
     
   }
+
 }

@@ -24,7 +24,7 @@ public class ShooterIOFlex implements ShooterIO {
 
   public ShooterIOFlex(int leaderCanId, int followCanId) {
     leaderMotorController = new SparkFlex(leaderCanId, MotorType.kBrushless);
-    followMotorController = new SparkFlex(leaderCanId, MotorType.kBrushless);
+    followMotorController = new SparkFlex(followCanId, MotorType.kBrushless);
 
     leaderMotorConfig = new SparkFlexConfig();
     followMotorConfig = new SparkFlexConfig();
