@@ -39,10 +39,17 @@ import frc.robot.subsystems.vision.*;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+
+  public Supplier<Rotation2d> hubrotationSupplier =
+      () -> {
+        return Rotation2d.k180deg;
+      };
+
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
   public static final double DRIVE_BASE_RADIUS =
@@ -349,5 +356,10 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+  public Supplier<Rotation2d> getHubRotation() {
+
+    return hubrotationSupplier;
   }
 }

@@ -29,6 +29,7 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.*;
 
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
@@ -119,9 +120,9 @@ public class Vision extends SubsystemBase {
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
 
       // Skip camera processing if it has been disconnected too long
-      if (missedUpdateCount[cameraIndex] >= missedUpdateLimit) {
-        continue; // Skip this camera.
-      }
+      //      if (missedUpdateCount[cameraIndex] >= missedUpdateLimit) {
+      //        continue; // Skip this camera.
+      //     }
 
       // Initialize logging values
       List<Pose3d> tagPoses = new LinkedList<>();

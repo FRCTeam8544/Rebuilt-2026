@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.photonvision.*;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */

@@ -140,7 +140,7 @@ public class RobotContainer {
                 drive,
                 () -> -maverick.getLeftY(),
                 () -> -maverick.getLeftX(),
-                () -> Rotation2d.kZero));
+                drive.hubrotationSupplier));
 
     // Switch to X pattern when X button is pressed
     maverick.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
