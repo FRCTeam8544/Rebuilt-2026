@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.shooter.Shooter;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ShooterCommands {
 
@@ -32,14 +34,47 @@ public class ShooterCommands {
             .getTranslation();
     }
 
-    public static Command joystickShoot( Shooter shooter, DoubleSupplier xSupplier, DoubleSupplier ySupplier ) {
+    public static Command buttonShoot( Shooter shooter,
+                                       Trigger shootTrigger,
+                                       Trigger feedTrigger)
+    {
         return Commands.run(
         () -> {
-          // Get linear velocity
-          Translation2d linearVelocity =
-              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-          
-          shooter.runVoltage(linearVelocity.getY());
+            if (shootTrigger.getAsBoolean())
+            {
+                shooter.runShooter(200);
+            }
+            else {
+                shooter.runShooter(0);
+            }
+
+            if (feedTrigger.getAsBoolean())
+            {
+                shooter.runFeed(1000);
+            }
+            else {
+                shooter.runFeed(0);
+            }
+        },
+        shooter);
+    } 
+
+    public static Command joystickVoltsShoot( Shooter shooter, 
+                                    DoubleSupplier x_LeftSupplier, DoubleSupplier y_LeftSupplier,
+                                    DoubleSupplier x_RightSupplier, DoubleSupplier y_RightSupplier ) {
+        return Commands.run(
+        () -> {
+            
+            // Get shooter linear velocity
+            Translation2d shootLinearVelocity =
+            getLinearVelocityFromJoysticks(x_RightSupplier.getAsDouble(), y_RightSupplier.getAsDouble());              
+            shooter.runShooterOpenLoop(shootLinearVelocity.getY());
+            
+            // Get feed linear velocity
+            Translation2d feedLinearVelocity =
+            getLinearVelocityFromJoysticks(x_LeftSupplier.getAsDouble(), y_LeftSupplier.getAsDouble());
+             
+            shooter.runFeedOpenLoop(feedLinearVelocity.getY());
           
         },
         shooter);

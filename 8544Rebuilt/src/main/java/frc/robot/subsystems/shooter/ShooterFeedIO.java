@@ -28,8 +28,8 @@ public interface ShooterFeedIO {
     public float outputCurrent = 0;
     public float outputVoltage = 0;
 
-    public float velocitySetPoint = 0.0f; // Percent of max motor speed (0...1)
-    public float voltageSetPoint = 0.0f; // Motor voltage, usually not directly controlled
+    public double velocitySetPoint = 0.0; // Percent of max motor speed (0...1)
+    public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
   }
 
   public default void updateInputs(ShooterFeedIOInputs inOutData) {}

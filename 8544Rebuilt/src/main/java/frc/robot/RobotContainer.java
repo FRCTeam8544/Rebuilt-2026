@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ShooterCommands;
@@ -19,6 +20,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -35,6 +39,11 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
+  private final Trigger aButtonGoose = new Trigger(goose.b());
+  private final Trigger yButtonGoose = new Trigger(goose.y());
+  private final Trigger xButtonGoose = new Trigger(goose.x());
+  private final Trigger rightBackGoose = new Trigger(goose.rightBumper());
+  private final Trigger leftBackGoose = new Trigger(goose.leftBumper());
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -143,11 +152,18 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-     // Default shooter controls, tied to right stick
-    shooter.setDefaultCommand(ShooterCommands.joystickShoot(
+     // Default shooter controls
+    shooter.setDefaultCommand(ShooterCommands.joystickVoltsShoot(
         shooter,
+        () -> -goose.getLeftX(),  
+        () -> -goose.getLeftY(), // Feed voltage
         () -> -goose.getRightX(),
-        () -> -goose.getRightY()));
+        () -> -goose.getRightY())); // Shooter voltage
+
+   /* shooter.setDefaultCommand(ShooterCommands.buttonShoot(
+              shooter,
+              leftBackGoose, 
+              aButtonGoose));*/
   }
 
   /**
