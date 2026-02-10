@@ -39,7 +39,7 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
-  private final Trigger aButtonGoose = new Trigger(goose.b());
+  private final Trigger aButtonGoose = new Trigger(goose.a());
   private final Trigger yButtonGoose = new Trigger(goose.y());
   private final Trigger xButtonGoose = new Trigger(goose.x());
   private final Trigger rightBackGoose = new Trigger(goose.rightBumper());
