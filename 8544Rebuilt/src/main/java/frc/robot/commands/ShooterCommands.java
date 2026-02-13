@@ -34,6 +34,59 @@ public class ShooterCommands {
             .getTranslation();
     }
 
+    // Use this command to tune Ks by increasing voltage until the flywheel
+    // begins to slightly turn, then back off a bit.
+    // This term will be used in the PID with feedforward control later.
+    public static Command openVoltageControl(Shooter shooter,
+                                         Trigger feedTrigger,
+                                         Trigger increaseVoltTrigger,
+                                         Trigger decreaseVoltTrigger,
+                                         Trigger increaseFeedVoltageTrigger,
+                                         Trigger decreaseFeedVoltageTrigger)
+    {
+        return Commands.run(
+        () -> {
+
+            boolean voltIncrease = increaseVoltTrigger.getAsBoolean();
+            boolean voltDecrease = decreaseVoltTrigger.getAsBoolean();
+            // If and only if one button is pressed at a time
+            if (voltDecrease ^ voltIncrease)
+            {
+                if (voltIncrease) {
+                    shooter.tuneIncreaseShootVoltage(); // Increase shooter volt
+                }
+                else
+                {
+                    shooter.tuneDecreaseShootVoltage(); // Decrease shooter volt
+                }
+            }
+            
+            boolean increaseFeedVolt = increaseFeedVoltageTrigger.getAsBoolean();
+            boolean decreaseFeedVolt = decreaseFeedVoltageTrigger.getAsBoolean();
+            if (increaseFeedVolt ^ decreaseFeedVolt) {
+                if (increaseFeedVoltageTrigger.getAsBoolean())
+                {
+                    shooter.tuneIncreaseFeedVoltage();
+                }
+                else
+                {
+                    shooter.tuneDecreaseFeedVoltage();
+                }
+            }
+
+            shooter.runShooterOpenLoop();
+            
+            if (feedTrigger.getAsBoolean())
+            {
+                shooter.runFeedOpenLoop();
+            }
+            else {
+                shooter.runFeedOpenLoop(0.0);
+            }
+        },
+        shooter);
+    }
+
     public static Command buttonShoot( Shooter shooter,
                                        Trigger shootTrigger,
                                        Trigger feedTrigger)

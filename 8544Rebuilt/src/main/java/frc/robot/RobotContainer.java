@@ -40,10 +40,13 @@ public class RobotContainer {
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
   private final Trigger aButtonGoose = new Trigger(goose.a());
+  private final Trigger bButtonGoose = new Trigger(goose.b());
   private final Trigger yButtonGoose = new Trigger(goose.y());
   private final Trigger xButtonGoose = new Trigger(goose.x());
   private final Trigger rightBackGoose = new Trigger(goose.rightBumper());
   private final Trigger leftBackGoose = new Trigger(goose.leftBumper());
+  private final Trigger leftTriggerGoose = new Trigger(goose.leftTrigger());
+  private final Trigger dpadUpTriggerGoose = new Trigger(goose.povUp());
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -153,12 +156,20 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
      // Default shooter controls
-    shooter.setDefaultCommand(ShooterCommands.joystickVoltsShoot(
+ /*   shooter.setDefaultCommand(ShooterCommands.joystickVoltsShoot(
         shooter,
         () -> -goose.getLeftX(),  
         () -> -goose.getLeftY(), // Feed voltage
         () -> -goose.getRightX(),
         () -> -goose.getRightY())); // Shooter voltage
+*/
+
+    // Raw feed and shooter voltage tuning
+    goose.leftTrigger().whileTrue(
+        ShooterCommands.openVoltageControl(shooter, 
+                                            leftTriggerGoose, // Feed trigger
+                                            yButtonGoose, aButtonGoose, 
+                                            xButtonGoose, bButtonGoose));
 
    /* shooter.setDefaultCommand(ShooterCommands.buttonShoot(
               shooter,

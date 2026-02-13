@@ -38,7 +38,7 @@ public class ShooterIOFlex implements ShooterIO {
     leaderMotorConfig = new SparkFlexConfig();
     followMotorConfig = new SparkFlexConfig();
 
-    leaderMotorConfig.idleMode(IdleMode.kBrake);
+    leaderMotorConfig.idleMode(IdleMode.kCoast);
     leaderMotorConfig.smartCurrentLimit(stallLimit);
     leaderMotorConfig.voltageCompensation(12);
     leaderMotorConfig.softLimit.forwardSoftLimitEnabled(false);
@@ -56,7 +56,7 @@ public class ShooterIOFlex implements ShooterIO {
                               com.revrobotics.ResetMode.kResetSafeParameters,
                               com.revrobotics.PersistMode.kPersistParameters);
     
-    followMotorConfig.idleMode(IdleMode.kBrake);
+    followMotorConfig.idleMode(IdleMode.kCoast);
     followMotorConfig.smartCurrentLimit(stallLimit);
     followMotorConfig.follow(leaderCanId, true); 
     followMotorConfig.voltageCompensation(12);

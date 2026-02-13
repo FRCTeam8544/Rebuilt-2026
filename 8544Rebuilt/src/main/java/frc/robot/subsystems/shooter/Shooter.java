@@ -27,10 +27,53 @@ public class Shooter extends SubsystemBase{
     private final ShooterFeedIO shooterFeedIO;
     private final ShooterFeedIOInputsAutoLogged shooterFeedInputs = new ShooterFeedIOInputsAutoLogged();
 
+    private double tuneFeedVoltage = 0.0;
+    private double tuneShootVoltage = 0.0;
+    private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
+    private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
+
     public Shooter()
     {
        this.shooterIO = new ShooterIOFlex(leftMotorCanID, rightMotorCanID);
        this.shooterFeedIO = new ShooterFeedIOFlex(feedMotorCanID);
+    }
+
+    public void tuneIncreaseShootVoltage() {
+      tuneShootVoltage += tuneShootVoltStep;
+      if (tuneShootVoltage > 12.0) {
+        tuneShootVoltage = 12.0;
+      }
+    }
+
+    public void tuneDecreaseShootVoltage() {
+      tuneShootVoltage -= tuneShootVoltStep;
+      if (tuneShootVoltage < 0.0) {
+        tuneShootVoltage = 0.0;
+      }
+    }
+
+    public void tuneIncreaseFeedVoltage() {
+      tuneFeedVoltage += tuneFeedVoltStep;
+      if (tuneFeedVoltage > 12.0) {
+        tuneFeedVoltage = 12.0;
+      }
+    }
+
+    public void tuneDecreaseFeedVoltage() {
+      tuneFeedVoltage -= tuneFeedVoltStep;
+      if (tuneFeedVoltage < 0.0) {
+        tuneFeedVoltage = 0.0;
+      }
+    }
+
+    public void runShooterOpenLoop()
+    {
+      runShooterOpenLoop( tuneShootVoltage / 12.0 );
+    }
+
+    public void runFeedOpenLoop()
+    {
+      runFeedOpenLoop( tuneFeedVoltage / 12.0 );
     }
 
     public void runShooterOpenLoop(double duty)
