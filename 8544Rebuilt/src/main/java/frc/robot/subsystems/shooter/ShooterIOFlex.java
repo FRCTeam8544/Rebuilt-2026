@@ -18,7 +18,7 @@ import com.revrobotics.RelativeEncoder;
 
 public class ShooterIOFlex implements ShooterIO {
   
-    private static final int stallLimit = 40;
+    private static final int stallLimit = 60;
 
     private final SparkFlex leaderMotorController;
     private final SparkFlex followMotorController;
@@ -90,6 +90,7 @@ public class ShooterIOFlex implements ShooterIO {
     inOutData.busVoltage = (float) leaderMotorController.getBusVoltage();
     inOutData.outputDuty = (float) leaderMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) leaderMotorController.getOutputCurrent();
+    inOutData.outputVoltage = (float) leaderMotorController.getAppliedOutput() * 12.0f;
   }
 
   @Override

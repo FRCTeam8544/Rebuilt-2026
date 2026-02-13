@@ -167,9 +167,11 @@ public class RobotContainer {
     // Raw feed and shooter voltage tuning
     goose.leftTrigger().whileTrue(
         ShooterCommands.openVoltageControl(shooter, 
-                                            leftTriggerGoose, // Feed trigger
+                                            dpadUpTriggerGoose, // Feed trigger
                                             yButtonGoose, aButtonGoose, 
                                             xButtonGoose, bButtonGoose));
+
+    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
 
    /* shooter.setDefaultCommand(ShooterCommands.buttonShoot(
               shooter,

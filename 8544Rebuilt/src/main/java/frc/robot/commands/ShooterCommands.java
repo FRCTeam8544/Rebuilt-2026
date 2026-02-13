@@ -34,6 +34,14 @@ public class ShooterCommands {
             .getTranslation();
     }
 
+    public static Command stopMotors(Shooter shooter) {
+        return Commands.run(
+        () -> {
+                shooter.stopOpenLoop();
+            },
+            shooter);
+    }
+
     // Use this command to tune Ks by increasing voltage until the flywheel
     // begins to slightly turn, then back off a bit.
     // This term will be used in the PID with feedforward control later.

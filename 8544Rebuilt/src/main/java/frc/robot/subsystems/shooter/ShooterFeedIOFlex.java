@@ -19,6 +19,7 @@ import frc.robot.subsystems.shooter.ShooterIO;
 
 public class ShooterFeedIOFlex implements ShooterFeedIO {
   
+    private static final double kS = 0.14;
     private static final int stallLimit = 40;
 
     private final SparkFlex motorController;    
@@ -37,7 +38,7 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
     motorConfig.voltageCompensation(12);
     motorConfig.softLimit.forwardSoftLimitEnabled(false);
     motorConfig.softLimit.reverseSoftLimitEnabled(false);
-    motorConfig.encoder.velocityConversionFactor(1.0/20.0); // 20 to 1 gearbox
+    motorConfig.encoder.velocityConversionFactor(20.0); // 20 to 1 gearbox
 
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -73,6 +74,8 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
     inOutData.busVoltage = (float) motorController.getBusVoltage();
     inOutData.outputDuty = (float) motorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) motorController.getOutputCurrent();
+    inOutData.outputVoltage = (float) motorController.getAppliedOutput() * 12.0f;
+  }
   }
 
   @Override

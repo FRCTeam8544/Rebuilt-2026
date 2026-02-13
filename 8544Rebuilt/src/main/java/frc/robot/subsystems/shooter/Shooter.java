@@ -27,7 +27,7 @@ public class Shooter extends SubsystemBase{
     private final ShooterFeedIO shooterFeedIO;
     private final ShooterFeedIOInputsAutoLogged shooterFeedInputs = new ShooterFeedIOInputsAutoLogged();
 
-    private double tuneFeedVoltage = 0.0;
+    private double tuneFeedVoltage = 3.0;
     private double tuneShootVoltage = 0.0;
     private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
     private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
