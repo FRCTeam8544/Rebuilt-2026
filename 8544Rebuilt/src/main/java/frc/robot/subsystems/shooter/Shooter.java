@@ -32,6 +32,8 @@ public class Shooter extends SubsystemBase{
     private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
     private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
 
+   private double tuneShootRpmAdjust = 0.0;
+   
     public Shooter()
     {
        this.shooterIO = new ShooterIOFlex(leftMotorCanID, rightMotorCanID);
@@ -106,16 +108,40 @@ public class Shooter extends SubsystemBase{
       shooterFeedInputs.velocitySetPoint = 0.0;
     }
 
+    public void resetDefaultRpms() {
+      tuneShootRpmAdjust = 0.0;
+    }
+
+    public void shooterRpmAdjust(double rpmAdjust)
+    {
+      tuneShootRpmAdjust += rpmAdjust;
+    }
+
+    public void stopShooter() {
+      shooterIO.setVoltage(0.0);
+    }
+
     public void runShooter(double rpm) {
 
-      // Prevent out of spec RPM
-      if ( (rpm > kMaxShooterRPM) || (rpm < -kMaxShooterRPM) )
-      {
-        rpm = Math.copySign(kMaxShooterRPM, rpm);
+      double adjustedRpm = rpm;
+      
+      if (rpm > 0.0) {
+        adjustedRpm += tuneShootRpmAdjust;
       }
-      shooterInputs.velocitySetPoint = rpm;
-      shooterInputs.feedForward = tuneShootVoltage;
-      shooterIO.setVelocity(shooterInputs.velocitySetPoint, shooterInputs.feedForward);
+
+      // Prevent out of spec RPM
+      if (adjustedRpm > kMaxShooterRPM)
+      {
+        adjustedRpm = kMaxShooterRPM;
+      }
+      else if (adjustedRpm < 0)
+      {
+        adjustedRpm = 0;
+      }
+
+      shooterInputs.velocitySetPoint = adjustedRpm;
+
+      shooterIO.setVelocity(shooterInputs.velocitySetPoint);
     }
 
     public void runFeed(double rpm)

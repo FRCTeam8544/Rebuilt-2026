@@ -97,24 +97,50 @@ public class ShooterCommands {
 
     public static Command buttonShoot( Shooter shooter,
                                        Trigger shootTrigger,
-                                       Trigger feedTrigger)
+                                       Trigger feedTrigger,
+                                       Trigger rpmAdjustDown,
+                                       Trigger rpmAdjustUp,
+                                       Trigger resetShooterDefaults)
     {
         return Commands.run(
         () -> {
-            if (shootTrigger.getAsBoolean())
+
+            final int rpmAdjustStep = 5;
+            final int shooterNominalRpm = 3000;
+            boolean adjustUp = rpmAdjustUp.getAsBoolean();
+            boolean adjustDown = rpmAdjustDown.getAsBoolean();
+
+            if (!resetShooterDefaults.getAsBoolean())
             {
-                shooter.runShooter(200);
+                if (adjustUp ^ adjustDown)
+                {
+                    if (adjustUp) {
+                        shooter.shooterRpmAdjust(rpmAdjustStep);
+                    }
+                    else
+                    {
+                        shooter.shooterRpmAdjust(-rpmAdjustStep);
+                    }
+                }
             }
             else {
-                shooter.runShooter(0);
+                shooter.resetDefaultRpms();
+            }
+
+            if (shootTrigger.getAsBoolean())
+            {
+                shooter.runShooter(shooterNominalRpm);
+            }
+            else {
+                shooter.stopShooter();
             }
 
             if (feedTrigger.getAsBoolean())
             {
-                shooter.runFeed(1000);
+                shooter.runFeedOpenLoop(0.6);
             }
             else {
-                shooter.runFeed(0);
+                shooter.runFeedOpenLoop(0);
             }
         },
         shooter);

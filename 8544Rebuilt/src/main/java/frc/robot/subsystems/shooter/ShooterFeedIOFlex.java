@@ -37,7 +37,8 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
     motorConfig.voltageCompensation(12);
     motorConfig.softLimit.forwardSoftLimitEnabled(false);
     motorConfig.softLimit.reverseSoftLimitEnabled(false);
-    motorConfig.encoder.velocityConversionFactor(20.0); // 20 to 1 gearbox
+    motorConfig.encoder.positionConversionFactor(1/20.0);
+    motorConfig.encoder.velocityConversionFactor(1/20.0); // 20 to 1 gearbox
 
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)

@@ -33,17 +33,10 @@ public class ShooterIOSim implements ShooterIO{
 
   
   @Override
-  public void setVelocity(double rpm, double feedForward) {
-
+  public void setVelocity(double rpm) {
   }
 
   @Override
   public void setVoltage(double volts) {
-    
-
-
-  }
-
-  public void setFeedForward(double ff) {
   }
 }

@@ -23,18 +23,17 @@ public interface ShooterIO {
     public boolean faultFirmware;
     
     // Outputs
-    public double feedForward;
+    public double feedForward = 0.0;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
     public float outputCurrent = 0;
     public float outputVoltage = 0;
 
     public double velocitySetPoint = 0.0; // Percent of max motor speed (0...1)
-    public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
+    public double voltageSetPoint= 0.0; // Motor voltage, usually not directly controlled
   }
 
   public default void updateInputs(ShooterIOInputs inOutData) {}
-  public default void setFeedForward(double ff) {}
-  public default void setVelocity(double rpm, double feedForward) {}
+  public default void setVelocity(double rpm) {}
   public default void setVoltage(double volts) {}
 }
