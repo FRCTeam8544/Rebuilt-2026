@@ -144,15 +144,18 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+
+        intake.setDefaultCommand(
+       IntakeCommands.openVoltageControl(
+          intake,
+          leftbumper,
+          rightbumper,
+          goosea,
+          goosey));
   }
 
-    intake.setDefaultCommand(
-       IntakeCommands.openVoltageControl(
-        intake,
-        () -> leftbumper.getAsBoolean(),
-        () -> rightbumper.getAsBoolean(),
-        () -> goosea.getAsBoolean(),
-        () -> goosey.getAsBoolean()));
+
     
     
 
