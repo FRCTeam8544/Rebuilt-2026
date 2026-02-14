@@ -107,13 +107,15 @@ public class Shooter extends SubsystemBase{
     }
 
     public void runShooter(double rpm) {
+
       // Prevent out of spec RPM
       if ( (rpm > kMaxShooterRPM) || (rpm < -kMaxShooterRPM) )
       {
         rpm = Math.copySign(kMaxShooterRPM, rpm);
       }
-      shooterInputs.velocitySetPoint = rpm * kMaxShooterRPM;
-      shooterIO.setVelocity(shooterInputs.velocitySetPoint);
+      shooterInputs.velocitySetPoint = rpm;
+      shooterInputs.feedForward = tuneShootVoltage;
+      shooterIO.setVelocity(shooterInputs.velocitySetPoint, shooterInputs.feedForward);
     }
 
     public void runFeed(double rpm)

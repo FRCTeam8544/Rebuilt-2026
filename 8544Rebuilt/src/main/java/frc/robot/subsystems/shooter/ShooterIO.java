@@ -23,6 +23,7 @@ public interface ShooterIO {
     public boolean faultFirmware;
     
     // Outputs
+    public double feedForward;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
     public float outputCurrent = 0;
@@ -33,7 +34,7 @@ public interface ShooterIO {
   }
 
   public default void updateInputs(ShooterIOInputs inOutData) {}
-
-  public default void setVelocity(double rpm) {}
+  public default void setFeedForward(double ff) {}
+  public default void setVelocity(double rpm, double feedForward) {}
   public default void setVoltage(double volts) {}
 }

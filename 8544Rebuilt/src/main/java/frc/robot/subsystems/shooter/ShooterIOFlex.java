@@ -19,6 +19,9 @@ import com.revrobotics.RelativeEncoder;
 public class ShooterIOFlex implements ShooterIO {
   
     private static final int stallLimit = 60;
+    
+    private static final double kS = 0.14;
+    private double feedForward = 0.0;
 
     private final SparkFlex leaderMotorController;
     private final SparkFlex followMotorController;
@@ -46,11 +49,12 @@ public class ShooterIOFlex implements ShooterIO {
     leaderMotorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Velocity control
-          .p(0.00003, ClosedLoopSlot.kSlot0)
+          .p(0.0000, ClosedLoopSlot.kSlot0)
           .i(0.00000, ClosedLoopSlot.kSlot0)
-          .d(0.00001, ClosedLoopSlot.kSlot0);
-    leaderMotorConfig.closedLoop.feedForward.kV(Constants.NeoVortex.nominalFF, 
-                                                ClosedLoopSlot.kSlot0);
+          .d(0.00000, ClosedLoopSlot.kSlot0);
+   // leaderMotorConfig.closedLoop.feedForward.kS(kS);
+    //leaderMotorConfig.closedLoop.feedForward.kV(Constants.NeoVortex.nominalFF, 
+      //                                          ClosedLoopSlot.kSlot0);
     
     leaderMotorController.configure(leaderMotorConfig, 
                               com.revrobotics.ResetMode.kResetSafeParameters,
@@ -77,6 +81,7 @@ public class ShooterIOFlex implements ShooterIO {
     inOutData.followMotorTemperature = (float) followMotorController.getMotorTemperature();
 
     // Fault codes
+    inOutData.feedForward = feedForward;
     Faults leaderFaults = leaderMotorController.getFaults();
     Faults followFaults = leaderMotorController.getFaults();
     inOutData.faultCan = leaderFaults.can || followFaults.can;
@@ -94,8 +99,19 @@ public class ShooterIOFlex implements ShooterIO {
   }
 
   @Override
-  public void setVelocity(double rpm) {
-    closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0);
+  public void setFeedForward(double ff) {
+leaderMotorConfig.closedLoop.feedForward.kV(feedForward, 
+                                                ClosedLoopSlot.kSlot0);
+
+   // leaderMotorController.configure(leaderMotorConfig, 
+     //                         com.revrobotics.ResetMode.kNoResetSafeParameters,
+       //                       com.revrobotics.PersistMode.kNoPersistParameters);
+    
+  }
+
+  @Override
+  public void setVelocity(double rpm, double feedForward) {
+    closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, feedForward);
   }
 
   @Override

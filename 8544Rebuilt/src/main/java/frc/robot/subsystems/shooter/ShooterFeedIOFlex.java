@@ -19,7 +19,6 @@ import frc.robot.subsystems.shooter.ShooterIO;
 
 public class ShooterFeedIOFlex implements ShooterFeedIO {
   
-    private static final double kS = 0.14;
     private static final int stallLimit = 40;
 
     private final SparkFlex motorController;    
@@ -76,8 +75,7 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
     inOutData.outputCurrent = (float) motorController.getOutputCurrent();
     inOutData.outputVoltage = (float) motorController.getAppliedOutput() * 12.0f;
   }
-  }
-
+  
   @Override
   public void setVelocity(double rpm) {
     closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0);
