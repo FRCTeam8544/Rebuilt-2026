@@ -20,7 +20,7 @@ public class ShooterIOFlex implements ShooterIO {
   
     private static final int stallLimit = 60;
     
-    private static final double kS = 0.14;
+    private static final double kS = 0.1435; // 142
 
     private final SparkFlex leaderMotorController;
     private final SparkFlex followMotorController;
@@ -48,12 +48,12 @@ public class ShooterIOFlex implements ShooterIO {
     leaderMotorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Velocity control
-          .p(0.0000, ClosedLoopSlot.kSlot0)
+          .p(0.00004, ClosedLoopSlot.kSlot0)
           .i(0.00000, ClosedLoopSlot.kSlot0)
-          .d(0.00000, ClosedLoopSlot.kSlot0);
+          .d(0.000001, ClosedLoopSlot.kSlot0);
    // leaderMotorConfig.closedLoop.feedForward.kS(kS);
-    //leaderMotorConfig.closedLoop.feedForward.kV(Constants.NeoVortex.nominalFF, 
-      //                                          ClosedLoopSlot.kSlot0);
+    //leaderMotorConfig.closedLoop.feedForward.kV(3.605 / 10000, 
+     //                                           ClosedLoopSlot.kSlot0);
     
     leaderMotorController.configure(leaderMotorConfig, 
                               com.revrobotics.ResetMode.kResetSafeParameters,
@@ -108,7 +108,9 @@ public class ShooterIOFlex implements ShooterIO {
 
   @Override
   public void setVelocity(double rpm, double feedForward) {
-    closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, feedForward);
+    final double flywheelFeedForward = 1.0 / 590.0; // 590
+    final double scaledFeedForward = flywheelFeedForward * rpm + kS;
+    closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, scaledFeedForward);
   }
 
   @Override
