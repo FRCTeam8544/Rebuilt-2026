@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.drive.Drive;
@@ -18,7 +20,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -30,16 +31,21 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private Intake intake;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
-
+  private final Trigger leftbumper = new Trigger(goose.leftBumper());
+  private final Trigger rightbumper = new Trigger(goose.rightBumper());
+  private final Trigger goosea = new Trigger(goose.a());
+  private final Trigger goosey = new Trigger(goose.y());
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    intake = new Intake();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -139,6 +145,22 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
   }
+
+    intake.setDefaultCommand(
+       IntakeCommands.openVoltageControl(
+        intake,
+        () -> leftbumper.getAsBoolean(),
+        () -> rightbumper.getAsBoolean(),
+        () -> goosea.getAsBoolean(),
+        () -> goosey.getAsBoolean()));
+    
+    
+
+
+
+    
+
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

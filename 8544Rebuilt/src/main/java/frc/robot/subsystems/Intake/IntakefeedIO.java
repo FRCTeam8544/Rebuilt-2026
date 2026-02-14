@@ -1,11 +1,11 @@
 package frc.robot.subsystems.Intake;
-/* 
+/*
 package frc.robot.subsystems.Intake;
 
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeFeedIO {
-    
+
   @AutoLog
   public static class ShooterFeedIOInputs {
     // Inputs
@@ -22,7 +22,7 @@ public interface IntakeFeedIO {
     public boolean faultGateDriver;
     public boolean faultEscEeprom;
     public boolean faultFirmware;
-    
+
     // Outputs
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage

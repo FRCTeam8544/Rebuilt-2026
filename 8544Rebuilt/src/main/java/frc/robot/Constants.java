@@ -6,7 +6,7 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
-   public static final class Neo550 {
+  public static final class Neo550 {
     public static final double nominalVoltage = 12;
     public static final double motorKV = 917;
     public static final double nominalFF = 1.0 / motorKV;
