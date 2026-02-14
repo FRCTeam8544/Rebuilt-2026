@@ -21,7 +21,6 @@ public class ShooterIOFlex implements ShooterIO {
     private static final int stallLimit = 60;
     
     private static final double kS = 0.14;
-    private double feedForward = 0.0;
 
     private final SparkFlex leaderMotorController;
     private final SparkFlex followMotorController;
@@ -81,7 +80,6 @@ public class ShooterIOFlex implements ShooterIO {
     inOutData.followMotorTemperature = (float) followMotorController.getMotorTemperature();
 
     // Fault codes
-    inOutData.feedForward = feedForward;
     Faults leaderFaults = leaderMotorController.getFaults();
     Faults followFaults = leaderMotorController.getFaults();
     inOutData.faultCan = leaderFaults.can || followFaults.can;
@@ -100,8 +98,7 @@ public class ShooterIOFlex implements ShooterIO {
 
   @Override
   public void setFeedForward(double ff) {
-leaderMotorConfig.closedLoop.feedForward.kV(feedForward, 
-                                                ClosedLoopSlot.kSlot0);
+//leaderMotorConfig.closedLoop.feedForward.kV(ff, ClosedLoopSlot.kSlot0);
 
    // leaderMotorController.configure(leaderMotorConfig, 
      //                         com.revrobotics.ResetMode.kNoResetSafeParameters,

@@ -14,7 +14,7 @@ import frc.robot.subsystems.shooter.ShooterFeedIO.ShooterFeedIOInputs;
 public class Shooter extends SubsystemBase{
 
     // Neo vortex can do over 5000 RPM, but flywheel is quite a chonker... so limit to be safe for now
-    public static final double kMaxShooterRPM = 2000;
+    public static final double kMaxShooterRPM = 3200;
     public static final double kMaxFeedRPM = 6000; // Attached to 20 to 1 gearbox
 
     public static final int leftMotorCanID = 24;

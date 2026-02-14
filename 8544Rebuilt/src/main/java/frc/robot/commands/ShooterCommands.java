@@ -82,7 +82,7 @@ public class ShooterCommands {
                 }
             }
 
-            shooter.runShooter(1000);
+            shooter.runShooter(3000);
             
             if (feedTrigger.getAsBoolean())
             {
