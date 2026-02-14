@@ -1,16 +1,11 @@
-package frc.robot.subsystems.drive.Intake;
+package frc.robot.subsystems.Intake;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import frc.robot.subsystems.drive.Intake.IntakeIO;
-import frc.robot.subsystems.drive.Intake.IntakeIOInputsAutoLogged;
-import frc.robot.subsystems.drive.Intake.IntakeIO.IntakeIOInputs;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.Intake.*;
-//import frc.robot.subsystems.drive.Intake.IntakeFeedIOInputsAutoLogged;
-//import frc.robot.subsystems.drive.Intake.IntakeFeedIO.IntakeFeedIOInputs;
+import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
 
 public class Intake extends SubsystemBase{
 

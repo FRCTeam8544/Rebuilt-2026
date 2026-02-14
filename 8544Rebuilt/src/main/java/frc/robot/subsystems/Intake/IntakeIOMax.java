@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive.Intake;
+package frc.robot.subsystems.Intake;
 
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
