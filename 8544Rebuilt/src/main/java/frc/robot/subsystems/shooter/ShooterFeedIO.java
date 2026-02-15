@@ -30,10 +30,13 @@ public interface ShooterFeedIO {
 
     public double velocitySetPoint = 0.0; // Percent of max motor speed (0...1)
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
+
+    public double feedForward = 0.0;
   }
 
   public default void updateInputs(ShooterFeedIOInputs inOutData) {}
 
   public default void setVelocity(double rpm) {}
   public default void setVoltage(double volts) {}
+  
 }

@@ -100,11 +100,14 @@ public class ShooterCommands {
                                        Trigger feedTrigger,
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp,
+                                       Trigger feedAdjustDown,
+                                       Trigger feedAdjustUp,
                                        Trigger resetShooterDefaults)
     {
         return Commands.run(
         () -> {
 
+            final int feedNominalRpm = 300;
             final int rpmAdjustStep = 5;
             final int shooterNominalRpm = 3000;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
@@ -135,9 +138,23 @@ public class ShooterCommands {
                 shooter.stopShooter();
             }
 
+            boolean feedAdjUp = feedAdjustUp.getAsBoolean();
+            boolean feedAdjDown = feedAdjustDown.getAsBoolean();
+            if (feedAdjDown ^ feedAdjUp) {
+                if (feedAdjUp) {
+                    //shooter.tuneIncreaseFeedVoltage();
+                    shooter.feedRpmAdjust(rpmAdjustStep);
+                }
+                else {
+                    //shooter.tuneDecreaseFeedVoltage();
+                   shooter.feedRpmAdjust(-rpmAdjustStep);
+                }
+            }
+
             if (feedTrigger.getAsBoolean())
             {
-                shooter.runFeedOpenLoop(0.6);
+                shooter.runFeed(feedNominalRpm);
+               // shooter.runFeedOpenLoop(0.6);
             }
             else {
                 shooter.runFeedOpenLoop(0);

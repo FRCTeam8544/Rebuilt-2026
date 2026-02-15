@@ -14,8 +14,8 @@ import frc.robot.subsystems.shooter.ShooterFeedIO.ShooterFeedIOInputs;
 public class Shooter extends SubsystemBase{
 
     // Neo vortex can do over 5000 RPM, but flywheel is quite a chonker... so limit to be safe for now
-    public static final double kMaxShooterRPM = 3200;
-    public static final double kMaxFeedRPM = 6000; // Attached to 20 to 1 gearbox
+    public static final double kMaxShooterRPM = 3000;
+    public static final double kMaxFeedRPM = 6600 / 20; // Attached to 20 to 1 gearbox
 
     public static final int leftMotorCanID = 24;
     public static final int rightMotorCanID = 25;
@@ -27,12 +27,13 @@ public class Shooter extends SubsystemBase{
     private final ShooterFeedIO shooterFeedIO;
     private final ShooterFeedIOInputsAutoLogged shooterFeedInputs = new ShooterFeedIOInputsAutoLogged();
 
-    private double tuneFeedVoltage = 3.0;
+    private double tuneFeedVoltage = 6.0;
     private double tuneShootVoltage = 0.0;
     private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
     private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
 
    private double tuneShootRpmAdjust = 0.0;
+   private double tuneFeedRpmAdjust = 0.0;
    
     public Shooter()
     {
@@ -80,8 +81,8 @@ public class Shooter extends SubsystemBase{
 
     public void runShooterOpenLoop(double duty)
     {
-      // Prevent duty beyond 1 to -1
-      if ( (duty > 1.0) || (duty < -1.0) )
+      // Prevent duty beyond 1 to 0
+      if ( (duty > 1.0) || (duty < 0.0) )
       {
         duty = Math.copySign(1.0, duty);
       }
@@ -95,8 +96,8 @@ public class Shooter extends SubsystemBase{
 
     public void runFeedOpenLoop(double duty)
     {
-       // Prevent duty beyond 1 to -1
-      if ( (duty > 1.0) || (duty < -1.0) )
+       // Prevent duty beyond 1 to 0
+      if ( (duty > 1.0) || (duty < 0.0) )
       {
         duty = Math.copySign(1.0, duty);
       }
@@ -110,6 +111,12 @@ public class Shooter extends SubsystemBase{
 
     public void resetDefaultRpms() {
       tuneShootRpmAdjust = 0.0;
+      tuneFeedRpmAdjust = 0.0;
+      tuneFeedVoltage = 3.0;
+    }
+
+    public void feedRpmAdjust(double rpmAdjust) {
+      tuneFeedRpmAdjust += rpmAdjust;
     }
 
     public void shooterRpmAdjust(double rpmAdjust)
@@ -146,14 +153,23 @@ public class Shooter extends SubsystemBase{
 
     public void runFeed(double rpm)
     {
-       // Prevent out of spec RPM
-      if ( (rpm > kMaxFeedRPM) || (rpm < -kMaxFeedRPM) )
+      double adjustedRpm = rpm;
+      if (rpm > 0.0)
       {
-        rpm = Math.copySign(kMaxShooterRPM, rpm);
+        adjustedRpm += tuneFeedRpmAdjust;
+      }
+
+       // Prevent out of spec RPM
+      if (adjustedRpm > kMaxFeedRPM)
+      {
+        adjustedRpm = kMaxFeedRPM;
+      }
+      else if (adjustedRpm < 0) {
+        adjustedRpm = 0.0;
       }
 
       shooterFeedInputs.voltageSetPoint = 0.0;
-      shooterFeedInputs.velocitySetPoint = rpm;
+      shooterFeedInputs.velocitySetPoint = adjustedRpm;
 
       shooterFeedIO.setVelocity(shooterFeedInputs.velocitySetPoint);
     }

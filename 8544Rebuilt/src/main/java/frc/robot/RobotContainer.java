@@ -49,6 +49,8 @@ public class RobotContainer {
   private final Trigger rightTriggerGoose = new Trigger(goose.rightTrigger());
   private final Trigger dpadUpTriggerGoose = new Trigger(goose.povUp());
   private final Trigger dpadDownTriggerGoose = new Trigger(goose.povDown());
+  private final Trigger dpadLeftTriggerGoose = new Trigger(goose.povLeft());
+  private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
 
   // Dashboard inputs
@@ -171,6 +173,7 @@ public class RobotContainer {
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose,
                                              rightTriggerGoose, 
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,
+                                             dpadLeftTriggerGoose, dpadRightTriggerGoose,
                                              startButtonGoose)
     );
     // Raw feed and shooter voltage tuning
