@@ -46,9 +46,9 @@ public class ShooterIOFlex implements ShooterIO {
     leaderMotorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Velocity control
-          .p(0.00004, ClosedLoopSlot.kSlot0)
+          .p(0.00015, ClosedLoopSlot.kSlot0) //was 0.00004 then 0.00020
           .i(0.00000, ClosedLoopSlot.kSlot0)
-          .d(0.000001, ClosedLoopSlot.kSlot0);
+          .d(0.00002, ClosedLoopSlot.kSlot0); //was 0.000001  then 0.000009
    // leaderMotorConfig.closedLoop.feedForward.kS(kS);
     //leaderMotorConfig.closedLoop.feedForward.kV(3.605 / 10000, 
      //                                           ClosedLoopSlot.kSlot0);
