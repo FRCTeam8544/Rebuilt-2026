@@ -12,8 +12,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import frc.robot.Constants;
-import frc.robot.Constants.NeoVortex;
-import frc.robot.subsystems.climber.ClimberIO.ClimberIOInputs;
 
 public class ClimberIOFlex implements ClimberIO {
 
@@ -28,17 +26,17 @@ public class ClimberIOFlex implements ClimberIO {
 
   public ClimberIOFlex(int canId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
-    motorEncoder = motorController.getAbsoluteEncoder();// TODO should be external encoder
+    motorEncoder = motorController.getAbsoluteEncoder();// TODO should be external encoder??
     closedLoop = motorController.getClosedLoopController();
     
     motorConfig = new SparkFlexConfig();
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig.smartCurrentLimit(stallLimit);
     motorConfig.voltageCompensation(nominalVoltage);
-    motorConfig.softLimit.forwardSoftLimitEnabled(false);
-    motorConfig.softLimit.reverseSoftLimitEnabled(false);
-    //motorConfig.encoder.positionConversionFactor(1/20.0); // 20 to 1 gearbox
-    //motorConfig.encoder.velocityConversionFactor(1/20.0); // 20 to 1 gearbox
+    motorConfig.softLimit.forwardSoftLimitEnabled(true);
+    motorConfig.softLimit.reverseSoftLimitEnabled(true);
+    motorConfig.softLimit.forwardSoftLimit(0.8);
+    motorConfig.softLimit.reverseSoftLimit(0.2);
 
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
