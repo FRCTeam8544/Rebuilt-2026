@@ -1,13 +1,12 @@
 package frc.robot.subsystems.Intake;
-/*
-package frc.robot.subsystems.Intake;
+
 
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeFeedIO {
 
   @AutoLog
-  public static class ShooterFeedIOInputs {
+  public static class IntakeFeedIOInputs {
     // Inputs
     public boolean connected = false;
 
@@ -33,9 +32,8 @@ public interface IntakeFeedIO {
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
   }
 
-  public default void updateInputs(ShooterFeedIOInputs inOutData) {}
+  public default void updateInputs(IntakeFeedIOInputs inOutData) {}
 
   public default void setVelocity(double rpm) {}
   public default void setVoltage(double volts) {}
 }
- */
