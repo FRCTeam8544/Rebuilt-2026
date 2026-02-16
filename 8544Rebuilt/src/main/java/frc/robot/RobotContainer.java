@@ -8,15 +8,21 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -28,16 +34,33 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Shooter shooter;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
+  private final Trigger aButtonGoose = new Trigger(goose.a());
+  private final Trigger bButtonGoose = new Trigger(goose.b());
+  private final Trigger yButtonGoose = new Trigger(goose.y());
+  private final Trigger xButtonGoose = new Trigger(goose.x());
+  private final Trigger rightBackGoose = new Trigger(goose.rightBumper());
+  private final Trigger leftBackGoose = new Trigger(goose.leftBumper());
+  private final Trigger leftTriggerGoose = new Trigger(goose.leftTrigger());
+  private final Trigger rightTriggerGoose = new Trigger(goose.rightTrigger());
+  private final Trigger dpadUpTriggerGoose = new Trigger(goose.povUp());
+  private final Trigger dpadDownTriggerGoose = new Trigger(goose.povDown());
+  private final Trigger dpadLeftTriggerGoose = new Trigger(goose.povLeft());
+  private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
+  private final Trigger startButtonGoose = new Trigger(goose.start());
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    shooter = new Shooter();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -136,6 +159,36 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+     // Default shooter controls
+ /*   shooter.setDefaultCommand(ShooterCommands.joystickVoltsShoot(
+        shooter,
+        () -> -goose.getLeftX(),  
+        () -> -goose.getLeftY(), // Feed voltage
+        () -> -goose.getRightX(),
+        () -> -goose.getRightY())); // Shooter voltage
+*/
+
+    shooter.setDefaultCommand(
+        ShooterCommands.buttonShoot(shooter, leftTriggerGoose,
+                                             rightTriggerGoose, 
+                                             dpadDownTriggerGoose, dpadUpTriggerGoose,
+                                             dpadLeftTriggerGoose, dpadRightTriggerGoose,
+                                             startButtonGoose)
+    );
+    // Raw feed and shooter voltage tuning
+    /*goose.leftTrigger().whileTrue(
+        ShooterCommands.openVoltageControl(shooter, 
+                                            dpadUpTriggerGoose, // Feed trigger
+                                            yButtonGoose, aButtonGoose, 
+                                            xButtonGoose, bButtonGoose));
+
+    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));*/
+
+   /* shooter.setDefaultCommand(ShooterCommands.buttonShoot(
+              shooter,
+              leftBackGoose, 
+              aButtonGoose));*/
   }
 
   /**
