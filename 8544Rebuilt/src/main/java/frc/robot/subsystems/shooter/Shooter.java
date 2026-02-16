@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.subsystems.shooter.ShooterIO;
@@ -14,7 +15,7 @@ import frc.robot.subsystems.shooter.ShooterFeedIO.ShooterFeedIOInputs;
 public class Shooter extends SubsystemBase{
 
     // Neo vortex can do over 5000 RPM, but flywheel is quite a chonker... so limit to be safe for now
-    public static final double kMaxShooterRPM = 3000;
+    public static final double kMaxShooterRPM = 4000;
     public static final double kMaxFeedRPM = 6600 / 20; // Attached to 20 to 1 gearbox
 
     public static final int leftMotorCanID = 24;
@@ -185,6 +186,14 @@ public class Shooter extends SubsystemBase{
     shooterFeedIO.updateInputs(shooterFeedInputs);
     Logger.processInputs("Shooter/Motors", shooterInputs);
     Logger.processInputs("Shooter/Feed", shooterFeedInputs);
+
+    SmartDashboard.putNumber("Shooter RPM", shooterInputs.velocity);
+    SmartDashboard.putNumber("Shooter RPM Setpoint", shooterInputs.velocitySetPoint);
+    
+    SmartDashboard.putNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
+    SmartDashboard.putNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
+
   }
+
 
 }
