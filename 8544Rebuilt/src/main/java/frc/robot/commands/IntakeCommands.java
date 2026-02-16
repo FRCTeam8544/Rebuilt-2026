@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Intake.*;
+//import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
+import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
+
 import java.util.function.DoubleSupplier;
 
 public class IntakeCommands {
@@ -63,17 +66,37 @@ public class IntakeCommands {
               intake.tuneDecreaseVoltage(); // Decrease intake volt
             }
           }
-
-
-      //    if (feedTrigger.getAsBoolean()) {
-       //     intake.runFeedOpenLoop();
-        //  } else {
-         //   intake.runFeedOpenLoop(0.0);
-        //  }
         },
         intake);
   }
-/*  for position ctrl
+  public static Command closedPositionControl(
+      Intake intake,
+      Trigger extendTrigger,
+      Trigger retractTrigger
+      //Trigger increasepositionTrigger,
+      //Trigger decreasepositionTrigger
+    //  Trigger decreaseFeedVoltageTrigger
+      ) {
+    return Commands.run(
+        () -> {
+          boolean extendPosition = extendTrigger.getAsBoolean();
+          boolean retractPosition = retractTrigger.getAsBoolean();
+          // If and only if one button is pressed at a time
+          if (retractPosition ^ extendPosition) {
+            if (extendPosition) {
+              intake.runIntake(0.5); // Increase intake volt
+            } else {
+              intake.runIntake(0); // Decrease intake volt
+            }
+           } else { intake.runIntake(IntakeIOMax.realPosition);
+
+           }
+            
+
+        },
+        intake);
+  }
+/*   for position ctrl
   public static Command buttonShoot(Intake intake, Trigger extendTrigger, Trigger retractTrigger) {
     return Commands.run(
         () -> {

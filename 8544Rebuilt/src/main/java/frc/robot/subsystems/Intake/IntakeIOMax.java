@@ -10,11 +10,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import frc.robot.subsystems.Intake.*;
 
 public class IntakeIOMax implements IntakeIO {
 
   private static final int stallLimit = 30;
-
+ 
   private final SparkMax armMotorController;
 
   private final RelativeEncoder armEncoder;
@@ -88,6 +89,10 @@ public class IntakeIOMax implements IntakeIO {
   // @Override
   public void setPosition(double rotations) {
     closedLoop.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  }
+  
+  public void realPosition(double rotations) {
+    armEncoder.getPosition();
   }
 
   @Override

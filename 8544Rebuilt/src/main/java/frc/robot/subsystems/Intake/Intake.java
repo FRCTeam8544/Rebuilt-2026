@@ -2,6 +2,8 @@ package frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Intake.*;
+
 
 import static edu.wpi.first.units.Units.Rotations;
 
@@ -13,7 +15,7 @@ public class Intake extends SubsystemBase {
   public static final double kMaxIntakeRPM = 2000;
   // public static final double kMaxFeedRPM = 6000; // Attached to 20 to 1 gearbox
 
-  public static final int armCanId = 30;
+  public static final int armCanId = 27;
   //  public static final int rightMotorCanID = 25;
   // public static final int feedMotorCanID = 26;
   //public static final int rotations = 0;
@@ -80,6 +82,9 @@ public class Intake extends SubsystemBase {
     
     IntakeIO.setVoltage(IntakeInputs.voltageSetPoint);
   }
+
+
+
 
   //    public void runFeedOpenLoop(double duty)
   // {
