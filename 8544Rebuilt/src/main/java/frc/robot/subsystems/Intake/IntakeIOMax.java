@@ -36,8 +36,10 @@ public static double realPosition;
     armMotorConfig.idleMode(IdleMode.kBrake);
     armMotorConfig.smartCurrentLimit(stallLimit);
     armMotorConfig.voltageCompensation(12);
-    armMotorConfig.softLimit.forwardSoftLimitEnabled(false);
-    armMotorConfig.softLimit.reverseSoftLimitEnabled(false);
+    armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
+    armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+    armMotorConfig.softLimit.forwardSoftLimit(0.2);
+    armMotorConfig.softLimit.reverseSoftLimit(.8);
   //  armMotorConfig.absoluteEncoder.positionConversionFactor(1/100.0);
    // armMotorConfig.absoluteEncoder.velocityConversionFactor(1/100.0);
     armMotorConfig
@@ -97,8 +99,8 @@ public static double realPosition;
     closedLoop.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
   
-  public void realPosition(double rotations) {
-    armEncoder.getPosition();
+  public double realPosition() {
+    return armEncoder.getPosition();
   }
 
   @Override
