@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Intake;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -14,18 +15,21 @@ import frc.robot.subsystems.Intake.*;
 
 public class IntakeIOMax implements IntakeIO {
 
-  private static final int stallLimit = 30;
+  private static final int stallLimit = 20;
+
+public static double realPosition;
  
   private final SparkMax armMotorController;
 
-  private final RelativeEncoder armEncoder;
+  private final AbsoluteEncoder armEncoder;
   private final SparkClosedLoopController closedLoop;
   private final SparkMaxConfig armMotorConfig;
+  private static final double gearRatio = 1/100.0;
 
   public IntakeIOMax(int armCanId) {
     armMotorController = new SparkMax(armCanId, MotorType.kBrushless);
 
-    armEncoder = armMotorController.getEncoder();
+    armEncoder = armMotorController.getAbsoluteEncoder();
     closedLoop = armMotorController.getClosedLoopController();
 
     armMotorConfig = new SparkMaxConfig();
@@ -34,13 +38,15 @@ public class IntakeIOMax implements IntakeIO {
     armMotorConfig.voltageCompensation(12);
     armMotorConfig.softLimit.forwardSoftLimitEnabled(false);
     armMotorConfig.softLimit.reverseSoftLimitEnabled(false);
+  //  armMotorConfig.absoluteEncoder.positionConversionFactor(1/100.0);
+   // armMotorConfig.absoluteEncoder.velocityConversionFactor(1/100.0);
     armMotorConfig
         .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // Velocity control
-        .p(0.0000, ClosedLoopSlot.kSlot0)
+        .p(0.1000, ClosedLoopSlot.kSlot0)
         .i(0.00000, ClosedLoopSlot.kSlot0)
-        .d(0.00000, ClosedLoopSlot.kSlot0);
+        .d(0.00002, ClosedLoopSlot.kSlot0);
     // armMotorConfig.closedLoop.feedForward.kS(kS);
     // armMotorConfig.closedLoop.feedForward.kV(Constants.NeoVortex.nominalFF,
     //                                          ClosedLoopSlot.kSlot0);

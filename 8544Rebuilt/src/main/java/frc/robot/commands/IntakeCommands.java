@@ -1,18 +1,12 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Intake.*;
 //import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
-import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
 
-import java.util.function.DoubleSupplier;
 
 public class IntakeCommands {
 
@@ -86,7 +80,7 @@ public class IntakeCommands {
             if (extendPosition) {
               intake.runIntake(0.5); // Increase intake volt
             } else {
-              intake.runIntake(0); // Decrease intake volt
+              intake.runIntake(0.1); // Decrease intake volt
             }
            } else { intake.runIntake(IntakeIOMax.realPosition);
 

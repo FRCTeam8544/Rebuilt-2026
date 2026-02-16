@@ -147,12 +147,13 @@ public class RobotContainer {
 
 
         intake.setDefaultCommand(
-       IntakeCommands.openVoltageControl(
+       IntakeCommands.closedPositionControl(
           intake,
           leftbumper,
-          rightbumper,
-          goosea,
-          goosey));
+          rightbumper
+       //   goosea,
+        //  goosey
+        ));
   }
 
 
