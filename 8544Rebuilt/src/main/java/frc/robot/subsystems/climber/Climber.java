@@ -21,7 +21,7 @@ public class Climber extends SubsystemBase {
     private final double maxPositionLimit = 0.5; // Rotations
 
   public Climber() {
-    climberIO = new ClimberIOFlex(climberCanId);
+    this.climberIO = new ClimberIOFlex(climberCanId);
   }
 
   public void runArmToPosition(double rotations) {

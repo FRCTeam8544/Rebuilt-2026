@@ -14,6 +14,10 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.climber.ClimberIOFlex;
+import frc.robot.subsystems.climber.ClimberIOSim;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon;
@@ -32,9 +36,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+
   // Subsystems
   private final Drive drive;
   private final Shooter shooter;
+  private final Climber climber;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -60,6 +67,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     shooter = new Shooter();
+    climber = new Climber();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -73,6 +81,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
         break;
 
       case SIM:
@@ -84,6 +93,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
         break;
 
       default:
