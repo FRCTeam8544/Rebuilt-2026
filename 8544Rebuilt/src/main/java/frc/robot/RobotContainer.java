@@ -162,10 +162,10 @@ public class RobotContainer {
         intake.setDefaultCommand(
        IntakeCommands.closedPositionControl(
           intake,
-          leftbumper,
-          rightbumper,
-          goosea,
-          goosey
+          leftBackGoose,
+          rightBackGoose,
+          aButtonGoose,
+          yButtonGoose
         ));
 
     shooter.setDefaultCommand(
