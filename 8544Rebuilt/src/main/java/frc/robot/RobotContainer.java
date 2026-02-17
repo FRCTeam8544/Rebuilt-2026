@@ -150,8 +150,11 @@ public class RobotContainer {
        IntakeCommands.closedPositionControl(
           intake,
           leftbumper,
-          rightbumper
+          rightbumper,
+          goosea,
+          goosey
         ));
+
   }
 
 

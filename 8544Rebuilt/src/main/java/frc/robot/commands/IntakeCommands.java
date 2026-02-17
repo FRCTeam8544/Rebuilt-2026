@@ -12,12 +12,22 @@ public class IntakeCommands {
 
   private IntakeCommands() {}
 
-  
+  public static Command feedVelocityControl(
+    Intake intake,
+    Trigger intakeTrigger,
+    Trigger expelTrigger) {
+      return Commands.run(
+        () -> {
+          
+        },
+        intake);
+      }
 
   public static Command stopMotors(Intake intake) {
     return Commands.run(
         () -> {
           intake.stopOpenLoop();
+          intake.runIntakeFeed(0);
         },
         intake);
   }
@@ -26,7 +36,9 @@ public class IntakeCommands {
   public static Command closedPositionControl(
       Intake intake,
       Trigger extendTrigger,
-      Trigger retractTrigger
+      Trigger retractTrigger,
+      Trigger intakeTrigger,
+      Trigger expelTrigger
       ) {
     return Commands.run(
         () -> {
@@ -42,7 +54,20 @@ public class IntakeCommands {
            } else { intake.holdPosition();
 
            }
-            
+          
+          boolean inCmd = intakeTrigger.getAsBoolean();
+          boolean outCmd = expelTrigger.getAsBoolean();
+          if (inCmd ^ outCmd) {
+            if (inCmd) {
+              intake.runIntakeFeed(300);
+            }
+            else {
+              intake.runIntakeFeed(-300);
+            }
+          }
+          else {
+            intake.runIntakeFeed(0);
+          }
 
         },
         intake);

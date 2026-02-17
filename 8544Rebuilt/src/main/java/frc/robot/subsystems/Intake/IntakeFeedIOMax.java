@@ -13,7 +13,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class IntakeFeedIOMax implements IntakeFeedIO {
 
-  private static final int stallLimit = 50;
+  private static final int kFeedMaxRpm = 2000;
+  private static final int stallLimit = 60;
 
   private final SparkMax rollerMotorController;
 
@@ -37,9 +38,12 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         // Velocity control
-        .p(0.0000, ClosedLoopSlot.kSlot0)
+        .p(0.0008, ClosedLoopSlot.kSlot0)
         .i(0.00000, ClosedLoopSlot.kSlot0)
-        .d(0.00000, ClosedLoopSlot.kSlot0);
+        .d(0.00001, ClosedLoopSlot.kSlot0);
+
+    rollerMotorConfig.encoder.positionConversionFactor(1/20.0); // 20 to 1 gearbox
+    rollerMotorConfig.encoder.velocityConversionFactor(1/20.0); // 20 to 1 gearbox
     // armMotorConfig.closedLoop.feedForward.kS(kS);
     // armMotorConfig.closedLoop.feedForward.kV(Constants.NeoVortex.nominalFF,
     //                                          ClosedLoopSlot.kSlot0);
@@ -75,7 +79,15 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
   
   // @Override
   public void setVelocity(double rpm) {
-    closedLoop.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    double adjustedRpm = rpm;
+    if (rpm > kFeedMaxRpm) {
+      adjustedRpm = kFeedMaxRpm;
+    }
+    else if (rpm < -kFeedMaxRpm) {
+      adjustedRpm = -kFeedMaxRpm;
+    }
+
+    closedLoop.setSetpoint(adjustedRpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   @Override
