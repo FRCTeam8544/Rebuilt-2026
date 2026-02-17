@@ -82,7 +82,7 @@ public class IntakeCommands {
             } else {
               intake.runIntake(0.1); // Decrease intake volt
             }
-           } else { intake.runIntake(IntakeIOMax.realPosition);
+           } else { intake.holdPosition();
 
            }
             

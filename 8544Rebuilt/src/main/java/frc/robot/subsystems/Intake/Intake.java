@@ -86,21 +86,6 @@ public class Intake extends SubsystemBase {
 
 
 
-  //    public void runFeedOpenLoop(double duty)
-  // {
-  // Prevent duty beyond 1 to -1
-  //    if ( (duty > 1.0) || (duty < -1.0) )
-  //   {
-  //    duty = Math.copySign(1.0, duty);
-  //   }
-
-  //    double scaledVolts = duty * Constants.NeoVortex.nominalVoltage;
-  // IntakeFeedIO.setVoltage(scaledVolts);
-
-  //  IntakeFeedInputs.voltageSetPoint = scaledVolts;
-  // IntakeFeedInputs.velocitySetPoint = 0.0;
-  //  }
-
   public void runIntake(double rotations) {
 
     // Prevent out of spec RPM
@@ -108,7 +93,18 @@ public class Intake extends SubsystemBase {
     IntakeInputs.positionSetPoint = rotations;
    // IntakeInputs.feedForward = tuneShootVoltage;
     IntakeIO.setPosition(IntakeInputs.positionSetPoint);
-  } // */
+  } 
+  
+  
+  public void holdPosition() {
+
+    // Prevent out of spec RPM
+
+    IntakeInputs.positionSetPoint = IntakeInputs.position;
+   // IntakeInputs.feedForward = tuneShootVoltage;
+    IntakeIO.setPosition(IntakeInputs.position);
+  }
+// */
   /*
       public void runFeed(double rpm)
       {

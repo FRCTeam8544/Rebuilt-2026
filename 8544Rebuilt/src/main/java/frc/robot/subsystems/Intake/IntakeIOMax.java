@@ -38,13 +38,14 @@ public static double realPosition;
     armMotorConfig.voltageCompensation(12);
     armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
     armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
-    armMotorConfig.softLimit.forwardSoftLimit(0.2);
-    armMotorConfig.softLimit.reverseSoftLimit(.8);
-  //  armMotorConfig.absoluteEncoder.positionConversionFactor(1/100.0);
-   // armMotorConfig.absoluteEncoder.velocityConversionFactor(1/100.0);
+    armMotorConfig.softLimit.forwardSoftLimit(0.9);
+    armMotorConfig.softLimit.reverseSoftLimit(0.1);
+    
+
     armMotorConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .positionWrappingEnabled(false)
         // Velocity control
         .p(0.1000, ClosedLoopSlot.kSlot0)
         .i(0.00000, ClosedLoopSlot.kSlot0)
@@ -84,15 +85,7 @@ public static double realPosition;
     inOutData.outputCurrent = (float) armMotorController.getOutputCurrent();
     inOutData.outputVoltage = (float) armMotorController.getAppliedOutput() * 12.0f;
   }
-  /*
-    @Override
-    public void setFeedForward(double ff) {
-  armMotorConfig.closedLoop.feedForward.kV(feedForward,
-                                                  ClosedLoopSlot.kSlot0);
-   */
-  // armMotorController.configure(armMotorConfig,
-  //                         com.revrobotics.ResetMode.kNoResetSafeParameters,
-  //                       com.revrobotics.PersistMode.kNoPersistParameters);
+
 
   // @Override
   public void setPosition(double rotations) {
