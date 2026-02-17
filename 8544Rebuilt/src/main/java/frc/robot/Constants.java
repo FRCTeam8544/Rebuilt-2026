@@ -17,12 +17,14 @@ public final class Constants {
     public static final double nominalVoltage = 12;
     public static final double motorKV = 917;
     public static final double nominalFF = 1.0 / Neo550.motorKV;
+    public static final double maxFreeRpm = 11000;
   }
 
   public static final class NeoVortex {
     public static final double nominalVoltage = 12;
     public static final double motorKV = 565;
     public static final double nominalFF = 1.0 / NeoVortex.motorKV;
+    public static final double maxFreeRpm = 6784;
   }
 
   public static enum Mode {
