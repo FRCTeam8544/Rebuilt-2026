@@ -13,7 +13,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class IntakeFeedIOMax implements IntakeFeedIO {
 
-  private static final int kFeedMaxRpm = 2000;
+  private static final int kFeedMaxRpm = 6000;
   private static final int stallLimit = 60;
 
   private final SparkMax rollerMotorController;

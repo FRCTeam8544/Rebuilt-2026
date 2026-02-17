@@ -59,10 +59,10 @@ public class IntakeCommands {
           boolean outCmd = expelTrigger.getAsBoolean();
           if (inCmd ^ outCmd) {
             if (inCmd) {
-              intake.runIntakeFeed(300);
+              intake.runIntakeFeed(200);
             }
             else {
-              intake.runIntakeFeed(-300);
+              intake.runIntakeFeed(-200);
             }
           }
           else {
