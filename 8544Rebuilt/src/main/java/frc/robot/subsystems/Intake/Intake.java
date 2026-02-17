@@ -11,29 +11,22 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
-  // Neo vortex can do over 5000 RPM, but flywheel is quite a chonker... so limit to be safe for now
-  public static final double kMaxIntakeRPM = 2000;
-  // public static final double kMaxFeedRPM = 6000; // Attached to 20 to 1 gearbox
+
+  public static final double kMaxIntakeRPM = 2000; //100:1 gearbox
+
 
   public static final int armCanId = 27;
-  //  public static final int rightMotorCanID = 25;
-  // public static final int feedMotorCanID = 26;
-  //public static final int rotations = 0;
+
   public final IntakeIO IntakeIO;
   public final IntakeIOInputsAutoLogged IntakeInputs = new IntakeIOInputsAutoLogged();
 
   // private final IntakeFeedIO IntakeFeedIO;
-  // private final IntakeFeedIOInputsAutoLogged IntakeFeedInputs = new
-  // IntakeFeedIOInputsAutoLogged();
 
-  // private double tuneFeedVoltage = 3.0;
   private double tuneShootVoltage = 0.0;
-  //   private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
   private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
 
   public Intake() {
     this.IntakeIO = new IntakeIOMax(armCanId);
-    // this.IntakeFeedIO = new IntakeFeedIOMax(feedMotorCanID);
   }
 
   public void tuneIncreaseVoltage() {
@@ -49,28 +42,7 @@ public class Intake extends SubsystemBase {
       tuneShootVoltage = 0.0;
     }
   }
-  /*
-  public void tuneIncreaseFeedVoltage() {
-    tuneFeedVoltage += tuneFeedVoltStep;
-    if (tuneFeedVoltage > 12.0) {
-      tuneFeedVoltage = 12.0;
-    }
-  }
 
-  public void tuneDecreaseFeedVoltage() {
-    tuneFeedVoltage -= tuneFeedVoltStep;
-    if (tuneFeedVoltage < 0.0) {
-      tuneFeedVoltage = 0.0;
-    }
-  }
-     */
-
-
-
-  //   public void runFeedOpenLoop()
-  ///  {
-  //   runFeedOpenLoop( tuneFeedVoltage / 12.0 );
-  // }
 
   public void runIntakeOpenLoop(boolean extend) {
  double sign = 1.0;
@@ -88,38 +60,19 @@ public class Intake extends SubsystemBase {
 
   public void runIntake(double rotations) {
 
-    // Prevent out of spec RPM
 
     IntakeInputs.positionSetPoint = rotations;
-   // IntakeInputs.feedForward = tuneShootVoltage;
     IntakeIO.setPosition(IntakeInputs.positionSetPoint);
   } 
   
   
   public void holdPosition() {
 
-    // Prevent out of spec RPM
 
     IntakeInputs.positionSetPoint = IntakeInputs.position;
-   // IntakeInputs.feedForward = tuneShootVoltage;
     IntakeIO.setPosition(IntakeInputs.position);
   }
-// */
-  /*
-      public void runFeed(double rpm)
-      {
-         // Prevent out of spec RPM
-        if ( (rpm > kMaxFeedRPM) || (rpm < -kMaxFeedRPM) )
-        {
-          rpm = Math.copySign(kMaxIntakeRPM, rpm);
-        }
 
-        IntakeFeedInputs.voltageSetPoint = 0.0;
-        IntakeFeedInputs.velocitySetPoint = rpm;
-
-        IntakeFeedIO.setVelocity(IntakeFeedInputs.velocitySetPoint);
-      }
-  */
   public void stopOpenLoop() {
     // runFeedOpenLoop(0.0);
    IntakeInputs.voltageSetPoint = 0;
@@ -129,8 +82,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     IntakeIO.updateInputs(IntakeInputs);
-    //  IntakeFeedIO.updateInputs(IntakeFeedInputs);
     Logger.processInputs("Intake/Motors", IntakeInputs);
-    //  Logger.processInputs("Intake/Feed", IntakeFeedInputs);
+    
   }
 }

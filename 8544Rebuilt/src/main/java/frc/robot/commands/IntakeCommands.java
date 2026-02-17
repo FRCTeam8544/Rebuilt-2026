@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Intake.*;
-//import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
 
 
 public class IntakeCommands {
@@ -23,53 +22,11 @@ public class IntakeCommands {
         intake);
   }
 
-  // Use this command to tune Ks by increasing voltage until the flywheel
-  // begins to slightly turn, then back off a bit.
-  // This term will be used in the PID with feedforward control later.
-  public static Command openVoltageControl(
-      Intake intake,
-      Trigger extendTrigger,
-      Trigger retractTrigger,
-      Trigger increasepositionTrigger,
-      Trigger decreasepositionTrigger
-    //  Trigger decreaseFeedVoltageTrigger
-      ) {
-    return Commands.run(
-        () -> {
-          boolean positionIncrease = increasepositionTrigger.getAsBoolean();
-          boolean positionDecrease = decreasepositionTrigger.getAsBoolean();
-          // If and only if one button is pressed at a time
-          if (positionDecrease ^ positionIncrease) {
-            if (positionIncrease) {
-              intake.runIntakeOpenLoop(true); // Increase intake volt
-            } else {
-              intake.runIntakeOpenLoop(false); // Decrease intake volt
-            }
-          }
-          else {
-            intake.stopOpenLoop();
-          }
- 
-          boolean voltageIncrease = increasepositionTrigger.getAsBoolean();
-          boolean voltageDecrease = decreasepositionTrigger.getAsBoolean();
-          // If and only if one button is pressed at a time
-          if (voltageDecrease ^ voltageIncrease) {
-            if (voltageIncrease) {
-              intake.tuneIncreaseVoltage(); // Increase intake volt
-            } else {
-              intake.tuneDecreaseVoltage(); // Decrease intake volt
-            }
-          }
-        },
-        intake);
-  }
+
   public static Command closedPositionControl(
       Intake intake,
       Trigger extendTrigger,
       Trigger retractTrigger
-      //Trigger increasepositionTrigger,
-      //Trigger decreasepositionTrigger
-    //  Trigger decreaseFeedVoltageTrigger
       ) {
     return Commands.run(
         () -> {
@@ -78,9 +35,9 @@ public class IntakeCommands {
           // If and only if one button is pressed at a time
           if (retractPosition ^ extendPosition) {
             if (extendPosition) {
-              intake.runIntake(0.5); // Increase intake volt
+              intake.runIntake(0.8); // Set Extend Position
             } else {
-              intake.runIntake(0.1); // Decrease intake volt
+              intake.runIntake(0.2); // Set Retract Position
             }
            } else { intake.holdPosition();
 
@@ -90,24 +47,6 @@ public class IntakeCommands {
         },
         intake);
   }
-/*   for position ctrl
-  public static Command buttonShoot(Intake intake, Trigger extendTrigger, Trigger retractTrigger) {
-    return Commands.run(
-        () -> {
-          if (extendTrigger.getAsBoolean()) {
-            intake.runintake(200);
-          } else {
-            intake.runintake(0);
-          }
-
-          if (retractTrigger.getAsBoolean()) {
-            intake.runFeed(1000);
-          } else {
-            intake.runFeed(0);
-          }
-        },
-        intake);
-        */
   }
 
   

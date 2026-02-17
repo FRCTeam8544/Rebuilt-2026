@@ -1,6 +1,5 @@
 package frc.robot.subsystems.Intake;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
@@ -11,7 +10,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import frc.robot.subsystems.Intake.*;
+
 
 public class IntakeIOMax implements IntakeIO {
 
@@ -35,6 +34,7 @@ public static double realPosition;
     armMotorConfig = new SparkMaxConfig();
     armMotorConfig.idleMode(IdleMode.kBrake);
     armMotorConfig.smartCurrentLimit(stallLimit);
+    
     armMotorConfig.voltageCompensation(12);
     armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
     armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
@@ -46,13 +46,11 @@ public static double realPosition;
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(false)
-        // Velocity control
-        .p(0.1000, ClosedLoopSlot.kSlot0)
+        // Position control
+        .p(2.0000, ClosedLoopSlot.kSlot0)
         .i(0.00000, ClosedLoopSlot.kSlot0)
-        .d(0.00002, ClosedLoopSlot.kSlot0);
-    // armMotorConfig.closedLoop.feedForward.kS(kS);
-    // armMotorConfig.closedLoop.feedForward.kV(Constants.NeoVortex.nominalFF,
-    //                                          ClosedLoopSlot.kSlot0);
+        .d(0.09000, ClosedLoopSlot.kSlot0);
+
 
     armMotorController.configure(
         armMotorConfig,
@@ -68,7 +66,6 @@ public static double realPosition;
     inOutData.armMotorTemperature = (float) armMotorController.getMotorTemperature();
 
     // Fault codes
-    // inOutData.feedForward = feedForward;
     Faults armFaults = armMotorController.getFaults();
     Faults followFaults = armMotorController.getFaults();
     inOutData.faultCan = armFaults.can;
@@ -80,14 +77,12 @@ public static double realPosition;
 
     // Outputs
     inOutData.busVoltage = (float) armMotorController.getBusVoltage();
-    inOutData.outputDuty =
-        (float) armMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
+    inOutData.outputDuty = (float) armMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) armMotorController.getOutputCurrent();
     inOutData.outputVoltage = (float) armMotorController.getAppliedOutput() * 12.0f;
   }
 
 
-  // @Override
   public void setPosition(double rotations) {
     closedLoop.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }

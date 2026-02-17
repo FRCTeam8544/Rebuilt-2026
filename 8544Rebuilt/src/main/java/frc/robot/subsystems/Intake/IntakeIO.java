@@ -12,9 +12,7 @@ public interface IntakeIO {
 
     public float velocity = 0.0f;
     public float position = 0.0f;
-
     public float armMotorTemperature = 0.0f;
-    // public float followMotorTemperature = 0.0f;
 
     // Fault codes
     public boolean faultSensor;
@@ -25,18 +23,16 @@ public interface IntakeIO {
     public boolean faultFirmware;
 
     // Outputs
-    // public double feedForward;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
     public float outputCurrent = 0;
     public float outputVoltage = 0;
 
-    public double positionSetPoint = 0.0; // Percent of max motor speed (0...1)
+    public double positionSetPoint = 0.0; // Position in rotations
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
   }
 
   public default void updateInputs(IntakeIOInputs inOutData) {}
-  // public default void setFeedForward(double ff) {}
   public default void setPosition(double rotations) {}
 
   public default void setVoltage(double volts) {}

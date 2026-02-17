@@ -151,18 +151,8 @@ public class RobotContainer {
           intake,
           leftbumper,
           rightbumper
-       //   goosea,
-        //  goosey
         ));
   }
-
-
-    
-    
-
-
-
-    
 
 
 
