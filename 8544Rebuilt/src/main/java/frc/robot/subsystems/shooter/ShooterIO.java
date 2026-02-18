@@ -9,8 +9,8 @@ public interface ShooterIO {
     // Inputs
     public boolean connected = false;
 
-    public float velocity = 0.0f;
-
+    public float motorVelocity = 0.0f;
+    public float flywheelVelocity = 0.0f;
     public float leaderMotorTemperature = 0.0f;
     public float followMotorTemperature = 0.0f;
 
@@ -29,7 +29,7 @@ public interface ShooterIO {
     public float outputCurrent = 0;
     public float outputVoltage = 0;
 
-    public double velocitySetPoint = 0.0; // Percent of max motor speed (0...1)
+    public double velocitySetPoint = 0.0; // Requested flywheel output RPM
     public double voltageSetPoint= 0.0; // Motor voltage, usually not directly controlled
   }
 

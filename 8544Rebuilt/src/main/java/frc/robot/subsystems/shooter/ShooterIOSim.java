@@ -9,7 +9,8 @@ public class ShooterIOSim implements ShooterIO{
   public void updateInputs(ShooterIOInputs inOutData)
   {
     inOutData.connected = false;
-    inOutData.velocity = 0;
+    inOutData.motorVelocity = 0;
+    inOutData.flywheelVelocity = 0;
     inOutData.leaderMotorTemperature = 0;
     inOutData.followMotorTemperature = 0;
 
