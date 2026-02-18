@@ -10,10 +10,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import frc.robot.Constants;
 
 public class IntakeFeedIOMax implements IntakeFeedIO {
 
-  private static final int kFeedMaxRpm = 6000;
+  private static final int kFeedMaxRpm = 5676;
   private static final int stallLimit = 60;
 
   private final SparkMax rollerMotorController;
@@ -38,14 +39,14 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         // Velocity control
-        .p(0.0008, ClosedLoopSlot.kSlot0)
+        .p(0.0001, ClosedLoopSlot.kSlot0) //was 0.0008
         .i(0.00000, ClosedLoopSlot.kSlot0)
-        .d(0.00001, ClosedLoopSlot.kSlot0);
+        .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
 
-    rollerMotorConfig.encoder.positionConversionFactor(1/20.0); // 20 to 1 gearbox
-    rollerMotorConfig.encoder.velocityConversionFactor(1/20.0); // 20 to 1 gearbox
+       rollerMotorConfig.encoder.positionConversionFactor(1/1.0); // 20 to 1 gearbox
+       rollerMotorConfig.encoder.velocityConversionFactor(1/1.0); // 20 to 1 gearbox
     // armMotorConfig.closedLoop.feedForward.kS(kS);
-    // armMotorConfig.closedLoop.feedForward.kV(Constants.NeoVortex.nominalFF,
+   //  rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
     //                                          ClosedLoopSlot.kSlot0);
 
     rollerMotorController.configure(
