@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.ClimberCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.climber.ClimberIOFlex;
@@ -185,6 +186,13 @@ public class RobotContainer {
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,
                                              dpadLeftTriggerGoose, dpadRightTriggerGoose,
                                              startButtonGoose)
+    );
+
+
+        climber.setDefaultCommand(
+        ClimberCommands.closedPositionControl(climber, xButtonGoose,
+                                             bButtonGoose
+                                            )
     );
     // Raw feed and shooter voltage tuning
     /*goose.leftTrigger().whileTrue(

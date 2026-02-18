@@ -37,6 +37,15 @@ public class Climber extends SubsystemBase {
       climberIO.setPosition(climberInputs.position);
   }
 
+
+  public void holdArmPosition() {
+
+      climberInputs.positionSetPoint = climberInputs.position;
+
+      climberIO.setPosition(climberInputs.positionSetPoint);
+  
+  }
+
   public void runArmOpenLoop(double duty) {
     double adjustedDuty = duty;
     if (adjustedDuty > 1.0)
