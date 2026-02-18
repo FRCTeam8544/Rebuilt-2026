@@ -17,7 +17,7 @@ public class ClimberCommands {
     return Commands.run(
         () -> {
         //  climber.stopOpenLoop();
-          climber.runArmToPosition(0);
+          climber.holdArmPosition();
         },
         climber);
   }
