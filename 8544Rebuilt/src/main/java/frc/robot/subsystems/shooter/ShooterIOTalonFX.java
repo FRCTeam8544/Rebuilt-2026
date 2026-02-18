@@ -37,7 +37,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     private VelocityTorqueCurrentFOC velocityTorqueRequest = new VelocityTorqueCurrentFOC(0.0);
     
     // Follower motor must always use the follow request otherwise hardware will break!!!
-    private Follower followRequest = new Follower(leaderCanId, MotorAlignmentValue.Opposed);
+    private Follower followRequest = new Follower(leaderCanId, MotorAlignmentValue.Aligned); // TOOD opposed?
     
   ShooterIOTalonFX(int leaderCanId, int followCanId) {
     
