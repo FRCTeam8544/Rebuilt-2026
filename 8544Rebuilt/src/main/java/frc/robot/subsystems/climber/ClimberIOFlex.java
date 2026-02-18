@@ -41,11 +41,13 @@ public class ClimberIOFlex implements ClimberIO {
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           // Velocity control
-          .p(0.02, ClosedLoopSlot.kSlot0)
+          .p(1.0, ClosedLoopSlot.kSlot0)
           .i(0.00000, ClosedLoopSlot.kSlot0)
-          .d(0.00000, ClosedLoopSlot.kSlot0);
-    motorConfig.closedLoop.feedForward.kV(nominalFF,
-                                          ClosedLoopSlot.kSlot0);
+          .d(0.00000, ClosedLoopSlot.kSlot0)
+          .outputRange(-1, 1, ClosedLoopSlot.kSlot0);
+          
+  //  motorConfig.closedLoop.feedForward.kV(nominalFF,
+     //                                     ClosedLoopSlot.kSlot0);
                                           
     motorController.configure(motorConfig, 
                               com.revrobotics.ResetMode.kResetSafeParameters,
