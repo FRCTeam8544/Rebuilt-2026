@@ -190,7 +190,7 @@ public class RobotContainer {
 
 
         climber.setDefaultCommand(
-        ClimberCommands.closedPositionControl(climber, xButtonGoose,
+        ClimberCommands.closedPositionControl(climber, xButtonGoose,  //was closedPositionControl
                                              bButtonGoose
                                             )
     );

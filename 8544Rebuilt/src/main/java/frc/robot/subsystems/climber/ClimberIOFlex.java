@@ -17,6 +17,7 @@ public class ClimberIOFlex implements ClimberIO {
 
     private static final double nominalVoltage = Constants.NeoVortex.nominalVoltage;
     private static final double nominalFF = Constants.NeoVortex.nominalFF;
+    private static final double Ks = 0.120;
     private static final int stallLimit = 30;
 
     private final SparkFlex motorController;    
@@ -33,21 +34,26 @@ public class ClimberIOFlex implements ClimberIO {
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig.smartCurrentLimit(stallLimit);
     motorConfig.voltageCompensation(nominalVoltage);
-    motorConfig.softLimit.forwardSoftLimitEnabled(true);
-    motorConfig.softLimit.reverseSoftLimitEnabled(true);
-    motorConfig.softLimit.forwardSoftLimit(0.8);
-    motorConfig.softLimit.reverseSoftLimit(0.2);
+    motorConfig.softLimit.forwardSoftLimitEnabled(false); //was true
+    motorConfig.softLimit.reverseSoftLimitEnabled(false);
+    motorConfig.closedLoop.positionWrappingEnabled(false;
+ //   motorConfig.softLimit.forwardSoftLimit(0.8);
+  //  motorConfig.softLimit.reverseSoftLimit(0.2);
+   // motorConfig.encoder.positionConversionFactor(100.0/1.0);
+   // motorConfig.encoder.velocityConversionFactor(100.0/1.0);
 
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           // Velocity control
-          .p(1.0, ClosedLoopSlot.kSlot0)
+          .p(0.001, ClosedLoopSlot.kSlot0)
           .i(0.00000, ClosedLoopSlot.kSlot0)
-          .d(0.00000, ClosedLoopSlot.kSlot0)
-          .outputRange(-1, 1, ClosedLoopSlot.kSlot0);
+          .d(0.00000, ClosedLoopSlot.kSlot0);
+          //.outputRange(-1, 1, ClosedLoopSlot.kSlot0);
+       //   motorConfig.closedLoop.feedForward.kS(Ks, ClosedLoopSlot.kSlot0);
           
-  //  motorConfig.closedLoop.feedForward.kV(nominalFF,
-     //                                     ClosedLoopSlot.kSlot0);
+ //   motorConfig.closedLoop.feedForward.kV(12 * nominalFF,
+  //                                        ClosedLoopSlot.kSlot0);
+   
                                           
     motorController.configure(motorConfig, 
                               com.revrobotics.ResetMode.kResetSafeParameters,
@@ -82,6 +88,6 @@ public class ClimberIOFlex implements ClimberIO {
   }
 
   public void setVoltage(double volts) {
-    motorController.setVoltage(0);
+    motorController.setVoltage(volts);
   }
 }

@@ -14,11 +14,12 @@ public class Climber extends SubsystemBase {
     private final ClimberIO climberIO;
     private final ClimberIOInputsAutoLogged climberInputs = new ClimberIOInputsAutoLogged();
 
-    private double tuneVoltage = 0.0;
-    private final double tuneVoltStep = 1.0 / 50.0; // 1 volt per second
+   // private double tuneVoltage = 0.0;
+ //   private final double tuneVoltStep = 1.0 / 50.0; // 1 volt per second
 
     private final double minPositionLimit = 0;   // Rotations
     private final double maxPositionLimit = 0.5; // Rotations
+ //   private final double armVoltageStep = 1.0 / 50.0; // 1v/s
 
   public Climber() {
     this.climberIO = new ClimberIOFlex(climberCanId);
@@ -34,7 +35,7 @@ public class Climber extends SubsystemBase {
       climberInputs.voltageSetPoint = 0.0;
       climberInputs.positionSetPoint = (float) rotations;
 
-      climberIO.setPosition(climberInputs.position);
+      climberIO.setPosition(climberInputs.position * 100.0);
   }
 
 
@@ -45,21 +46,48 @@ public class Climber extends SubsystemBase {
       climberIO.setPosition(climberInputs.positionSetPoint);
   
   }
-
-  public void runArmOpenLoop(double duty) {
-    double adjustedDuty = duty;
-    if (adjustedDuty > 1.0)
+/* 
+  public void runArmOpenLoop(double voltage) {
+    double adjustedDuty = voltage + tuneVoltage;
+    if (adjustedDuty > 12.0)
     {
-      adjustedDuty = 1.0;
+      adjustedDuty = 12.0;
     }
-    else if (duty < 0) {
+    else if (voltage < 0) {
       adjustedDuty = 0.0;
     }
 
     climberInputs.positionSetPoint = 0.0;
-    climberInputs.voltageSetPoint = (float) adjustedDuty * Constants.NeoVortex.nominalVoltage;
+    climberInputs.voltageSetPoint = (float) adjustedDuty;
     climberIO.setVoltage(climberInputs.voltageSetPoint);
   }
+
+
+
+    public void increaseArmVoltage() {
+    tuneVoltage += armVoltageStep;
+    if (tuneVoltage > 12.0)
+    {
+      tuneVoltage = 12.0;
+    }
+    else if (tuneVoltage < 0) {
+      tuneVoltage = 0.0;
+    }
+  }
+
+   
+    public void decreaseArmVoltage() {
+    tuneVoltage -= armVoltageStep;
+    if (tuneVoltage > 12.0)
+    {
+      tuneVoltage = 12.0;
+    }
+    else if (tuneVoltage < 0) {
+      tuneVoltage = 0.0;
+    }
+  }
+    */
+
 
   @Override
   public void periodic() {
