@@ -36,19 +36,20 @@ public class ClimberIOFlex implements ClimberIO {
     motorConfig.voltageCompensation(nominalVoltage);
     motorConfig.softLimit.forwardSoftLimitEnabled(false); //was true
     motorConfig.softLimit.reverseSoftLimitEnabled(false);
-    motorConfig.closedLoop.positionWrappingEnabled(false;
+    motorConfig.closedLoop.positionWrappingEnabled(true);
  //   motorConfig.softLimit.forwardSoftLimit(0.8);
   //  motorConfig.softLimit.reverseSoftLimit(0.2);
-   // motorConfig.encoder.positionConversionFactor(100.0/1.0);
-   // motorConfig.encoder.velocityConversionFactor(100.0/1.0);
+  //  motorConfig.encoder.positionConversionFactor(1.0/100.0);
+  //  motorConfig.encoder.velocityConversionFactor(1.0/100.0);
 
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           // Velocity control
-          .p(0.001, ClosedLoopSlot.kSlot0)
+          .p(150.00, ClosedLoopSlot.kSlot0)
           .i(0.00000, ClosedLoopSlot.kSlot0)
+          .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
           .d(0.00000, ClosedLoopSlot.kSlot0);
-          //.outputRange(-1, 1, ClosedLoopSlot.kSlot0);
+          
        //   motorConfig.closedLoop.feedForward.kS(Ks, ClosedLoopSlot.kSlot0);
           
  //   motorConfig.closedLoop.feedForward.kV(12 * nominalFF,

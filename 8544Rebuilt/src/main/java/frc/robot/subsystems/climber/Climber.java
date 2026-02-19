@@ -35,7 +35,7 @@ public class Climber extends SubsystemBase {
       climberInputs.voltageSetPoint = 0.0;
       climberInputs.positionSetPoint = (float) rotations;
 
-      climberIO.setPosition(climberInputs.position * 100.0);
+      climberIO.setPosition(climberInputs.position);  //*100.0 */
   }
 
 
