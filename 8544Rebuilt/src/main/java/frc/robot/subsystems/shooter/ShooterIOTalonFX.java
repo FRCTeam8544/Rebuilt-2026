@@ -10,9 +10,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkBase.Faults;
 
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.shooter.Shooter.Flywheel;
 
 // Talon FX paired with Kraken X60 motors.
 
@@ -34,11 +36,11 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // Leader Control requests
     private DutyCycleOut openLoopRequest = new DutyCycleOut(0);
-    private VelocityTorqueCurrentFOC velocityTorqueRequest = new VelocityTorqueCurrentFOC(0.0);
+    private VelocityTorqueCurrentFOC velocityTorqueRequest;
     
     // Follower motor must always use the follow request otherwise hardware will break!!!
-    private Follower followRequest = new Follower(leaderCanId, MotorAlignmentValue.Aligned); // TOOD opposed?
-    
+    private Follower followRequest;
+
   ShooterIOTalonFX(int leaderCanId, int followCanId) {
     
     // Common configuration
@@ -46,8 +48,13 @@ public class ShooterIOTalonFX implements ShooterIO {
     this.followCanId = followCanId;
     
     // Needs motor config time request or something?
+    velocityTorqueRequest = new VelocityTorqueCurrentFOC(0.0);
    // velocityTorqueRequest.UseTimesync = true;
    // velocityTorqueRequest.UpdateFreqHz = 0;
+
+    // Use aligned follow request because the follower motor config is inverted already.
+    // Positive voltage for either motor will result synchronized movement.
+    followRequest = new Follower(leaderCanId, MotorAlignmentValue.Opposed); 
 
     CurrentLimitsConfigs commonCurrentLimitsConfig = 
       new CurrentLimitsConfigs()
@@ -65,9 +72,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast).
                                  withInverted(InvertedValue.CounterClockwise_Positive)
       );
-
-
     leaderTalon.getConfigurator().apply(leaderConfig); // Apply leader config
+
 
     // Follow Motor (Robot right side, looking out to front of robot)
     followTalon = new TalonFX(followCanId,TunerConstants.kCANBus);
@@ -77,10 +83,37 @@ public class ShooterIOTalonFX implements ShooterIO {
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                                 .withInverted(InvertedValue.Clockwise_Positive)
       );
-    
-
     followTalon.getConfigurator().apply(followConfig); // Apply follow config
 
+  }
+
+  
+  @Override
+  public void updateInputs(ShooterIOInputs inOutData)
+  {
+    inOutData.connected = leaderTalon.isAlive() && followTalon.isAlive();
+    inOutData.motorVelocity = (float) leaderTalon.getVelocity().getValueAsDouble();
+    inOutData.flywheelVelocity = inOutData.motorVelocity * (float) Flywheel.kDriveToOutputGearRatio;
+    inOutData.leaderMotorTemperature = (float) leaderTalon.getDeviceTemp().getValueAsDouble();
+    inOutData.followMotorTemperature = (float) followTalon.getDeviceTemp().getValueAsDouble();
+
+    // Fault codes
+   /* Faults leaderFaults = leaderMotorController.getFaults();
+    Faults followFaults = leaderMotorController.getFaults();
+    inOutData.faultCan = leaderFaults.can || followFaults.can;
+    inOutData.faultTemperature = leaderFaults.temperature || followFaults.temperature;
+    inOutData.faultSensor = leaderFaults.sensor || followFaults.sensor;
+    inOutData.faultGateDriver = leaderFaults.gateDriver || followFaults.gateDriver;
+    inOutData.faultEscEeprom = leaderFaults.escEeprom || followFaults.escEeprom;
+    inOutData.faultFirmware = leaderFaults.firmware || followFaults.firmware;
+*/
+    // Outputs
+    inOutData.busVoltage = (float) leaderTalon.getSupplyCurrent().getValueAsDouble();
+    inOutData.outputDuty = (float) leaderTalon.getDutyCycle().getValueAsDouble(); // -1 to 1 percent applied of bus voltage
+    inOutData.outputCurrent = (float) leaderTalon.getStatorCurrent().getValueAsDouble();
+    inOutData.outputVoltage = (float) leaderTalon.getMotorVoltage().getValueAsDouble();
+
+    inOutData.feedForward = currentFeedForward;
   }
 
   @Override
@@ -107,6 +140,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     double duty = volts / Constants.kNominalVoltage;
     openLoopRequest.Output = duty;
     leaderTalon.setControl(openLoopRequest);
+    followTalon.setControl(followRequest);
   }
 
 }

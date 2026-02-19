@@ -44,8 +44,9 @@ public class Shooter extends SubsystemBase{
    
     public Shooter()
     {
-       this.shooterIO = new ShooterIOFlex(leftMotorCanID, rightMotorCanID);
-       this.shooterFeedIO = new ShooterFeedIOFlex(feedMotorCanID);
+      this.shooterIO = new ShooterIOTalonFX(leftMotorCanID, rightMotorCanID);
+           //  this.shooterIO = new ShooterIOFlex(leftMotorCanID, rightMotorCanID);
+       this.shooterFeedIO = new ShooterFeedIOSim();//  new ShooterFeedIOFlex(feedMotorCanID);
     }
 
     public void tuneIncreaseShootVoltage() {
@@ -67,12 +68,17 @@ public class Shooter extends SubsystemBase{
       if (tuneFeedVoltage > 12.0) {
         tuneFeedVoltage = 12.0;
       }
+      else if (tuneFeedVoltage < 0.0) {
+        tuneFeedVoltage = 0.0;
+      }
     }
 
     public void tuneDecreaseFeedVoltage() {
       tuneFeedVoltage -= tuneFeedVoltStep;
       if (tuneFeedVoltage < 0.0) {
         tuneFeedVoltage = 0.0;
+      } else if (tuneFeedVoltage > 12.0) {
+        tuneFeedVoltage = 12.0;
       }
     }
 
@@ -138,6 +144,7 @@ public class Shooter extends SubsystemBase{
       shooterIO.setVoltage(0.0);
     }
 
+    // This should be the requested flywheel RPM
     public void runShooter(double rpm) {
 
       double adjustedRpm = rpm;
