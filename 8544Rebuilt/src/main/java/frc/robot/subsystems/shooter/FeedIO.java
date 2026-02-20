@@ -3,14 +3,15 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ShooterFeedIO {
+public interface FeedIO {
     
   @AutoLog
-  public static class ShooterFeedIOInputs {
+  public static class FeedIOInputs {
     // Inputs
     public boolean connected = false;
 
-    public float velocity = 0.0f;
+    public double wheelVelocity = 0.0f;
+    public double motorVelocity = 0.0f;
 
     public float motorTemperature = 0.0f;
 
@@ -34,7 +35,7 @@ public interface ShooterFeedIO {
     public double feedForward = 0.0;
   }
 
-  public default void updateInputs(ShooterFeedIOInputs inOutData) {}
+  public default void updateInputs(FeedIOInputs inOutData) {}
 
   public default void setVelocity(double rpm) {}
   public default void setVoltage(double volts) {}

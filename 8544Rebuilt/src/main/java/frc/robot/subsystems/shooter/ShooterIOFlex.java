@@ -73,12 +73,13 @@ public class ShooterIOFlex implements ShooterIO {
   public void updateInputs(ShooterIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.velocity = (float) leaderEncoder.getVelocity();
+    inOutData.motorVelocity = leaderEncoder.getVelocity();
+    inOutData.flywheelVelocity = inOutData.motorVelocity;
     inOutData.leaderMotorTemperature = (float) leaderMotorController.getMotorTemperature();
     inOutData.followMotorTemperature = (float) followMotorController.getMotorTemperature();
 
     // Fault codes
-    Faults leaderFaults = leaderMotorController.getFaults();
+    /*Faults leaderFaults = leaderMotorController.getFaults();
     Faults followFaults = leaderMotorController.getFaults();
     inOutData.faultCan = leaderFaults.can || followFaults.can;
     inOutData.faultTemperature = leaderFaults.temperature || followFaults.temperature;
@@ -86,7 +87,7 @@ public class ShooterIOFlex implements ShooterIO {
     inOutData.faultGateDriver = leaderFaults.gateDriver || followFaults.gateDriver;
     inOutData.faultEscEeprom = leaderFaults.escEeprom || followFaults.escEeprom;
     inOutData.faultFirmware = leaderFaults.firmware || followFaults.firmware;
-
+*/
     // Outputs
     inOutData.busVoltage = (float) leaderMotorController.getBusVoltage();
     inOutData.outputDuty = (float) leaderMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage

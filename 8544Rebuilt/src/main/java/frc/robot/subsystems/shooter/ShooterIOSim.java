@@ -9,18 +9,19 @@ public class ShooterIOSim implements ShooterIO{
   public void updateInputs(ShooterIOInputs inOutData)
   {
     inOutData.connected = false;
-    inOutData.velocity = 0;
+    inOutData.motorVelocity = 0;
+    inOutData.flywheelVelocity = 0;
     inOutData.leaderMotorTemperature = 0;
     inOutData.followMotorTemperature = 0;
 
     // Fault codes
-    inOutData.faultSensor = false;
+   /* inOutData.faultSensor = false;
     inOutData.faultCan = false;
     inOutData.faultTemperature = false;
     inOutData.faultGateDriver = false;
     inOutData.faultEscEeprom = false;
     inOutData.faultFirmware = false;
-    
+    */
     // Outputs
     inOutData.busVoltage = 0.0f;
     inOutData.outputDuty = 0.0f; // -1 to 1 percent applied of bus voltage

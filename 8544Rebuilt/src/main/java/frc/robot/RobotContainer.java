@@ -178,13 +178,24 @@ public class RobotContainer {
     ));*/
 
     shooter.setDefaultCommand(
-        ShooterCommands.buttonShoot(shooter, leftTriggerGoose,
-                                             rightTriggerGoose, 
+        ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
+                                             rightTriggerGoose, // Feed shooter
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,
                                              dpadLeftTriggerGoose, dpadRightTriggerGoose,
                                              startButtonGoose)
     );
 
+    // Raw feed and shooter voltage tuning
+   /* goose.leftTrigger().whileTrue(
+        ShooterCommands.openVoltageControl(shooter, 
+                                            dpadUpTriggerGoose, // Feed trigger
+                                            yButtonGoose, aButtonGoose, 
+                                            xButtonGoose, bButtonGoose));
+
+    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
+*/
+
+  
   }
 
 
