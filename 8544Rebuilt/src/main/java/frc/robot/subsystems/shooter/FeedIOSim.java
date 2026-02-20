@@ -12,7 +12,8 @@ public class FeedIOSim implements FeedIO {
   public void updateInputs(FeedIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.velocity = 0;// TODO need encoder;
+    inOutData.wheelVelocity = 0;
+    inOutData.motorVelocity = 0;
     inOutData.motorTemperature = 42;
 
     // Fault codes

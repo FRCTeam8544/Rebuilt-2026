@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase{
     private final FeedIO feedIO;
     private final FeedIOInputsAutoLogged feedInputs = new FeedIOInputsAutoLogged();
 
-    private double tuneFeedVoltage = 6.0;
+    private double tuneFeedVoltage = 3.0;
     private double tuneShootVoltage = 0.0;
     private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
     private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
@@ -99,18 +99,22 @@ public class Shooter extends SubsystemBase{
 
     public void runShooterOpenLoop()
     {
-      runShooterOpenLoop( tuneShootVoltage / 12.0 );
+      runShooterOpenLoop( 0.0 ); // Will be adjusted internally
     }
 
     public void runFeedOpenLoop()
     {
-      runFeedOpenLoop( tuneFeedVoltage / 12.0 );
+      runFeedOpenLoop( 0.0 ); // Will be adjusted internally
     }
 
     public void runShooterOpenLoop(double duty)
     {
       double adjustedDuty = duty;
       
+      if (adjustedDuty != 0.0) {
+        adjustedDuty += tuneShootVoltage / Constants.NeoVortex.nominalVoltage;
+      }
+
       // Prevent duty beyond 1 to 0
       adjustedDuty = Math.min(adjustedDuty, 1.0);
       if (adjustedDuty < 0.0)
@@ -132,12 +136,22 @@ public class Shooter extends SubsystemBase{
 
     public void runFeedOpenLoop(double duty)
     {
-       // Prevent duty beyond 1 to 0
-      if ( (duty > 1.0) || (duty < 0.0) )
-      {
-        duty = Math.copySign(1.0, duty);
+      double adjustedDuty = duty;
+
+      if (adjustedDuty != 0.0) {
+        adjustedDuty += tuneFeedVoltage / Constants.NeoVortex.nominalVoltage;
       }
 
+       // Prevent duty beyond 1 to 0
+      adjustedDuty = Math.min(adjustedDuty, 1.0);
+      if ( adjustedDuty < 0.0) {
+        adjustedDuty = 0.0;
+      }
+
+      // Prevent out of spec RPM
+      if (Math.abs(feedInputs.wheelVelocity) > FeedWheel.kMaxFeedRPM) {
+        adjustedDuty = 0.0;
+      }
 
       double scaledVolts = duty * Constants.NeoVortex.nominalVoltage;
       feedIO.setVoltage(scaledVolts);
@@ -146,10 +160,20 @@ public class Shooter extends SubsystemBase{
       feedInputs.velocitySetPoint = 0.0;
     }
 
-    public void resetDefaultRpms() {
-      tuneShootRpmAdjust = 0.0;
+    public void resetFeedDefaultVoltage() {
+      tuneFeedVoltage = 0.0;
+    }
+
+    public void resetFeedDefaultRpm() {
       tuneFeedRpmAdjust = 0.0;
-      tuneFeedVoltage = 3.0;
+    }
+
+    public void resetShooterDefaultVoltage() {
+      tuneShootVoltage = 0.0;
+    }
+
+    public void resetShooterDefaultRpm() {
+      tuneShootRpmAdjust = 0.0;
     }
 
     public void feedRpmAdjust(double rpmAdjust) {
@@ -161,8 +185,15 @@ public class Shooter extends SubsystemBase{
       tuneShootRpmAdjust += rpmAdjust;
     }
 
+    // ------------------ Shooter ------------------------
+
     public void stopShooter() {
-      shooterIO.setVoltage(0.0);
+    //  if (Math.abs(getFlywheelVelocityRPM()) > 250) {
+     //   shooterIO.setVoltage(-1.0); // Gentle break
+     // }
+     // else {
+        shooterIO.setVoltage(0.0); // Gentle break
+     // }
     }
 
     // This should be the requested flywheel RPM
@@ -187,6 +218,8 @@ public class Shooter extends SubsystemBase{
       shooterIO.setVelocity(shooterInputs.velocitySetPoint);
     }
 
+    // -------------------  FEED --------------------------------
+
     public void runFeed(double rpm)
     {
       double adjustedRpm = rpm;
@@ -196,7 +229,7 @@ public class Shooter extends SubsystemBase{
       }
 
       // Prevent out of spec RPM
-      adjustedRpm = Math.min(adjustedRpm,kMaxFeedRPM);
+      adjustedRpm = Math.min(adjustedRpm,FeedWheel.kMaxFeedRPM);
       if (adjustedRpm < 0) {
         adjustedRpm = 0.0;
       }
@@ -207,9 +240,8 @@ public class Shooter extends SubsystemBase{
       feedIO.setVelocity(feedInputs.velocitySetPoint);
     }
 
-    public void stopOpenLoop() {
-        runFeedOpenLoop(0.0);
-        runShooterOpenLoop(0.0);
+    public void stopFeed() {
+      shooterIO.setVoltage(0);
     }
   
   @Override

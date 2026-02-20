@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 
 import frc.robot.Constants.NeoVortex;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.Shooter.FeedWheel;
 
 public class FeedIOFlex implements FeedIO {
   
@@ -60,7 +61,8 @@ public class FeedIOFlex implements FeedIO {
   public void updateInputs(FeedIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.velocity = (float) motorEncoder.getVelocity();
+    inOutData.motorVelocity = motorEncoder.getVelocity();
+    inOutData.wheelVelocity = inOutData.motorVelocity * FeedWheel.kDriveToOutputGearRatio;
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
 
     // Fault codes

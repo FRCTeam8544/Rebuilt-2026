@@ -10,7 +10,8 @@ public interface FeedIO {
     // Inputs
     public boolean connected = false;
 
-    public float velocity = 0.0f;
+    public double wheelVelocity = 0.0f;
+    public double motorVelocity = 0.0f;
 
     public float motorTemperature = 0.0f;
 

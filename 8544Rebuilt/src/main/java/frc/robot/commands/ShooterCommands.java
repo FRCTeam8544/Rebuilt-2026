@@ -1,13 +1,11 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -45,7 +43,8 @@ public class ShooterCommands {
     public static Command stopMotors(Shooter shooter) {
         return Commands.run(
         () -> {
-                shooter.stopOpenLoop();
+                shooter.stopFeed();
+                shooter.stopShooter();
             },
             shooter);
     }
@@ -127,21 +126,24 @@ public class ShooterCommands {
                 if (adjustUp ^ adjustDown)
                 {
                     if (adjustUp) {
-                        shooter.shooterRpmAdjust(rpmAdjustStep);
+                        //shooter.shooterRpmAdjust(rpmAdjustStep);
+                        shooter.tuneIncreaseShootVoltage();
                     }
                     else
                     {
-                        shooter.shooterRpmAdjust(-rpmAdjustStep);
+                        //shooter.shooterRpmAdjust(-rpmAdjustStep);
+                        shooter.tuneDecreaseShootVoltage();
                     }
                 }
             }
             else {
-                shooter.resetDefaultRpms();
+                shooter.resetShooterDefaultVoltage();
+                shooter.resetFeedDefaultRpm();
             }
 
             if (shootTrigger.getAsBoolean())
             {
-                shooter.runShooter(shooterNominalRpm);
+                shooter.runShooterOpenLoop();
             }
             else {
                 shooter.stopShooter();
@@ -166,7 +168,7 @@ public class ShooterCommands {
                // shooter.runFeedOpenLoop(0.6);
             }
             else {
-                shooter.runFeedOpenLoop(0);
+                shooter.runFeed(0);
             }
         },
         shooter);
