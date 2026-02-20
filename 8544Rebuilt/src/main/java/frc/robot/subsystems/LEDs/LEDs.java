@@ -3,6 +3,7 @@ package frc.robot.subsystems.LEDs;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -17,11 +18,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class LEDs extends SubsystemBase {
     private final CANBus kCANBus = new CANBus("canivorea");
     private final CANdle m_candle = new CANdle(20, kCANBus);
-    private int r = 200;
-    private int g = 0;
-    private int b = 0;
-    private int w = 0;
-   private RGBWColor RGBWColor = new RGBWColor( r,  g,  b);
+    private int r = 68;
+    private int g = 47;
+    private int b = 118;
+   private RGBWColor EnableColor = new RGBWColor( r,  g,  b);
+    private RGBWColor disableColor = new RGBWColor( 50,  40,  4);
+   
 
 
     private final SolidColor[] m_colors; 
@@ -29,18 +31,40 @@ public class LEDs extends SubsystemBase {
             public LEDs() {
                 //setDefaultCommand(updateLEDs());
                m_colors = new SolidColor[] {
-        new SolidColor(0, 30).withColor(RGBWColor)
+        new SolidColor(0, 30).withColor(EnableColor) ,
+        new SolidColor(0, 30).withColor(disableColor)
             };
             }
         
 public void solidColorrgb() {
-     {
-            for (var solidColor : m_colors) {
-                m_candle.setControl(solidColor);
-            }}
+        
+                m_candle.setControl(m_colors[0]);
+            
 }
         
-            /**
+ @Override
+ public void periodic() {
+
+    if (DriverStation.isEnabled()) {
+         m_candle.setControl(m_colors[0]);
+    }
+    else {
+        m_candle.setControl(m_colors[1]);
+    }
+    
+ }   
+
+
+
+
+
+
+
+
+
+
+
+/**
      * Updates the animations and LEDs of the CANdle.
      *
      * @return Command to run

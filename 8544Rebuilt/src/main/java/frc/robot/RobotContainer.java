@@ -15,6 +15,7 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.LEDs.*;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon;
 import frc.robot.subsystems.drive.ModuleIO;
@@ -35,6 +36,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Shooter shooter;
+  private final LEDs leds;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -60,6 +62,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     shooter = new Shooter();
+    leds = new LEDs();
 
     switch (Constants.currentMode) {
       case REAL:

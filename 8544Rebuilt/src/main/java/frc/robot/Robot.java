@@ -121,7 +121,9 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    Commands.runOnce (()-> {leds.solidColorrgb();}, leds);
+    //Commands.runOnce (()-> {leds.solidColorrgb();}, leds);
+    //  leds.solidColorrgb();
+
 
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
