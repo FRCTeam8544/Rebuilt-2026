@@ -159,14 +159,23 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-        intake.setDefaultCommand(
-       IntakeCommands.closedPositionControl(
-          intake,
-          leftBackGoose,
-          rightBackGoose,
-          aButtonGoose,
-          yButtonGoose
-        ));
+    intake.setDefaultCommand(
+        IntakeCommands.openLoopControl(
+            intake,
+            leftBackGoose, // retract arm
+            rightBackGoose, // extend arm
+            aButtonGoose,   // intake Fuel
+            yButtonGoose    // expel Fuel
+    ));
+
+    /*intake.setDefaultCommand(
+        IntakeCommands.closedPositionControl(
+            intake,
+            leftBackGoose,
+            rightBackGoose,
+            aButtonGoose,
+            yButtonGoose
+    ));*/
 
     shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose,

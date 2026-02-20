@@ -18,20 +18,42 @@ public class Intake extends SubsystemBase {
   public static final int armCanId = 27;
   public static final int feedCanId = 28;
 
-  public final IntakeIO IntakeIO;
-  public final IntakeIOInputsAutoLogged IntakeInputs = new IntakeIOInputsAutoLogged();
+  public final IntakeIO intakeArmIO;
+  public final IntakeIOInputsAutoLogged intakeArmInputs = new IntakeIOInputsAutoLogged();
 
   private final IntakeFeedIO intakeFeedIO;
   private final IntakeFeedIOInputsAutoLogged intakeFeedInputs = new IntakeFeedIOInputsAutoLogged();
 
   public Intake() {
-    this.IntakeIO = new IntakeIOMax(armCanId);
+    this.intakeArmIO = new IntakeIOMax(armCanId);
     this.intakeFeedIO = new IntakeFeedIOMax(feedCanId);
   }
 
-  public void runIntake(double rotations) {
-    IntakeInputs.positionSetPoint = rotations;
-    IntakeIO.setPosition(IntakeInputs.positionSetPoint);
+  public void runArmOpenLoop(double duty) {
+    double adjustedDuty = duty;
+    adjustedDuty = Math.min(adjustedDuty, 1.0);
+    adjustedDuty = Math.max(adjustedDuty, -1.0);
+
+    intakeArmInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
+    intakeArmInputs.positionSetPoint = 0.0;
+
+    intakeArmIO.setVoltage(intakeArmInputs.voltageSetPoint);
+  }
+
+  public void runFeedOpenLoop(double duty) {
+    double adjustedDuty = duty;
+    adjustedDuty = Math.min(adjustedDuty, 1.0);
+    adjustedDuty = Math.max(adjustedDuty, -1.0);
+
+    intakeFeedInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
+    intakeFeedInputs.velocitySetPoint = 0.0;
+
+    intakeFeedIO.setVoltage(intakeArmInputs.voltageSetPoint);
+  }
+
+  public void runIntakeArm(double rotations) {
+    intakeArmInputs.positionSetPoint = rotations;
+    intakeArmIO.setPosition(intakeArmInputs.positionSetPoint);
   } 
 
   public void runIntakeFeed(double rpm) {
@@ -44,21 +66,22 @@ public class Intake extends SubsystemBase {
     intakeFeedIO.setVelocity(intakeFeedInputs.velocitySetPoint);
   }
 
-  public void holdPosition() {
-    IntakeInputs.positionSetPoint = IntakeInputs.position;
-    IntakeIO.setPosition(IntakeInputs.position);
+  public void holdArmPosition() {
+    intakeArmInputs.positionSetPoint = intakeArmInputs.position;
+    intakeArmIO.setPosition(intakeArmInputs.position);
   }
 
   public void stopOpenLoop() {
-    IntakeIO.setVoltage(0);
+    intakeArmIO.setVoltage(0);
+    intakeFeedIO.setVoltage(0);
   }
 
   @Override
   public void periodic() {
-    IntakeIO.updateInputs(IntakeInputs);
+    intakeArmIO.updateInputs(intakeArmInputs);
     intakeFeedIO.updateInputs(intakeFeedInputs);
-    Logger.processInputs("Intake/Motors", IntakeInputs);
-    Logger.processInputs("Intake/FeedMotor", intakeFeedInputs);
+    Logger.processInputs("Intake/Arm", intakeArmInputs);
+    Logger.processInputs("Intake/Feed", intakeFeedInputs);
     
   }
 }
