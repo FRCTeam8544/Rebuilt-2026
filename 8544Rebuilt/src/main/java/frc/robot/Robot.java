@@ -2,6 +2,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.LEDs.LEDs;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -19,8 +22,10 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private LEDs leds;
 
   public Robot() {
+    leds = new LEDs();
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -116,9 +121,12 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    Commands.runOnce (()-> {leds.solidColorrgb();}, leds);
+
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
   }
 
   /** This function is called periodically during operator control. */
