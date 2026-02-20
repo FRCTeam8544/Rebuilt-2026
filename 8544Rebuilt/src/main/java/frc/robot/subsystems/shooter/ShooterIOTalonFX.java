@@ -47,7 +47,7 @@ public class ShooterIOTalonFX implements ShooterIO {
   ShooterIOTalonFX(int leaderCanId, int followCanId) {
     
     // Setup common control request objects that will be reused for each loop iteration.
-        
+
     openLoopRequest = new DutyCycleOut(0).withEnableFOC(true);
 
     // Needs motor config time request or something? TODO
@@ -111,8 +111,8 @@ public class ShooterIOTalonFX implements ShooterIO {
   public void updateInputs(ShooterIOInputs inOutData)
   {
     inOutData.connected = leaderTalon.isAlive() && followTalon.isAlive();
-    inOutData.motorVelocity = (float) leaderTalon.getVelocity().getValueAsDouble() * 60.0f; // CTR provides RPS convert to RPM
-    inOutData.flywheelVelocity = inOutData.motorVelocity * (float) Flywheel.kDriveToOutputGearRatio;
+    inOutData.motorVelocity = leaderTalon.getVelocity().getValueAsDouble() * 60.0f; // CTR provides RPS convert to RPM
+    inOutData.flywheelVelocity = inOutData.motorVelocity * Flywheel.kDriveToOutputGearRatio;
     inOutData.leaderMotorTemperature = (float) leaderTalon.getDeviceTemp().getValueAsDouble();
     inOutData.followMotorTemperature = (float) followTalon.getDeviceTemp().getValueAsDouble();
 

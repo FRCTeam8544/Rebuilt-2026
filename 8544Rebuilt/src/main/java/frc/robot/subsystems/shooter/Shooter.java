@@ -48,6 +48,15 @@ public class Shooter extends SubsystemBase{
       this.shooterFeedIO = new ShooterFeedIOFlex(feedMotorCanID);
     }
 
+    // Provide the shooter velocity as revolutions per second
+    public double getShooterFFCharacterizationVelocity() {
+      return shooterInputs.motorVelocity / 60.0; // Convert RPM to RPS
+    }
+
+    public double getFlywheelVelocityRPM() {
+      return shooterInputs.flywheelVelocity;
+    }
+
     public void tuneIncreaseShootVoltage() {
       tuneShootVoltage += tuneShootVoltStep;
       if (tuneShootVoltage > 12.0) {

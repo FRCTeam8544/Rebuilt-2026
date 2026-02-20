@@ -9,8 +9,8 @@ public interface ShooterIO {
     // Inputs
     public boolean connected = false;
 
-    public float motorVelocity = 0.0f;
-    public float flywheelVelocity = 0.0f;
+    public double motorVelocity = 0.0f;
+    public double flywheelVelocity = 0.0f;
     public float leaderMotorTemperature = 0.0f;
     public float followMotorTemperature = 0.0f;
 

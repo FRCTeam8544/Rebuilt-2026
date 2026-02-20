@@ -73,7 +73,7 @@ public class ShooterIOFlex implements ShooterIO {
   public void updateInputs(ShooterIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.motorVelocity = (float) leaderEncoder.getVelocity();
+    inOutData.motorVelocity = leaderEncoder.getVelocity();
     inOutData.flywheelVelocity = inOutData.motorVelocity;
     inOutData.leaderMotorTemperature = (float) leaderMotorController.getMotorTemperature();
     inOutData.followMotorTemperature = (float) followMotorController.getMotorTemperature();
