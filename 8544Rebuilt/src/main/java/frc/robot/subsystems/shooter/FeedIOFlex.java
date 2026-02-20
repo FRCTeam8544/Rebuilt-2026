@@ -14,7 +14,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import frc.robot.Constants.NeoVortex;
 import frc.robot.subsystems.shooter.ShooterIO;
 
-public class ShooterFeedIOFlex implements ShooterFeedIO {
+public class FeedIOFlex implements FeedIO {
   
     private static final int stallLimit = 40;
 
@@ -28,7 +28,7 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
     private final SparkClosedLoopController closedLoop;
     private final SparkFlexConfig motorConfig;
 
-  public ShooterFeedIOFlex(int canId) {
+  public FeedIOFlex(int canId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
     motorEncoder = motorController.getEncoder();
     closedLoop = motorController.getClosedLoopController();
@@ -57,7 +57,7 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
   }
 
   @Override
-  public void updateInputs(ShooterFeedIOInputs inOutData)
+  public void updateInputs(FeedIOInputs inOutData)
   {
     inOutData.connected = true;
     inOutData.velocity = (float) motorEncoder.getVelocity();

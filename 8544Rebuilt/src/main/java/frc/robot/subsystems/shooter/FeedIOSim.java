@@ -1,15 +1,15 @@
 package frc.robot.subsystems.shooter;
 
 
-public class ShooterFeedIOSim implements ShooterFeedIO {
+public class FeedIOSim implements FeedIO {
   
 
 
-  public ShooterFeedIOSim() {
+  public FeedIOSim() {
   }
 
   @Override
-  public void updateInputs(ShooterFeedIOInputs inOutData)
+  public void updateInputs(FeedIOInputs inOutData)
   {
     inOutData.connected = true;
     inOutData.velocity = 0;// TODO need encoder;
