@@ -92,21 +92,20 @@ public class ShooterIOTalonFX implements ShooterIO {
   public void updateInputs(ShooterIOInputs inOutData)
   {
     inOutData.connected = leaderTalon.isAlive() && followTalon.isAlive();
-    inOutData.motorVelocity = (float) leaderTalon.getVelocity().getValueAsDouble();
+    inOutData.motorVelocity = (float) leaderTalon.getVelocity().getValueAsDouble() / 60.0f; // CTR provides RPS convert to RPM
     inOutData.flywheelVelocity = inOutData.motorVelocity * (float) Flywheel.kDriveToOutputGearRatio;
     inOutData.leaderMotorTemperature = (float) leaderTalon.getDeviceTemp().getValueAsDouble();
     inOutData.followMotorTemperature = (float) followTalon.getDeviceTemp().getValueAsDouble();
 
     // Fault codes
-   /* Faults leaderFaults = leaderMotorController.getFaults();
-    Faults followFaults = leaderMotorController.getFaults();
-    inOutData.faultCan = leaderFaults.can || followFaults.can;
-    inOutData.faultTemperature = leaderFaults.temperature || followFaults.temperature;
-    inOutData.faultSensor = leaderFaults.sensor || followFaults.sensor;
-    inOutData.faultGateDriver = leaderFaults.gateDriver || followFaults.gateDriver;
-    inOutData.faultEscEeprom = leaderFaults.escEeprom || followFaults.escEeprom;
-    inOutData.faultFirmware = leaderFaults.firmware || followFaults.firmware;
-*/
+    inOutData.faultSupplyUnderVoltage = leaderTalon.getFault_Undervoltage().getValue() || followTalon.getFault_Undervoltage().getValue();
+    inOutData.faultBridgeBrownout = leaderTalon.getFault_BridgeBrownout().getValue() || followTalon.getFault_BridgeBrownout().getValue();
+    inOutData.faultTemperature = leaderTalon.getFault_DeviceTemp().getValue() || followTalon.getFault_DeviceTemp().getValue();
+    inOutData.faultControllerTemperature = leaderTalon.getFault_ProcTemp().getValue() || followTalon.getFault_ProcTemp().getValue();
+    inOutData.faultHardwareLeaderMotor = leaderTalon.getFault_Hardware().getValue();
+    inOutData.faultHardwareFollowMotor = followTalon.getFault_Hardware().getValue();
+    inOutData.faultStatorCurrentLimitLeaderMotor = followTalon.getFault_StatorCurrLimit().getValue();
+    inOutData.faultStatorCurrentLimitFollowMotor = followTalon.getFault_StatorCurrLimit().getValue();
     // Outputs
     inOutData.busVoltage = (float) leaderTalon.getSupplyCurrent().getValueAsDouble();
     inOutData.outputDuty = (float) leaderTalon.getDutyCycle().getValueAsDouble(); // -1 to 1 percent applied of bus voltage

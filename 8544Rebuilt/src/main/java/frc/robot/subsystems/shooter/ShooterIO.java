@@ -15,13 +15,15 @@ public interface ShooterIO {
     public float followMotorTemperature = 0.0f;
 
     // Fault codes
-    public boolean faultSensor;
-    public boolean faultCan;
-    public boolean faultTemperature;
-    public boolean faultGateDriver;
-    public boolean faultEscEeprom;
-    public boolean faultFirmware;
-    
+    boolean faultSupplyUnderVoltage = false;
+    boolean faultBridgeBrownout = false;
+    boolean faultTemperature = false;
+    boolean faultControllerTemperature = false;
+    boolean faultHardwareLeaderMotor = false;
+    boolean faultHardwareFollowMotor = false;
+    boolean faultStatorCurrentLimitLeaderMotor = false;
+    boolean faultStatorCurrentLimitFollowMotor = false;
+
     // Outputs
     public double feedForward = 0.0;
     public float busVoltage = 0;

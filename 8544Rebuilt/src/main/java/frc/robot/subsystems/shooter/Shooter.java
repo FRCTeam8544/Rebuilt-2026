@@ -45,8 +45,7 @@ public class Shooter extends SubsystemBase{
     public Shooter()
     {
       this.shooterIO = new ShooterIOTalonFX(leftMotorCanID, rightMotorCanID);
-           //  this.shooterIO = new ShooterIOFlex(leftMotorCanID, rightMotorCanID);
-       this.shooterFeedIO = new ShooterFeedIOSim();//  new ShooterFeedIOFlex(feedMotorCanID);
+      this.shooterFeedIO = new ShooterFeedIOFlex(feedMotorCanID);
     }
 
     public void tuneIncreaseShootVoltage() {
