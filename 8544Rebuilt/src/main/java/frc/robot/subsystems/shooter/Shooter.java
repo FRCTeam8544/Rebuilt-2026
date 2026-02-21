@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase{
     private final FeedIO feedIO;
     private final FeedIOInputsAutoLogged feedInputs = new FeedIOInputsAutoLogged();
 
-    private double tuneFeedVoltage = 3.0;
+    private double tuneFeedVoltage = 0.0;
     private double tuneShootVoltage = 0.0;
     private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
     private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
@@ -111,7 +111,7 @@ public class Shooter extends SubsystemBase{
     {
       double adjustedDuty = duty;
       
-      if (adjustedDuty != 0.0) {
+      if (adjustedDuty > 0.0) {
         adjustedDuty += tuneShootVoltage / Constants.NeoVortex.nominalVoltage;
       }
 
@@ -124,10 +124,14 @@ public class Shooter extends SubsystemBase{
 
       // Safety limit RPM
       if (Math.abs(getFlywheelVelocityRPM()) > Flywheel.kMaxShooterRPM) {
+        shooterInputs.maxFlywheelSpeedHit = true;
         adjustedDuty = 0.0;
       }
+      else {
+        shooterInputs.maxFlywheelSpeedHit = false;
+      }
 
-      double scaledVolts = adjustedDuty * Constants.NeoVortex.nominalVoltage;
+      double scaledVolts = adjustedDuty * Constants.KrakenX60.nominalVoltage;
       shooterIO.setVoltage(scaledVolts);
 
       shooterInputs.voltageSetPoint = scaledVolts;
@@ -149,9 +153,9 @@ public class Shooter extends SubsystemBase{
       }
 
       // Prevent out of spec RPM
-      if (Math.abs(feedInputs.wheelVelocity) > FeedWheel.kMaxFeedRPM) {
-        adjustedDuty = 0.0;
-      }
+     // if (Math.abs(feedInputs.wheelVelocity) > FeedWheel.kMaxFeedRPM) {
+      //////  adjustedDuty = 0.0;
+      //}
 
       double scaledVolts = duty * Constants.NeoVortex.nominalVoltage;
       feedIO.setVoltage(scaledVolts);

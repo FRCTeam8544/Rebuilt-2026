@@ -14,7 +14,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class IntakeIOMax implements IntakeIO {
 
-  private static final int stallLimit = 20;
+  private static final int stallLimit = 15;
 
 public static double realPosition;
  
@@ -36,8 +36,8 @@ public static double realPosition;
     armMotorConfig.smartCurrentLimit(stallLimit);
     
     armMotorConfig.voltageCompensation(12);
-    armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
-    armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+    armMotorConfig.softLimit.forwardSoftLimitEnabled(false);
+    armMotorConfig.softLimit.reverseSoftLimitEnabled(false);
     armMotorConfig.softLimit.forwardSoftLimit(0.9);
     armMotorConfig.softLimit.reverseSoftLimit(0.1);
     
@@ -47,7 +47,7 @@ public static double realPosition;
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(false)
         // Position control
-        .p(2.0000, ClosedLoopSlot.kSlot0)
+        .p(0.0000, ClosedLoopSlot.kSlot0) // was 2
         .i(0.00000, ClosedLoopSlot.kSlot0)
         .d(0.09000, ClosedLoopSlot.kSlot0);
 

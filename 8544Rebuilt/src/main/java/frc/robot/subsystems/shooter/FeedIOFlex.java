@@ -17,7 +17,7 @@ import frc.robot.subsystems.shooter.Shooter.FeedWheel;
 
 public class FeedIOFlex implements FeedIO {
   
-    private static final int stallLimit = 40;
+    private static final int stallLimit = 15;
 
     private static final double kMeasuredKv = 540.0;  // Was 540
     private static final double kS = 0.95; // Static mechanism friction

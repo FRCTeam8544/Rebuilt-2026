@@ -24,7 +24,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Used to sycnronize control requests to the shooter motor paring
     private static final int kMotorPairControlUpdateTimeSyncHz = 50;
 
-    private static final int kStatorCurrentLimit = 80;
+    private static final int kStatorCurrentLimit = 15;
 
     // TODO>>>..
     private static final double kMeasuredKv = 590.0;
@@ -115,7 +115,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.flywheelVelocity = inOutData.motorVelocity * Flywheel.kDriveToOutputGearRatio;
     inOutData.leaderMotorTemperature = (float) leaderTalon.getDeviceTemp().getValueAsDouble();
     inOutData.followMotorTemperature = (float) followTalon.getDeviceTemp().getValueAsDouble();
-
+    inOutData.maxFlywheelSpeedHit = inOutData.flywheelVelocity > Flywheel.kMaxShooterRPM;
+    
     // Fault codes
     inOutData.faultSupplyUnderVoltage = leaderTalon.getFault_Undervoltage().getValue() || followTalon.getFault_Undervoltage().getValue();
     inOutData.faultBridgeBrownout = leaderTalon.getFault_BridgeBrownout().getValue() || followTalon.getFault_BridgeBrownout().getValue();

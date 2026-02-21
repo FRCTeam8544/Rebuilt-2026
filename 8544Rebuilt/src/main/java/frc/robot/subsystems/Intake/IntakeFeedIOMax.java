@@ -15,7 +15,7 @@ import frc.robot.Constants;
 public class IntakeFeedIOMax implements IntakeFeedIO {
 
   private static final int kFeedMaxRpm = 5676;
-  private static final int stallLimit = 60;
+  private static final int stallLimit = 15;
 
   private final SparkMax rollerMotorController;
 
@@ -33,6 +33,7 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
     rollerMotorConfig.idleMode(IdleMode.kBrake);
     rollerMotorConfig.smartCurrentLimit(stallLimit);
     rollerMotorConfig.voltageCompensation(12);
+    rollerMotorConfig.inverted(true);
     rollerMotorConfig.softLimit.forwardSoftLimitEnabled(false);
     rollerMotorConfig.softLimit.reverseSoftLimitEnabled(false);
     rollerMotorConfig
@@ -43,8 +44,8 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
         .i(0.00000, ClosedLoopSlot.kSlot0)
         .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
 
-       rollerMotorConfig.encoder.positionConversionFactor(1/1.0); // 20 to 1 gearbox
-       rollerMotorConfig.encoder.velocityConversionFactor(1/1.0); // 20 to 1 gearbox
+       rollerMotorConfig.encoder.positionConversionFactor(1);
+       rollerMotorConfig.encoder.velocityConversionFactor(1);
     // armMotorConfig.closedLoop.feedForward.kS(kS);
    //  rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
     //                                          ClosedLoopSlot.kSlot0);

@@ -7,6 +7,9 @@ import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import frc.robot.subsystems.shooter.Shooter.Flywheel;
+
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.RelativeEncoder;
@@ -78,6 +81,8 @@ public class ShooterIOFlex implements ShooterIO {
     inOutData.leaderMotorTemperature = (float) leaderMotorController.getMotorTemperature();
     inOutData.followMotorTemperature = (float) followMotorController.getMotorTemperature();
 
+    inOutData.maxFlywheelSpeedHit = inOutData.flywheelVelocity > Flywheel.kMaxShooterRPM;
+    
     // Fault codes
     /*Faults leaderFaults = leaderMotorController.getFaults();
     Faults followFaults = leaderMotorController.getFaults();

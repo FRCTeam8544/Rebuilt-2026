@@ -25,6 +25,7 @@ public interface ShooterIO {
     boolean faultStatorCurrentLimitFollowMotor = false;
 
     // Outputs
+    public boolean maxFlywheelSpeedHit = false;
     public double feedForward = 0.0;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage

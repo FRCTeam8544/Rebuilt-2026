@@ -62,8 +62,10 @@ public class Intake extends SubsystemBase {
   }
   
   public void stopFeed() {
+    intakeFeedInputs.voltageSetPoint = 0;
     intakeFeedInputs.velocitySetPoint = 0;
-    intakeFeedIO.setVelocity(intakeFeedInputs.velocitySetPoint);
+    intakeFeedIO.setVoltage(0);
+    //intakeFeedIO.setVelocity(intakeFeedInputs.velocitySetPoint);
   }
 
   public void holdArmPosition() {

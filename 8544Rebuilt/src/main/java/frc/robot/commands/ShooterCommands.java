@@ -164,17 +164,17 @@ public class ShooterCommands {
 
             if (feedTrigger.getAsBoolean())
             {
-                shooter.runFeed(feedNominalRpm);
-               // shooter.runFeedOpenLoop(0.6);
+               // shooter.runFeed(feedNominalRpm);
+                shooter.runFeedOpenLoop(0.4);
             }
             else {
-                shooter.runFeed(0);
+                shooter.stopFeed();
             }
         },
         shooter);
     } 
 
-    public static Command joystickVoltsShoot( Shooter shooter, 
+  /*  public static Command joystickVoltsShoot( Shooter shooter, 
                                     DoubleSupplier x_LeftSupplier, DoubleSupplier y_LeftSupplier,
                                     DoubleSupplier x_RightSupplier, DoubleSupplier y_RightSupplier ) {
         return Commands.run(
@@ -193,7 +193,7 @@ public class ShooterCommands {
           
         },
         shooter);
-    }
+    }*/
 
     
   /**
