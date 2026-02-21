@@ -165,7 +165,7 @@ public class ShooterCommands {
             if (feedTrigger.getAsBoolean())
             {
                // shooter.runFeed(feedNominalRpm);
-                shooter.runFeedOpenLoop(0.4);
+                shooter.runFeedOpenLoop();
             }
             else {
                 shooter.stopFeed();

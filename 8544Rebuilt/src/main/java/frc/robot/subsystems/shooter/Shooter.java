@@ -39,8 +39,8 @@ public class Shooter extends SubsystemBase{
     private final FeedIO feedIO;
     private final FeedIOInputsAutoLogged feedInputs = new FeedIOInputsAutoLogged();
 
-    private double tuneFeedVoltage = 0.0;
-    private double tuneShootVoltage = 0.0;
+    private double tuneFeedVoltage = 3.0;
+    private double tuneShootVoltage = 3.0;
     private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
     private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
 
@@ -99,21 +99,21 @@ public class Shooter extends SubsystemBase{
 
     public void runShooterOpenLoop()
     {
-      runShooterOpenLoop( 0.0 ); // Will be adjusted internally
+      runShooterOpenLoop( tuneShootVoltage / Constants.KrakenX60.nominalVoltage ); // Will be adjusted internally
     }
 
     public void runFeedOpenLoop()
     {
-      runFeedOpenLoop( 0.0 ); // Will be adjusted internally
+      runFeedOpenLoop( tuneFeedVoltage / Constants.Neo550.nominalVoltage);
     }
 
     public void runShooterOpenLoop(double duty)
     {
       double adjustedDuty = duty;
       
-      if (adjustedDuty > 0.0) {
+    /*  if (adjustedDuty > 0.0) {
         adjustedDuty += tuneShootVoltage / Constants.NeoVortex.nominalVoltage;
-      }
+      }*/
 
       // Prevent duty beyond 1 to 0
       adjustedDuty = Math.min(adjustedDuty, 1.0);
@@ -142,9 +142,9 @@ public class Shooter extends SubsystemBase{
     {
       double adjustedDuty = duty;
 
-      if (adjustedDuty != 0.0) {
+    /*  if (adjustedDuty != 0.0) {
         adjustedDuty += tuneFeedVoltage / Constants.NeoVortex.nominalVoltage;
-      }
+      }*/
 
        // Prevent duty beyond 1 to 0
       adjustedDuty = Math.min(adjustedDuty, 1.0);
@@ -196,6 +196,9 @@ public class Shooter extends SubsystemBase{
      //   shooterIO.setVoltage(-1.0); // Gentle break
      // }
      // else {
+     
+      shooterInputs.voltageSetPoint = 0.0;
+      shooterInputs.velocitySetPoint = 0;
         shooterIO.setVoltage(0.0); // Gentle break
      // }
     }
@@ -245,6 +248,9 @@ public class Shooter extends SubsystemBase{
     }
 
     public void stopFeed() {
+      
+      feedInputs.voltageSetPoint = 0.0;
+      feedInputs.velocitySetPoint = 0.0;
       shooterIO.setVoltage(0);
     }
   
