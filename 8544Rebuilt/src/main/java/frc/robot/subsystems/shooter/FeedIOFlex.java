@@ -14,10 +14,11 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import frc.robot.Constants.NeoVortex;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.Shooter.FeedWheel;
+import pabeles.concurrency.IntObjectConsumer;
 
 public class FeedIOFlex implements FeedIO {
   
-    private static final int stallLimit = 15;
+    private static final int stallLimit = 40;
 
     private static final double kMeasuredKv = 540.0;  // Was 540
     private static final double kS = 0.95; // Static mechanism friction
@@ -93,6 +94,8 @@ public class FeedIOFlex implements FeedIO {
 
   @Override
   public void setVoltage(double volts) {
+    inOutData.voltageSetPoint(volts);
+    inOutData.velocitySetPoint(0);
     motorController.setVoltage(volts);
   }
 

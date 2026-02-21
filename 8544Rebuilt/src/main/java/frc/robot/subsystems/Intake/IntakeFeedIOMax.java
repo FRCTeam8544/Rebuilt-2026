@@ -81,15 +81,15 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
   
   // @Override
   public void setVelocity(double rpm) {
-    double adjustedRpm = rpm;
+   /* double adjustedRpm = rpm;
     if (rpm > kFeedMaxRpm) {
       adjustedRpm = kFeedMaxRpm;
     }
     else if (rpm < -kFeedMaxRpm) {
       adjustedRpm = -kFeedMaxRpm;
-    }
+    }*/
 
-    closedLoop.setSetpoint(adjustedRpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    closedLoop.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   @Override

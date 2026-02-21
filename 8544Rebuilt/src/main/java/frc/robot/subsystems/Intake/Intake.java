@@ -41,10 +41,10 @@ public class Intake extends SubsystemBase {
     intakeArmInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
     intakeArmInputs.positionSetPoint = 0.0;
 
-    if ((intakeArmInputs.position < forwardLimit) ||
-        (intakeArmInputs.position > backwardLimit) ) {
+    //if ((intakeArmInputs.position < forwardLimit) ||
+      //  (intakeArmInputs.position > backwardLimit) ) {
       intakeArmIO.setVoltage(intakeArmInputs.voltageSetPoint);
-    }
+   // }
   }
 
   public void runFeedOpenLoop(double duty) {
