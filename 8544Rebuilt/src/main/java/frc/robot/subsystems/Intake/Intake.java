@@ -61,11 +61,12 @@ public class Intake extends SubsystemBase {
     intakeFeedInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
     intakeFeedInputs.velocitySetPoint = 0.0;
 
-    intakeFeedIO.setVoltage(intakeArmInputs.voltageSetPoint);
+    intakeFeedIO.setVoltage(intakeFeedInputs.voltageSetPoint);
   }
 
   public void runIntakeArm(double rotations) {
     intakeArmInputs.positionSetPoint = rotations;
+    intakeArmInputs.voltageSetPoint = 0.0;
     intakeArmIO.setPosition(intakeArmInputs.positionSetPoint);
   } 
 
