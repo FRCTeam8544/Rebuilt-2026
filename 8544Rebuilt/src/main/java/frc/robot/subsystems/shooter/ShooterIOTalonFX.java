@@ -155,7 +155,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // Control requests must be sent in pairs to control the leader and follower together.
     leaderTalon.setControl(velocityTorqueRequest);
-  //  followTalon.setControl(followRequest);
+    followTalon.setControl(followRequest);
     
   }
 

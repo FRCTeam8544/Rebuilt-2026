@@ -251,7 +251,7 @@ public class Shooter extends SubsystemBase{
       
       feedInputs.voltageSetPoint = 0.0;
       feedInputs.velocitySetPoint = 0.0;
-      shooterIO.setVoltage(0);
+      feedIO.setVoltage(0);
     }
   
   @Override
