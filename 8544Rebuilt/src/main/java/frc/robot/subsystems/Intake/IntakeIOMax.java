@@ -15,7 +15,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class IntakeIOMax implements IntakeIO {
 
   private static final int stallLimit = 15;
-
 public static double realPosition;
  
   private final SparkMax armMotorController;
@@ -38,10 +37,11 @@ public static double realPosition;
     armMotorConfig.voltageCompensation(12);
     armMotorConfig.softLimit.forwardSoftLimitEnabled(false);
     armMotorConfig.softLimit.reverseSoftLimitEnabled(false);
-    armMotorConfig.softLimit.forwardSoftLimit(0.9);
+    // Disable hard limitarmMotorConfig.
+    armMotorConfig.softLimit.forwardSoftLimit(0.875);
     armMotorConfig.softLimit.reverseSoftLimit(0.1);
     
-
+// 0.072 stow position for arm
     armMotorConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -84,7 +84,7 @@ public static double realPosition;
 
 
   public void setPosition(double rotations) {
-    closedLoop.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+     closedLoop.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
   
   public double realPosition() {

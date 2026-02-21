@@ -22,7 +22,7 @@ public class IntakeCommands {
         () -> {
 
           final double armExtendDuty = 0.3;
-          final double armRetractDuty = 0.4;
+          final double armRetractDuty = -0.4;
           boolean extendPosition = armOutTrigger.getAsBoolean();
           boolean retractPosition = armInTrigger.getAsBoolean();
           // If and only if one button is pressed at a time

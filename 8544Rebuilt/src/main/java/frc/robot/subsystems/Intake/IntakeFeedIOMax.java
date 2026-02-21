@@ -36,14 +36,14 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
     rollerMotorConfig.inverted(true);
     rollerMotorConfig.softLimit.forwardSoftLimitEnabled(false);
     rollerMotorConfig.softLimit.reverseSoftLimitEnabled(false);
-    rollerMotorConfig
+   /* rollerMotorConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         // Velocity control
         .p(0.0001, ClosedLoopSlot.kSlot0) //was 0.0008
         .i(0.00000, ClosedLoopSlot.kSlot0)
         .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
-
+*/
        rollerMotorConfig.encoder.positionConversionFactor(1);
        rollerMotorConfig.encoder.velocityConversionFactor(1);
     // armMotorConfig.closedLoop.feedForward.kS(kS);
