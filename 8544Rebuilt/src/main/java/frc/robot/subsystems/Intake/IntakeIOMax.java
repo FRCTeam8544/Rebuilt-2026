@@ -35,10 +35,10 @@ public static double realPosition;
     armMotorConfig.smartCurrentLimit(stallLimit);
     
     armMotorConfig.voltageCompensation(12);
-    armMotorConfig.softLimit.forwardSoftLimitEnabled(false);
-    armMotorConfig.softLimit.reverseSoftLimitEnabled(false);
+    armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
+    armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
     // Disable hard limitarmMotorConfig.
-    armMotorConfig.softLimit.forwardSoftLimit(0.875);
+    armMotorConfig.softLimit.forwardSoftLimit(0.95);
     armMotorConfig.softLimit.reverseSoftLimit(0.1);
     
 // 0.072 stow position for arm

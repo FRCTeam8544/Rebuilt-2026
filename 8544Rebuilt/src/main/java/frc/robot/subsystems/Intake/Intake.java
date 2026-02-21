@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
 
   public void runArmOpenLoop(double duty) {
     
-    final double forwardLimit = 0.86; // Zero is "straight up" 870
+    final double forwardLimit = 0.95; // Zero is "straight up" 870
     final double backwardLimit = 0.07; // Stow position
 
     double adjustedDuty = duty;
@@ -41,7 +41,7 @@ public class Intake extends SubsystemBase {
     intakeArmInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
     intakeArmInputs.positionSetPoint = 0.0;
 
-    if ((intakeArmInputs.position < forwardLimit) && 
+    if ((intakeArmInputs.position < forwardLimit) ||
         (intakeArmInputs.position > backwardLimit) ) {
       intakeArmIO.setVoltage(intakeArmInputs.voltageSetPoint);
     }

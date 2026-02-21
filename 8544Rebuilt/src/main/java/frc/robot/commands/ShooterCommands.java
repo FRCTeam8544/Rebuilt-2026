@@ -121,7 +121,7 @@ public class ShooterCommands {
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
 
-            if (!resetShooterDefaults.getAsBoolean())
+           /// if (!resetShooterDefaults.getAsBoolean())
             {
                 if (adjustUp ^ adjustDown)
                 {
@@ -136,10 +136,10 @@ public class ShooterCommands {
                     }
                 }
             }
-            else {
-                shooter.resetShooterDefaultVoltage();
-                shooter.resetFeedDefaultRpm();
-            }
+          //  else {
+             //   shooter.resetShooterDefaultVoltage();
+             //   shooter.resetFeedDefaultRpm();
+        //    }
 
             if (shootTrigger.getAsBoolean())
             {
@@ -153,12 +153,12 @@ public class ShooterCommands {
             boolean feedAdjDown = feedAdjustDown.getAsBoolean();
             if (feedAdjDown ^ feedAdjUp) {
                 if (feedAdjUp) {
-                    //shooter.tuneIncreaseFeedVoltage();
-                    shooter.feedRpmAdjust(rpmAdjustStep);
+                    shooter.tuneIncreaseFeedVoltage();
+                    //shooter.feedRpmAdjust(rpmAdjustStep);
                 }
                 else {
-                    //shooter.tuneDecreaseFeedVoltage();
-                   shooter.feedRpmAdjust(-rpmAdjustStep);
+                    shooter.tuneDecreaseFeedVoltage();
+                   //shooter.feedRpmAdjust(-rpmAdjustStep);
                 }
             }
 
