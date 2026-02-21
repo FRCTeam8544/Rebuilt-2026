@@ -21,8 +21,8 @@ public class IntakeCommands {
       return Commands.run(
         () -> {
 
-          final double armExtendDuty = 0.3;
-          final double armRetractDuty = -0.4;
+          final double armExtendDuty = 0.6;
+          final double armRetractDuty = -0.8;
           boolean extendPosition = armOutTrigger.getAsBoolean();
           boolean retractPosition = armInTrigger.getAsBoolean();
           // If and only if one button is pressed at a time
@@ -37,7 +37,7 @@ public class IntakeCommands {
             intake.runArmOpenLoop(0.0);
           }
 
-          final double intakeFeedDuty = 0.4;
+          final double intakeFeedDuty = 1.0;
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
           if (intakeFuel ^ expelFuel) {

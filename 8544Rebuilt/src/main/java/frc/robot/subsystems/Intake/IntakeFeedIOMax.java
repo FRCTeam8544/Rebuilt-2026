@@ -15,7 +15,7 @@ import frc.robot.Constants;
 public class IntakeFeedIOMax implements IntakeFeedIO {
 
   private static final int kFeedMaxRpm = 5676;
-  private static final int stallLimit = 15;
+  private static final int stallLimit = 30;
 
   private final SparkMax rollerMotorController;
 

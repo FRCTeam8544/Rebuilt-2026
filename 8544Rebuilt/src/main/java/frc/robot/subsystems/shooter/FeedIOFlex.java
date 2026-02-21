@@ -94,8 +94,8 @@ public class FeedIOFlex implements FeedIO {
 
   @Override
   public void setVoltage(double volts) {
-    inOutData.voltageSetPoint(volts);
-    inOutData.velocitySetPoint(0);
+    //inOutData.(volts);
+//    inOutData.velocitySetPoint(0);
     motorController.setVoltage(volts);
   }
 
