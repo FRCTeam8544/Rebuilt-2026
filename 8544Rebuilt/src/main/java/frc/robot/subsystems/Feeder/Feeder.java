@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.Feeder;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -10,14 +10,9 @@ import frc.robot.subsystems.shooter.ShooterIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
 import frc.robot.Constants;
 import frc.robot.subsystems.Feeder.*;;
-public class Shooter extends SubsystemBase{
+public class Feeder extends SubsystemBase{
 
-    // Limit chonker flywheel.. so limit to be safe for now
-    public static final class Flywheel {
-      public static final double kMaxShooterRPM = 4000; // Output flywheel, not motor
-      public static final double kDriveToOutputGearRatio = 1.4;
-      public static final double kOutputToDriveGearRatio = 1.0 / kDriveToOutputGearRatio;
-    }
+
 
     // Feed is feed through a 20 to 1 gearbox, but the speed is monitored through the internal
     // encoder
@@ -31,9 +26,6 @@ public class Shooter extends SubsystemBase{
     public static final int rightMotorCanID = 25;
     public static final int feedMotorCanID = 26;
 
-    private final ShooterIO shooterIO;
-    private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
-
     private final FeederIO feedIO;
     private final FeedIOInputsAutoLogged feedInputs = new FeedIOInputsAutoLogged();
 
@@ -45,36 +37,13 @@ public class Shooter extends SubsystemBase{
    private double tuneShootRpmAdjust = 0.0;
    private double tuneFeedRpmAdjust = 0.0;
    
-    public Shooter()
+    public Feeder()
     {
-      this.shooterIO = new ShooterIOTalonFX(leftMotorCanID, rightMotorCanID);
       this.feedIO = new FeederIOFlex(feedMotorCanID);
 
       setupDefaultDashboard();
     }
 
-    // Provide the shooter velocity as revolutions per second
-    public double getShooterFFCharacterizationVelocity() {
-      return shooterInputs.motorVelocity / 60.0; // Convert RPM to RPS
-    }
-
-    public double getFlywheelVelocityRPM() {
-      return shooterInputs.flywheelVelocity;
-    }
-
-    public void tuneIncreaseShootVoltage() {
-      tuneShootVoltage += tuneShootVoltStep;
-      if (tuneShootVoltage > 12.0) {
-        tuneShootVoltage = 12.0;
-      }
-    }
-
-    public void tuneDecreaseShootVoltage() {
-      tuneShootVoltage -= tuneShootVoltStep;
-      if (tuneShootVoltage < 0.0) {
-        tuneShootVoltage = 0.0;
-      }
-    }
 
     public void tuneIncreaseFeedVoltage() {
       tuneFeedVoltage += tuneFeedVoltStep;
@@ -95,46 +64,12 @@ public class Shooter extends SubsystemBase{
       }
     }
 
-    public void runShooterOpenLoop()
-    {
-      runShooterOpenLoop( tuneShootVoltage / Constants.KrakenX60.nominalVoltage ); // Will be adjusted internally
-    }
 
     public void runFeedOpenLoop()
     {
       runFeedOpenLoop( tuneFeedVoltage / Constants.Neo550.nominalVoltage);
     }
 
-    public void runShooterOpenLoop(double duty)
-    {
-      double adjustedDuty = duty;
-      
-    /*  if (adjustedDuty > 0.0) {
-        adjustedDuty += tuneShootVoltage / Constants.NeoVortex.nominalVoltage;
-      }*/
-
-      // Prevent duty beyond 1 to 0
-      adjustedDuty = Math.min(adjustedDuty, 1.0);
-      if (adjustedDuty < 0.0)
-      {
-        adjustedDuty = 0.0;
-      }
-
-      // Safety limit RPM
-      if (Math.abs(getFlywheelVelocityRPM()) > Flywheel.kMaxShooterRPM) {
-        shooterInputs.maxFlywheelSpeedHit = true;
-        adjustedDuty = 0.0;
-      }
-      else {
-        shooterInputs.maxFlywheelSpeedHit = false;
-      }
-
-      double scaledVolts = adjustedDuty * Constants.KrakenX60.nominalVoltage;
-      shooterIO.setVoltage(scaledVolts);
-
-      shooterInputs.voltageSetPoint = scaledVolts;
-      shooterInputs.velocitySetPoint = 0.0;
-    }
 
     public void runFeedOpenLoop(double duty)
     {
@@ -195,9 +130,9 @@ public class Shooter extends SubsystemBase{
      // }
      // else {
      
-      shooterInputs.voltageSetPoint = 0.0;
-      shooterInputs.velocitySetPoint = 0;
-        shooterIO.setVoltage(0.0); // Gentle break
+      feedInputs.voltageSetPoint = 0.0;
+      feedInputs.velocitySetPoint = 0;
+        feedIO.setVoltage(0.0); // Gentle break
      // }
     }
 
@@ -211,16 +146,7 @@ public class Shooter extends SubsystemBase{
       }
 
       // Prevent out of spec RPM
-      adjustedRpm = Math.min(adjustedRpm,Flywheel.kMaxShooterRPM);
-      if (adjustedRpm < 0)
-      {
-        adjustedRpm = 0;
-      }
 
-      // Scale requested flywheel RPM to shooter motor RPM
-      shooterInputs.velocitySetPoint = adjustedRpm * Flywheel.kOutputToDriveGearRatio;
-
-      shooterIO.setVelocity(shooterInputs.velocitySetPoint);
     }
 
     // -------------------  FEED --------------------------------
@@ -254,28 +180,22 @@ public class Shooter extends SubsystemBase{
   
   @Override
   public void periodic() {
-    shooterIO.updateInputs(shooterInputs);
     feedIO.updateInputs(feedInputs);
-    Logger.processInputs("Shooter/Flywheel", shooterInputs);
     Logger.processInputs("Shooter/Feed", feedInputs);
     
     
-    SmartDashboard.putNumber("Flywheel RPM", shooterInputs.flywheelVelocity);
-    SmartDashboard.putNumber("Shooter RPM", shooterInputs.motorVelocity);
-    SmartDashboard.putNumber("Shooter RPM Setpoint", shooterInputs.velocitySetPoint);
+    SmartDashboard.putNumber("Shooter RPM", feedInputs.motorVelocity);
+    SmartDashboard.putNumber("Shooter RPM Setpoint", feedInputs.velocitySetPoint);
     
-    SmartDashboard.putNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
-    SmartDashboard.putNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
+    SmartDashboard.putNumber("Shooter Leader Temp", feedInputs.motorTemperature);
 
   }
 
   private void setupDefaultDashboard()
   {
-    SmartDashboard.setDefaultNumber("Flywheel RPM", shooterInputs.flywheelVelocity);
-    SmartDashboard.setDefaultNumber("Shooter RPM", shooterInputs.motorVelocity);
-    SmartDashboard.setDefaultNumber("Shooter RPM Setpoint", shooterInputs.velocitySetPoint);
-    SmartDashboard.setDefaultNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
-    SmartDashboard.setDefaultNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
+    SmartDashboard.setDefaultNumber("Shooter RPM", feedInputs.motorVelocity);
+    SmartDashboard.setDefaultNumber("Shooter RPM Setpoint", feedInputs.velocitySetPoint);
+    SmartDashboard.setDefaultNumber("Shooter Leader Temp", feedInputs.motorTemperature);
   }
 
 }

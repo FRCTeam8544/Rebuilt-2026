@@ -14,6 +14,8 @@ public interface IntakeIO {
     public float position = 0.0f;
     public float armMotorTemperature = 0.0f;
 
+    public double velocitySetPoint = 0;
+
     // Fault codes
     public boolean faultSensor;
     public boolean faultCan;
@@ -36,4 +38,5 @@ public interface IntakeIO {
   public default void setPosition(double rotations) {}
 
   public default void setVoltage(double volts) {}
+  public default void setVelocity(double rpm) {}
 }

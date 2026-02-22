@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.Arm;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -12,7 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.Constants;
 
-public class IntakeFeedIOMax implements IntakeFeedIO {
+public class ArmIOMax implements ArmIO {
 
   private static final int kFeedMaxRpm = 5676;
   private static final int stallLimit = 30;
@@ -23,7 +23,7 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
   private final SparkClosedLoopController closedLoop;
   private final SparkMaxConfig rollerMotorConfig;
 
-  public IntakeFeedIOMax(int rollerCanId) {
+  public ArmIOMax(int rollerCanId) {
     rollerMotorController = new SparkMax(rollerCanId, MotorType.kBrushless);
 
     rollerEncoder = rollerMotorController.getEncoder();
@@ -57,7 +57,7 @@ public class IntakeFeedIOMax implements IntakeFeedIO {
   }
 
   @Override
-  public void updateInputs(IntakeFeedIOInputs inOutData) {
+  public void updateInputs(ArmIOInputs inOutData) {
     inOutData.connected = true;
     inOutData.velocity = (float) rollerEncoder.getVelocity();
     inOutData.motorTemperature = (float) rollerMotorController.getMotorTemperature();

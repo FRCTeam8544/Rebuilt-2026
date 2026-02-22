@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.Feeder;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -16,7 +16,7 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.Shooter.FeedWheel;
 import pabeles.concurrency.IntObjectConsumer;
 
-public class FeedIOFlex implements FeedIO {
+public class FeederIOFlex implements FeederIO {
   
     private static final int stallLimit = 40;
 
@@ -30,7 +30,7 @@ public class FeedIOFlex implements FeedIO {
     private final SparkClosedLoopController closedLoop;
     private final SparkFlexConfig motorConfig;
 
-  public FeedIOFlex(int canId) {
+  public FeederIOFlex(int canId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
     motorEncoder = motorController.getEncoder();
     closedLoop = motorController.getClosedLoopController();
