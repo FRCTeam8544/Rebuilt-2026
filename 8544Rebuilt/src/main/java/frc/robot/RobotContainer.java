@@ -8,16 +8,16 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.shooter.*;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -27,19 +27,39 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // Subsystems
   private final Drive drive;
-  private final Vision vision;
+  private Intake intake;
+  private final Shooter shooter;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
+
+  private final Trigger aButtonGoose = new Trigger(goose.a());
+  private final Trigger bButtonGoose = new Trigger(goose.b());
+  private final Trigger yButtonGoose = new Trigger(goose.y());
+  private final Trigger xButtonGoose = new Trigger(goose.x());
+  private final Trigger rightBackGoose = new Trigger(goose.rightBumper());
+  private final Trigger leftBackGoose = new Trigger(goose.leftBumper());
+  private final Trigger leftTriggerGoose = new Trigger(goose.leftTrigger());
+  private final Trigger rightTriggerGoose = new Trigger(goose.rightTrigger());
+  private final Trigger dpadUpTriggerGoose = new Trigger(goose.povUp());
+  private final Trigger dpadDownTriggerGoose = new Trigger(goose.povDown());
+  private final Trigger dpadLeftTriggerGoose = new Trigger(goose.povLeft());
+  private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
+  private final Trigger startButtonGoose = new Trigger(goose.start());
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    intake = new Intake();
+    shooter = new Shooter();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -52,14 +72,6 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-
-        vision =
-            new Vision(
-                drive.robotPoseSupplier,
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVision(
-                    VisionConstants.CenterApriltag, VisionConstants.robotToCamera0));
-
         break;
 
       case SIM:
@@ -71,15 +83,6 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-
-        vision =
-            new Vision(
-                drive.robotPoseSupplier,
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.CenterApriltag,
-                    VisionConstants.robotToCamera0,
-                    drive::getPose));
         break;
 
       default:
@@ -91,9 +94,6 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-
-        vision =
-            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
 
@@ -143,7 +143,7 @@ public class RobotContainer {
                 drive,
                 () -> -maverick.getLeftY(),
                 () -> -maverick.getLeftX(),
-                vision.getHubRotation()));
+                () -> Rotation2d.kZero));
 
     // Switch to X pattern when X button is pressed
     maverick.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -158,7 +158,46 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    intake.setDefaultCommand(
+        IntakeCommands.openLoopControl(
+            intake,
+            leftBackGoose, // retract arm
+            rightBackGoose, // extend arm
+            aButtonGoose,   // intake Fuel
+            yButtonGoose    // expel Fuel
+    ));
+
+    /*intake.setDefaultCommand(
+        IntakeCommands.closedPositionControl(
+            intake,
+            leftBackGoose,
+            rightBackGoose,
+            aButtonGoose,
+            yButtonGoose
+    ));*/
+
+    shooter.setDefaultCommand(
+        ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
+                                             rightTriggerGoose, // Feed shooter
+                                             dpadDownTriggerGoose, dpadUpTriggerGoose,
+                                             dpadLeftTriggerGoose, dpadRightTriggerGoose,
+                                             startButtonGoose)
+    );
+
+    // Raw feed and shooter voltage tuning
+   /* goose.leftTrigger().whileTrue(
+        ShooterCommands.openVoltageControl(shooter, 
+                                            dpadUpTriggerGoose, // Feed trigger
+                                            yButtonGoose, aButtonGoose, 
+                                            xButtonGoose, bButtonGoose));
+
+    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
+*/
+
+  
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
