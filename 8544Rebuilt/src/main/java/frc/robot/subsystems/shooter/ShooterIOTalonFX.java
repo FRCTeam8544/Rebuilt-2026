@@ -32,9 +32,10 @@ public class ShooterIOTalonFX implements ShooterIO {
     //private static final double kV = (1.0 / kMeasuredKv) * 5; // Convert to V per RPS
   //  private static final double kV = 0.89; // For 32.1 rps 155,   .758
     private static final double kV = 0.89; // For 32.1 rps 155,   .758
-    
+
     //private static final double kS = 1.8; // AMps // 0.33 was
     private static final double kS = 1.74;
+    private static final double kD = 0.1; //.2
     //private static final double kP = 10.0 / 32.1; // 0.2778; 36 is target rps of motor
     private static final double kPNominal = 10.0 / 32.1; // 0.2778; 36 is target rps of motor
     private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
@@ -99,7 +100,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         .withKV(kV) // Velocity target of 1 rps results in kV Volts output
         .withKP(kP) // An error of 1 rps results in KP Volts output
         .withKI(0.0) // Avoid non-zero: No output for integrated error
-        .withKD(0.0); // Output for error derivative
+        .withKD(kD); // Output for error derivative
 
     // Apply leader config
     leaderTalon.getConfigurator().apply(leaderConfig);
