@@ -174,6 +174,7 @@ public class RobotContainer {
             yButtonGoose    // expel Fuel
     ));
 
+    // Calibration only
 //    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
  //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
 
@@ -184,11 +185,10 @@ public class RobotContainer {
                                              dpadLeftTriggerGoose, dpadRightTriggerGoose
                                              )
     );
-
    
-  //  climber.setDefaultCommand(
- //       ClimberCommands.openVoltageControl(climber,
-    //                                       backButtonGoose, startButtonGoose));
+    climber.setDefaultCommand(
+        ClimberCommands.openVoltageControl(climber,
+                                           backButtonGoose, startButtonGoose));
 
   }
 

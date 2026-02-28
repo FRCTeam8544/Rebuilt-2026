@@ -115,9 +115,10 @@ public class ShooterCommands {
         () -> {
 
             final int feedNominalRpm = 300;
-            
+
             final int rpmAdjustStep = 100 / 50;
             final double shooterNominalRpm = 3000;
+            
 
             //final int shooterNominalRpm = 2700;
            // final double shooterLowNominalRpm = 337.5;
