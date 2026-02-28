@@ -30,8 +30,9 @@ public class ShooterIOTalonFX implements ShooterIO {
     private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
     //private static final double kV = (1.0 / kMeasuredKv) * 5; // Convert to V per RPS
     //private static final double kV = (1.0 / kMeasuredKv) * 5; // Convert to V per RPS
-    private static final double kV = 0.155; // For 32.1 rps
-
+  //  private static final double kV = 0.89; // For 32.1 rps 155,   .758
+    private static final double kV = 0.89; // For 32.1 rps 155,   .758
+    
     //private static final double kS = 1.8; // AMps // 0.33 was
     private static final double kS = 1.74;
     //private static final double kP = 10.0 / 32.1; // 0.2778; 36 is target rps of motor
