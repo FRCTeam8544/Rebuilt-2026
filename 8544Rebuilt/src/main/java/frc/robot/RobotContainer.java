@@ -162,9 +162,9 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Calibration shooter
-    goose.back().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+   // goose.back().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
     
-    shooter.setDefaultCommand(
+   shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
                                              rightTriggerGoose, // Feed shooter
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,

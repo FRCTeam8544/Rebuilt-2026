@@ -22,7 +22,7 @@ import frc.robot.subsystems.shooter.Shooter.Flywheel;
 public class ShooterIOTalonFX implements ShooterIO {
     
     // Used to sycnronize control requests to the shooter motor paring
-    private static final int kMotorPairControlUpdateTimeSyncHz = 50;
+    private static final int kMotorPairControlUpdateTimeSyncHz = 100;
 
     private static final int kStatorCurrentLimit = 80;
 
