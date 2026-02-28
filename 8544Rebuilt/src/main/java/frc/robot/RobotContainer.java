@@ -17,6 +17,11 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.shooter.*;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -30,8 +35,9 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
-  private Intake intake;
+  private final Intake intake;
   private final Shooter shooter;
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -72,6 +78,14 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        vision =
+            new Vision(
+                drive.robotPoseSupplier,
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(
+                    VisionConstants.CenterApriltag, VisionConstants.robotToCamera0));
+
         break;
 
       case SIM:
@@ -83,6 +97,15 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        vision =
+            new Vision(
+                drive.robotPoseSupplier,
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.CenterApriltag,
+                    VisionConstants.robotToCamera0,
+                    drive::getPose));
         break;
 
       default:
@@ -94,6 +117,10 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+                
+        vision =
+            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
+
         break;
     }
 
