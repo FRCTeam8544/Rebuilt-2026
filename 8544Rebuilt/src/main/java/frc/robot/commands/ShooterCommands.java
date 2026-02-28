@@ -115,34 +115,27 @@ public class ShooterCommands {
         () -> {
 
             final int feedNominalRpm = 300;
-            final int rpmAdjustStep = 5;
-            final int shooterNominalRpm = 3000;
+            final int rpmAdjustStep = 100 / 50;
+            final int shooterNominalRpm = 2700;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
 
-           /// if (!resetShooterDefaults.getAsBoolean())
+            if (adjustUp ^ adjustDown)
             {
-                if (adjustUp ^ adjustDown)
+                if (adjustUp) {
+                    shooter.shooterRpmAdjust(rpmAdjustStep);
+                    //shooter.tuneIncreaseShootVoltage();
+                }
+                else
                 {
-                    if (adjustUp) {
-                        //shooter.shooterRpmAdjust(rpmAdjustStep);
-                        shooter.tuneIncreaseShootVoltage();
-                    }
-                    else
-                    {
-                        //shooter.shooterRpmAdjust(-rpmAdjustStep);
-                        shooter.tuneDecreaseShootVoltage();
-                    }
+                    shooter.shooterRpmAdjust(-rpmAdjustStep);
+                    //shooter.tuneDecreaseShootVoltage();
                 }
             }
-          //  else {
-             //   shooter.resetShooterDefaultVoltage();
-             //   shooter.resetFeedDefaultRpm();
-        //    }
 
             if (shootTrigger.getAsBoolean())
             {
-                shooter.runShooterOpenLoop();
+                shooter.runShooter(shooterNominalRpm);
             }
             else {
                 shooter.stopShooter();

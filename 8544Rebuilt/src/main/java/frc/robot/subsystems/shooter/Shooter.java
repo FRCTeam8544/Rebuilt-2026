@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,7 +48,13 @@ public class Shooter extends SubsystemBase{
 
    private double tuneShootRpmAdjust = 0.0;
    private double tuneFeedRpmAdjust = 0.0;
-   
+
+   // Zero faces to the front of robot
+  public DoubleSupplier flywheelRpmSupplier =
+    () -> {
+      return shooterInputs.flywheelVelocity;
+    };
+
     public Shooter()
     {
       this.shooterIO = new ShooterIOTalonFX(leftMotorCanID, rightMotorCanID);
@@ -220,6 +228,7 @@ public class Shooter extends SubsystemBase{
       }
 
       // Scale requested flywheel RPM to shooter motor RPM
+      shooterInputs.voltageSetPoint = 0.0;
       shooterInputs.velocitySetPoint = adjustedRpm * Flywheel.kOutputToDriveGearRatio;
 
       shooterIO.setVelocity(shooterInputs.velocitySetPoint);

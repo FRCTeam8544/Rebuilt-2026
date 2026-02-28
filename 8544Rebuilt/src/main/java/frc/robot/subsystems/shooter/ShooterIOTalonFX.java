@@ -27,8 +27,14 @@ public class ShooterIOTalonFX implements ShooterIO {
     private static final int kStatorCurrentLimit = 20;
 
     // TODO>>>..
-    private static final double kMeasuredKv = 590.0;
-    private static final double kS = 0.1435; // TODO tune Static mechanism friction
+    private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
+    private static final double kV = (1.0 / kMeasuredKv) * 10; // Convert to V per RPS
+    private static final double kV_Boost = 0.0;
+    private static final double kS = 0.33;
+    private static final double kP = 0.2778;
+
+    // Raw voltage to RPM
+    // 
 
     private final TalonFX leaderTalon;
     private final TalonFXConfiguration leaderConfig;
@@ -83,9 +89,9 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // Closed loop settings for velocity control
     leaderConfig.Slot0
-        .withKS(0.1) // Add V output to overcome static friction
-        .withKV(0.0) // Velocity target of 1 rps results in kV Volts output
-        .withKP(0.0) // An error of 1 rps results in KP Volts output
+        .withKS(kS) // Add V output to overcome static friction
+        .withKV(kV + kV_Boost) // Velocity target of 1 rps results in kV Volts output
+        .withKP(kP) // An error of 1 rps results in KP Volts output
         .withKI(0.0) // Avoid non-zero: No output for integrated error
         .withKD(0.0); // Output for error derivative
 
@@ -149,7 +155,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     final double scaledFeedForward = flywheelFeedForward * rpm + kS;
     currentFeedForward = scaledFeedForward;
     closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, currentFeedForward);*/
-    
     
     velocityTorqueRequest.Velocity = adjustedRpm / 60.0; // CTR uses revolutions per second
 
