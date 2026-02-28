@@ -52,6 +52,7 @@ public class RobotContainer {
   private final Trigger dpadLeftTriggerGoose = new Trigger(goose.povLeft());
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
+  private final Trigger backButtonGoose = new Trigger(goose.back());
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -160,15 +161,9 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-     // Default shooter controls
- /*   shooter.setDefaultCommand(ShooterCommands.joystickVoltsShoot(
-        shooter,
-        () -> -goose.getLeftX(),  
-        () -> -goose.getLeftY(), // Feed voltage
-        () -> -goose.getRightX(),
-        () -> -goose.getRightY())); // Shooter voltage
-*/
-
+    // Calibration shooter
+    goose.back().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+    
     shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
                                              rightTriggerGoose, // Feed shooter

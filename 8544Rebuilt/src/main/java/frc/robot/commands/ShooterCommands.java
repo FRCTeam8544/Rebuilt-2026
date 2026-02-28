@@ -13,6 +13,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -241,6 +245,9 @@ public class ShooterCommands {
             // When cancelled, calculate and print results
             .finallyDo(
                 () -> {
+                  DataLog log = DataLogManager.getLog();
+                  var voltageLogger = new DoubleLogEntry(log, "/Calibration/shooter/voltage");
+                  var velocityLogger = new DoubleLogEntry(log, "/Calibration/shooter/velocity");
                   int n = velocitySamples.size();
                   double sumX = 0.0;
                   double sumY = 0.0;
@@ -251,6 +258,8 @@ public class ShooterCommands {
                     sumY += voltageSamples.get(i);
                     sumXY += velocitySamples.get(i) * voltageSamples.get(i);
                     sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
+                    voltageLogger.append(voltageSamples.get(i).doubleValue());
+                    velocityLogger.append(velocitySamples.get(i).doubleValue());
                   }
                   double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
                   double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
