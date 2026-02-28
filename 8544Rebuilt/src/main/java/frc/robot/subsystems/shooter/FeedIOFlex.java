@@ -13,8 +13,10 @@ import com.revrobotics.spark.SparkClosedLoopController;
 
 import frc.robot.Constants.NeoVortex;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.Shooter.FeedWheel;
+import pabeles.concurrency.IntObjectConsumer;
 
-public class ShooterFeedIOFlex implements ShooterFeedIO {
+public class FeedIOFlex implements FeedIO {
   
     private static final int stallLimit = 40;
 
@@ -28,7 +30,7 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
     private final SparkClosedLoopController closedLoop;
     private final SparkFlexConfig motorConfig;
 
-  public ShooterFeedIOFlex(int canId) {
+  public FeedIOFlex(int canId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
     motorEncoder = motorController.getEncoder();
     closedLoop = motorController.getClosedLoopController();
@@ -57,10 +59,11 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
   }
 
   @Override
-  public void updateInputs(ShooterFeedIOInputs inOutData)
+  public void updateInputs(FeedIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.velocity = (float) motorEncoder.getVelocity();
+    inOutData.motorVelocity = motorEncoder.getVelocity();
+    inOutData.wheelVelocity = inOutData.motorVelocity * FeedWheel.kDriveToOutputGearRatio;
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
 
     // Fault codes
@@ -91,6 +94,8 @@ public class ShooterFeedIOFlex implements ShooterFeedIO {
 
   @Override
   public void setVoltage(double volts) {
+    //inOutData.(volts);
+//    inOutData.velocitySetPoint(0);
     motorController.setVoltage(volts);
   }
 

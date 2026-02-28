@@ -11,22 +11,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.ClimberCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.climber.ClimberIOFlex;
-import frc.robot.subsystems.climber.ClimberIOSim;
-import frc.robot.subsystems.climber.ClimberIO;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
-import java.util.function.BooleanSupplier;
+import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.shooter.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -38,15 +28,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
 
-
   // Subsystems
   private final Drive drive;
+  private Intake intake;
   private final Shooter shooter;
-  private final Climber climber;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
+
   private final Trigger aButtonGoose = new Trigger(goose.a());
   private final Trigger bButtonGoose = new Trigger(goose.b());
   private final Trigger yButtonGoose = new Trigger(goose.y());
@@ -67,8 +57,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
+    intake = new Intake();
     shooter = new Shooter();
-    climber = new Climber();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -82,7 +72,6 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-
         break;
 
       case SIM:
@@ -94,7 +83,6 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-
         break;
 
       default:
@@ -171,43 +159,45 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-     // Default shooter controls
- /*   shooter.setDefaultCommand(ShooterCommands.joystickVoltsShoot(
-        shooter,
-        () -> -goose.getLeftX(),  
-        () -> -goose.getLeftY(), // Feed voltage
-        () -> -goose.getRightX(),
-        () -> -goose.getRightY())); // Shooter voltage
-*/
+    intake.setDefaultCommand(
+        IntakeCommands.openLoopControl(
+            intake,
+            leftBackGoose, // retract arm
+            rightBackGoose, // extend arm
+            aButtonGoose,   // intake Fuel
+            yButtonGoose    // expel Fuel
+    ));
+
+    /*intake.setDefaultCommand(
+        IntakeCommands.closedPositionControl(
+            intake,
+            leftBackGoose,
+            rightBackGoose,
+            aButtonGoose,
+            yButtonGoose
+    ));*/
 
     shooter.setDefaultCommand(
-        ShooterCommands.buttonShoot(shooter, leftTriggerGoose,
-                                             rightTriggerGoose, 
+        ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
+                                             rightTriggerGoose, // Feed shooter
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,
                                              dpadLeftTriggerGoose, dpadRightTriggerGoose,
                                              startButtonGoose)
     );
 
-
-        climber.setDefaultCommand(
-        ClimberCommands.closedPositionControl(climber, xButtonGoose,  //was closedPositionControl
-                                             bButtonGoose
-                                            )
-    );
     // Raw feed and shooter voltage tuning
-    /*goose.leftTrigger().whileTrue(
+   /* goose.leftTrigger().whileTrue(
         ShooterCommands.openVoltageControl(shooter, 
                                             dpadUpTriggerGoose, // Feed trigger
                                             yButtonGoose, aButtonGoose, 
                                             xButtonGoose, bButtonGoose));
 
-    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));*/
+    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
+*/
 
-   /* shooter.setDefaultCommand(ShooterCommands.buttonShoot(
-              shooter,
-              leftBackGoose, 
-              aButtonGoose));*/
+  
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

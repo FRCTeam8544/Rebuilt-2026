@@ -1,12 +1,12 @@
+package frc.robot.subsystems.Intake;
 
-package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ShooterFeedIO {
-    
+public interface IntakeFeedIO {
+
   @AutoLog
-  public static class ShooterFeedIOInputs {
+  public static class IntakeFeedIOInputs {
     // Inputs
     public boolean connected = false;
 
@@ -21,7 +21,7 @@ public interface ShooterFeedIO {
     public boolean faultGateDriver;
     public boolean faultEscEeprom;
     public boolean faultFirmware;
-    
+
     // Outputs
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
@@ -30,13 +30,10 @@ public interface ShooterFeedIO {
 
     public double velocitySetPoint = 0.0; // Percent of max motor speed (0...1)
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
-
-    public double feedForward = 0.0;
   }
 
-  public default void updateInputs(ShooterFeedIOInputs inOutData) {}
+  public default void updateInputs(IntakeFeedIOInputs inOutData) {}
 
   public default void setVelocity(double rpm) {}
   public default void setVoltage(double volts) {}
-  
 }
