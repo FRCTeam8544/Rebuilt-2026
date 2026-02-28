@@ -26,22 +26,7 @@ public class Intake extends SubsystemBase {
     this.intakeIO = new IntakeIOMax(intakeCanId);
   }
 
-  public void runArmOpenLoop(double duty) {
-    
-    final double forwardLimit = 0.95; // Zero is "straight up" 870
-    final double backwardLimit = 0.07; // Stow position
-
-    double adjustedDuty = duty;
-    adjustedDuty = Math.min(adjustedDuty, 1.0);
-    adjustedDuty = Math.max(adjustedDuty, -1.0);
-
-    intakeInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
-    intakeInputs.positionSetPoint = 0.0;
-
-
-  }
-
-  public void runFeedOpenLoop(double duty) {
+  public void runIntakeOpenLoop(double duty) {
     double adjustedDuty = duty;
   //  adjustedDuty = Math.min(adjustedDuty, 1.0);
     //adjustedDuty = Math.max(adjustedDuty, -1.0);
@@ -64,7 +49,7 @@ public class Intake extends SubsystemBase {
     intakeIO.setVelocity(intakeInputs.velocitySetPoint);
   }
   
-  public void stopFeed() {
+  public void stopIntake() {
     intakeInputs.voltageSetPoint = 0;
     intakeInputs.velocitySetPoint = 0;
     intakeIO.setVoltage(0);

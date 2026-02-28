@@ -12,8 +12,8 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkClosedLoopController;
 
 import frc.robot.Constants.NeoVortex;
-import frc.robot.subsystems.shooter.ShooterIO;
-import frc.robot.subsystems.shooter.Shooter.FeedWheel;
+import frc.robot.subsystems.Feeder.*;
+import frc.robot.subsystems.Feeder.Feeder.FeedWheel;
 import pabeles.concurrency.IntObjectConsumer;
 
 public class FeederIOFlex implements FeederIO {
@@ -86,9 +86,9 @@ public class FeederIOFlex implements FeederIO {
   
   @Override
   public void setVelocity(double rpm) {
-    final double flywheelFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel
-    final double scaledFeedForward = flywheelFeedForward * rpm + kS;
-    currentFeedForward = scaledFeedForward;
+    final double feederFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel
+    final double scaledfeederFeedForward = feederFeedForward * rpm + kS;
+    currentFeedForward = scaledfeederFeedForward;
     closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, currentFeedForward);
   }
 

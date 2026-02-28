@@ -5,9 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.subsystems.shooter.ShooterIO;
-import frc.robot.subsystems.shooter.ShooterIOInputsAutoLogged;
-import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
+
 import frc.robot.Constants;
 import frc.robot.subsystems.Feeder.*;;
 public class Feeder extends SubsystemBase{
@@ -22,19 +20,14 @@ public class Feeder extends SubsystemBase{
       public static final double kMaxFeedRPM = Constants.NeoVortex.freeSpeedRPM * kDriveToOutputGearRatio;
     }
 
-    public static final int leftMotorCanID = 24;
-    public static final int rightMotorCanID = 25;
     public static final int feedMotorCanID = 26;
 
     private final FeederIO feedIO;
     private final FeedIOInputsAutoLogged feedInputs = new FeedIOInputsAutoLogged();
 
     private double tuneFeedVoltage = 10.0;
-    private double tuneShootVoltage = 0.0;
     private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
-    private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
 
-   private double tuneShootRpmAdjust = 0.0;
    private double tuneFeedRpmAdjust = 0.0;
    
     public Feeder()
@@ -66,6 +59,12 @@ public class Feeder extends SubsystemBase{
 
 
     public void runFeedOpenLoop()
+    {
+      runFeedOpenLoop( tuneFeedVoltage / Constants.Neo550.nominalVoltage);
+    }
+
+
+        public void runFeedOpenLoopReverse()
     {
       runFeedOpenLoop( tuneFeedVoltage / Constants.Neo550.nominalVoltage);
     }
@@ -105,48 +104,8 @@ public class Feeder extends SubsystemBase{
       tuneFeedRpmAdjust = 0.0;
     }
 
-    public void resetShooterDefaultVoltage() {
-      tuneShootVoltage = 0.0;
-    }
-
-    public void resetShooterDefaultRpm() {
-      tuneShootRpmAdjust = 0.0;
-    }
-
     public void feedRpmAdjust(double rpmAdjust) {
       tuneFeedRpmAdjust += rpmAdjust;
-    }
-
-    public void shooterRpmAdjust(double rpmAdjust)
-    {
-      tuneShootRpmAdjust += rpmAdjust;
-    }
-
-    // ------------------ Shooter ------------------------
-
-    public void stopShooter() {
-    //  if (Math.abs(getFlywheelVelocityRPM()) > 250) {
-     //   shooterIO.setVoltage(-1.0); // Gentle break
-     // }
-     // else {
-     
-      feedInputs.voltageSetPoint = 0.0;
-      feedInputs.velocitySetPoint = 0;
-        feedIO.setVoltage(0.0); // Gentle break
-     // }
-    }
-
-    // This should be the requested flywheel RPM
-    public void runShooter(double rpm) {
-
-      double adjustedRpm = rpm;
-      
-      if (rpm > 0.0) {
-        adjustedRpm += tuneShootRpmAdjust;
-      }
-
-      // Prevent out of spec RPM
-
     }
 
     // -------------------  FEED --------------------------------
@@ -181,21 +140,19 @@ public class Feeder extends SubsystemBase{
   @Override
   public void periodic() {
     feedIO.updateInputs(feedInputs);
-    Logger.processInputs("Shooter/Feed", feedInputs);
+    Logger.processInputs("Feeder/Feed", feedInputs);
     
     
-    SmartDashboard.putNumber("Shooter RPM", feedInputs.motorVelocity);
-    SmartDashboard.putNumber("Shooter RPM Setpoint", feedInputs.velocitySetPoint);
-    
-    SmartDashboard.putNumber("Shooter Leader Temp", feedInputs.motorTemperature);
-
+    SmartDashboard.putNumber("Feeder RPM", feedInputs.motorVelocity);
+    SmartDashboard.putNumber("Feeder RPM Setpoint", feedInputs.velocitySetPoint);
+    SmartDashboard.putNumber("Feeder Leader Temp", feedInputs.motorTemperature);
   }
 
   private void setupDefaultDashboard()
   {
-    SmartDashboard.setDefaultNumber("Shooter RPM", feedInputs.motorVelocity);
-    SmartDashboard.setDefaultNumber("Shooter RPM Setpoint", feedInputs.velocitySetPoint);
-    SmartDashboard.setDefaultNumber("Shooter Leader Temp", feedInputs.motorTemperature);
+    SmartDashboard.setDefaultNumber("Feeder RPM", feedInputs.motorVelocity);
+    SmartDashboard.setDefaultNumber("Feeder RPM Setpoint", feedInputs.velocitySetPoint);
+    SmartDashboard.setDefaultNumber("Feeder Leader Temp", feedInputs.motorTemperature);
   }
 
 }

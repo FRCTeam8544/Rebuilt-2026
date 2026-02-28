@@ -18,7 +18,6 @@ public class Arm extends SubsystemBase {
 
 
   public static final int armCanId = 27;
-  public static final int feedCanId = 28;
   public final ArmIO ArmIO;
   public final ArmIOInputsAutoLogged ArmInputs = new ArmIOInputsAutoLogged();
 
@@ -30,8 +29,8 @@ public class Arm extends SubsystemBase {
 
   public void runArmOpenLoop(double duty) {
     
-    final double forwardLimit = 0.95; // Zero is "straight up" 870
-    final double backwardLimit = 0.07; // Stow position
+   // final double forwardLimit = 0.95; // Zero is "straight up" 870
+   // final double backwardLimit = 0.07; // Stow position
 
     double adjustedDuty = duty;
     adjustedDuty = Math.min(adjustedDuty, 1.0);
@@ -40,10 +39,8 @@ public class Arm extends SubsystemBase {
     ArmInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
     ArmInputs.positionSetPoint = 0.0;
 
-    //if ((intakeArmInputs.position < forwardLimit) ||
-      //  (intakeArmInputs.position > backwardLimit) ) {
       ArmIO.setVoltage(ArmInputs.voltageSetPoint);
-   // }
+   
   }
 
 

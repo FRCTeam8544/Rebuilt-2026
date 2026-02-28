@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.shooter.Shooter;
-
+import frc.robot.subsystems.Feeder.*;  //TODO move to new FeederCommands.java
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -43,7 +43,7 @@ public class ShooterCommands {
     public static Command stopMotors(Shooter shooter) {
         return Commands.run(
         () -> {
-                shooter.stopFeed();
+                
                 shooter.stopShooter();
             },
             shooter);
@@ -53,11 +53,10 @@ public class ShooterCommands {
     // begins to slightly turn, then back off a bit.
     // This term will be used in the PID with feedforward control later.
     public static Command openVoltageControl(Shooter shooter,
-                                         Trigger feedTrigger,
+                                         
                                          Trigger increaseVoltTrigger,
-                                         Trigger decreaseVoltTrigger,
-                                         Trigger increaseFeedVoltageTrigger,
-                                         Trigger decreaseFeedVoltageTrigger)
+                                         Trigger decreaseVoltTrigger
+                                         )
     {
         return Commands.run(
         () -> {
@@ -76,46 +75,22 @@ public class ShooterCommands {
                 }
             }
             
-            boolean increaseFeedVolt = increaseFeedVoltageTrigger.getAsBoolean();
-            boolean decreaseFeedVolt = decreaseFeedVoltageTrigger.getAsBoolean();
-            if (increaseFeedVolt ^ decreaseFeedVolt) {
-                if (increaseFeedVoltageTrigger.getAsBoolean())
-                {
-                    shooter.tuneIncreaseFeedVoltage();
-                }
-                else
-                {
-                    shooter.tuneDecreaseFeedVoltage();
-                }
-            }
 
             shooter.runShooterOpenLoop();
-            //shooter.runShooter(3000);
-            
-            if (feedTrigger.getAsBoolean())
-            {
-                shooter.runFeedOpenLoop();
-            }
-            else {
-                shooter.runFeedOpenLoop(0.0);
-            }
+
         },
         shooter);
     }
 
     public static Command buttonShoot( Shooter shooter,
                                        Trigger shootTrigger,
-                                       Trigger feedTrigger,
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp,
-                                       Trigger feedAdjustDown,
-                                       Trigger feedAdjustUp,
                                        Trigger resetShooterDefaults)
     {
         return Commands.run(
         () -> {
 
-            final int feedNominalRpm = 300;
             final int rpmAdjustStep = 5;
             final int shooterNominalRpm = 3000;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
@@ -136,6 +111,8 @@ public class ShooterCommands {
                     }
                 }
             }
+
+            shooter.runShooterOpenLoop();  //may remove
           //  else {
              //   shooter.resetShooterDefaultVoltage();
              //   shooter.resetFeedDefaultRpm();
@@ -149,27 +126,9 @@ public class ShooterCommands {
                 shooter.stopShooter();
             }
 
-            boolean feedAdjUp = feedAdjustUp.getAsBoolean();
-            boolean feedAdjDown = feedAdjustDown.getAsBoolean();
-            if (feedAdjDown ^ feedAdjUp) {
-                if (feedAdjUp) {
-                    shooter.tuneIncreaseFeedVoltage();
-                    //shooter.feedRpmAdjust(rpmAdjustStep);
-                }
-                else {
-                    shooter.tuneDecreaseFeedVoltage();
-                   //shooter.feedRpmAdjust(-rpmAdjustStep);
-                }
-            }
 
-            if (feedTrigger.getAsBoolean())
-            {
-               // shooter.runFeed(feedNominalRpm);
-                shooter.runFeedOpenLoop();
-            }
-            else {
-                shooter.stopFeed();
-            }
+
+
         },
         shooter);
     } 

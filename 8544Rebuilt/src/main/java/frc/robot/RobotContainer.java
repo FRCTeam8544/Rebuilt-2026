@@ -11,12 +11,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.FeederCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.shooter.*;
+import frc.robot.subsystems.Feeder.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -32,6 +34,7 @@ public class RobotContainer {
   private final Drive drive;
   private Intake intake;
   private final Shooter shooter;
+  private final Feeder feeder;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -59,6 +62,7 @@ public class RobotContainer {
 
     intake = new Intake();
     shooter = new Shooter();
+    feeder = new Feeder();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -179,10 +183,17 @@ public class RobotContainer {
 
     shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
-                                             rightTriggerGoose, // Feed shooter
+                                            
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,
-                                             dpadLeftTriggerGoose, dpadRightTriggerGoose,
+                                    
                                              startButtonGoose)
+    );
+
+    feeder.setDefaultCommand(
+        FeederCommands.buttonFeed(feeder, rightTriggerGoose, 
+          dpadRightTriggerGoose, 
+         dpadLeftTriggerGoose, bButtonGoose
+          )
     );
 
     // Raw feed and shooter voltage tuning

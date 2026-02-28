@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Intake.*;
-import frc.robot.subsystems.Arm.*;
+
 
 
 public class IntakeCommands {
@@ -22,35 +22,19 @@ public class IntakeCommands {
       return Commands.run(
         () -> {
 
-          final double armExtendDuty = 0.6;
-          final double armRetractDuty = -0.8;
-          boolean extendPosition = armOutTrigger.getAsBoolean();
-          boolean retractPosition = armInTrigger.getAsBoolean();
-          // If and only if one button is pressed at a time
-          if (retractPosition ^ extendPosition) {
-            if (extendPosition) {
-              intake.runArmOpenLoop(armExtendDuty); // Set Extend Position
-            } else {
-              intake.runArmOpenLoop(armRetractDuty); // Set Retract Position
-            }
-          }
-          else { 
-            intake.runArmOpenLoop(0.0);
-          }
-
           final double intakeFeedDuty = 1.0;
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
           if (intakeFuel ^ expelFuel) {
             if (intakeFuel) {
-              intake.runFeedOpenLoop(intakeFeedDuty);
+              intake.runIntakeOpenLoop(intakeFeedDuty);
             }
             else {
-              intake.runFeedOpenLoop(-intakeFeedDuty);
+              intake.runIntakeOpenLoop(-intakeFeedDuty);
             }
           }
           else {
-            intake.runFeedOpenLoop(0.0);
+            intake.runIntakeOpenLoop(0.0);
           }
 
         },
