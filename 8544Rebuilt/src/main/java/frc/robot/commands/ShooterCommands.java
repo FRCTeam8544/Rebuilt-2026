@@ -117,6 +117,7 @@ public class ShooterCommands {
             final int feedNominalRpm = 300;
             final int rpmAdjustStep = 100 / 50;
             final int shooterNominalRpm = 2700;
+           // final double shooterNominalRpm = 337.5;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
 
