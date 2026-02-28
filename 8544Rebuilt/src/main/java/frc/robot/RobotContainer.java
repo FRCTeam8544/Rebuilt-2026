@@ -13,10 +13,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.ClimberCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.shooter.*;
+import frc.robot.subsystems.climber.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -30,8 +32,9 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
-  private Intake intake;
+  private final Intake intake;
   private final Shooter shooter;
+  private final Climber climber;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -50,6 +53,7 @@ public class RobotContainer {
   private final Trigger dpadLeftTriggerGoose = new Trigger(goose.povLeft());
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
+  private final Trigger backButtonGoose = new Trigger(goose.back());
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -59,6 +63,7 @@ public class RobotContainer {
 
     intake = new Intake();
     shooter = new Shooter();
+    climber = new Climber();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -72,6 +77,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
         break;
 
       case SIM:
@@ -168,34 +174,19 @@ public class RobotContainer {
             yButtonGoose    // expel Fuel
     ));
 
-    /*intake.setDefaultCommand(
-        IntakeCommands.closedPositionControl(
-            intake,
-            leftBackGoose,
-            rightBackGoose,
-            aButtonGoose,
-            yButtonGoose
-    ));*/
-
     shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
                                              rightTriggerGoose, // Feed shooter
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,
-                                             dpadLeftTriggerGoose, dpadRightTriggerGoose,
-                                             startButtonGoose)
+                                             dpadLeftTriggerGoose, dpadRightTriggerGoose
+                                             )
     );
 
-    // Raw feed and shooter voltage tuning
-   /* goose.leftTrigger().whileTrue(
-        ShooterCommands.openVoltageControl(shooter, 
-                                            dpadUpTriggerGoose, // Feed trigger
-                                            yButtonGoose, aButtonGoose, 
-                                            xButtonGoose, bButtonGoose));
+   
+    climber.setDefaultCommand(
+        ClimberCommands.openVoltageControl(climber,
+                                           backButtonGoose, startButtonGoose));
 
-    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
-*/
-
-  
   }
 
 

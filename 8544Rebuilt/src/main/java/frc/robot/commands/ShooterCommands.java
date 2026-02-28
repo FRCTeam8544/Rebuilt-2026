@@ -109,8 +109,7 @@ public class ShooterCommands {
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp,
                                        Trigger feedAdjustDown,
-                                       Trigger feedAdjustUp,
-                                       Trigger resetShooterDefaults)
+                                       Trigger feedAdjustUp)
     {
         return Commands.run(
         () -> {

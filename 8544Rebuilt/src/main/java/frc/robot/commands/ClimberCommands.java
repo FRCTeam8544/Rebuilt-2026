@@ -16,8 +16,8 @@ public class ClimberCommands {
   public static Command stopMotors(Climber climber) {
     return Commands.run(
         () -> {
-        //  climber.stopOpenLoop();
-          climber.holdArmPosition();
+        //  climber.holdArmPosition();
+          climber.runArmOpenLoop(0);
         },
         climber);
   }
@@ -47,7 +47,7 @@ public class ClimberCommands {
         },
         climber);
   }
-/* 
+
   public static Command openVoltageControl(
       Climber climber,
       Trigger extendTrigger,
@@ -57,17 +57,20 @@ public class ClimberCommands {
         () -> {
           boolean extendPosition = extendTrigger.getAsBoolean();
           boolean retractPosition = retractTrigger.getAsBoolean();
+          double climberDuty = 0.3;
           // If and only if one button is pressed at a time
           if (retractPosition ^ extendPosition) {
             if (extendPosition) {
-              climber.increaseArmVoltage(); // Set Extend Position
+              climber.runArmOpenLoop(climberDuty); // Extend
             } else {
-              climber.decreaseArmVoltage(); // Set Retract Position
+              climber.runArmOpenLoop(-climberDuty); // Retract
             }
-           } 
-          climber.runArmOpenLoop(0);
-
+           }
+           else {
+              climber.runArmOpenLoop(0);
+           }
         },
         climber);
-  } */
   }
+
+}

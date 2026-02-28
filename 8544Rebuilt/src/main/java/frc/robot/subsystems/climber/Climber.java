@@ -1,102 +1,102 @@
 package frc.robot.subsystems.climber;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
 
-  public static final int climberCanId = 29;
-
+  private static final int climberCanId = 29;
+ //private static final int climberCanCoderId = 84;??
   
-    private final ClimberIO climberIO;
-    private final ClimberIOInputsAutoLogged climberInputs = new ClimberIOInputsAutoLogged();
+  private final ClimberIO climberIO;
+  private final ClimberIOInputsAutoLogged climberInputs = new ClimberIOInputsAutoLogged();
 
-   // private double tuneVoltage = 0.0;
- //   private final double tuneVoltStep = 1.0 / 50.0; // 1 volt per second
+  private final double minPositionLimit = 0;   // Rotations
+  private final double maxPositionLimit = 0.5; // Rotations
 
-    private final double minPositionLimit = 0;   // Rotations
-    private final double maxPositionLimit = 0.5; // Rotations
- //   private final double armVoltageStep = 1.0 / 50.0; // 1v/s
+  // Zero faces to the front of robot
+  public DoubleSupplier armPositionSupplier =
+    () -> {
+      // TODO provide in degrees, use rotations for now
+      //return Units.rotationsToDegrees(climberInputs.absolutePosition);
+      return climberInputs.position;
+    };
+
+  public DoubleSupplier armSetPointSupplier =
+    () -> {
+      // TODO provide in degrees, use rotations for now
+      //return Units.rotationsToDegrees(climberInputs.positionSetPoint);
+      return climberInputs.positionSetPoint;
+    };
+
+  public DoubleSupplier motorTempSupplier =
+    () -> {
+      return climberInputs.motorTemperature;
+    };
 
   public Climber() {
     this.climberIO = new ClimberIOFlex(climberCanId);
+    
+    setupDefaultDashboard();
   }
 
   public void runArmToPosition(double rotations) {
-      if (rotations > 1.0) {
+      if (rotations > maxPositionLimit) {
         rotations = 1.0;
       }
-      else if (rotations < 0.0) {
+      else if (rotations < minPositionLimit) {
         rotations = 0.0;
       }
       climberInputs.voltageSetPoint = 0.0;
       climberInputs.positionSetPoint = (float) rotations;
 
-      climberIO.setPosition(climberInputs.position);  //*100.0 */
+      climberIO.setPosition(climberInputs.position);
   }
-
 
   public void holdArmPosition() {
-
-      climberInputs.positionSetPoint = climberInputs.position;
-
-      climberIO.setPosition(climberInputs.positionSetPoint);
-  
+    climberInputs.voltageSetPoint = 0.0;
+    climberInputs.positionSetPoint = climberInputs.position;
+    climberIO.setPosition(climberInputs.positionSetPoint);
   }
-/* 
-  public void runArmOpenLoop(double voltage) {
-    double adjustedDuty = voltage + tuneVoltage;
-    if (adjustedDuty > 12.0)
+ 
+  public void runArmOpenLoop(double duty) {
+    double adjustedDuty = duty;
+    if (adjustedDuty > 1.0)
     {
-      adjustedDuty = 12.0;
+      adjustedDuty = 1.0;
     }
-    else if (voltage < 0) {
-      adjustedDuty = 0.0;
+    else if (adjustedDuty < -1.0) {
+      adjustedDuty = -1.0;
     }
 
     climberInputs.positionSetPoint = 0.0;
-    climberInputs.voltageSetPoint = (float) adjustedDuty;
+    climberInputs.voltageSetPoint = (float) adjustedDuty * Constants.kNominalVoltage;
     climberIO.setVoltage(climberInputs.voltageSetPoint);
   }
-
-
-
-    public void increaseArmVoltage() {
-    tuneVoltage += armVoltageStep;
-    if (tuneVoltage > 12.0)
-    {
-      tuneVoltage = 12.0;
-    }
-    else if (tuneVoltage < 0) {
-      tuneVoltage = 0.0;
-    }
-  }
-
-   
-    public void decreaseArmVoltage() {
-    tuneVoltage -= armVoltageStep;
-    if (tuneVoltage > 12.0)
-    {
-      tuneVoltage = 12.0;
-    }
-    else if (tuneVoltage < 0) {
-      tuneVoltage = 0.0;
-    }
-  }
-    */
 
 
   @Override
   public void periodic() {
     climberIO.updateInputs(climberInputs);
-    Logger.processInputs("Climber/Motor", climberInputs);
+    Logger.processInputs("Climber", climberInputs);
 
     SmartDashboard.putNumber("Climber Position", climberInputs.position);
     SmartDashboard.putNumber("Climber Setpoint", climberInputs.positionSetPoint);
-    
-    SmartDashboard.putNumber("Intake Arm Temp", climberInputs.motorTemperature);
+    SmartDashboard.putNumber("Climber Motor Temp", climberInputs.motorTemperature);
   }
+
+
+private void setupDefaultDashboard()
+{
+  SmartDashboard.setDefaultNumber("Climber Position", climberInputs.position);
+  SmartDashboard.setDefaultNumber("Climber SetPoint", climberInputs.positionSetPoint);
+  SmartDashboard.setDefaultNumber("Climber Motor Temp", climberInputs.motorTemperature);
+}
+
 }

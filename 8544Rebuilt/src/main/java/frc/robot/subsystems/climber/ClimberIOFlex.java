@@ -18,7 +18,7 @@ public class ClimberIOFlex implements ClimberIO {
     private static final double nominalVoltage = Constants.NeoVortex.nominalVoltage;
     private static final double nominalFF = Constants.NeoVortex.nominalFF;
     private static final double Ks = 0.120;
-    private static final int stallLimit = 30;
+    private static final int stallLimit = 40;
 
     private final SparkFlex motorController;    
     private final AbsoluteEncoder motorEncoder;
@@ -44,7 +44,7 @@ public class ClimberIOFlex implements ClimberIO {
 
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          // Velocity control
+          // Position Control
           .p(150.00, ClosedLoopSlot.kSlot0)
           .i(0.00000, ClosedLoopSlot.kSlot0)
           .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
