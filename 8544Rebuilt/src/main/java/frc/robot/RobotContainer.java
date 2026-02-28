@@ -174,8 +174,8 @@ public class RobotContainer {
             yButtonGoose    // expel Fuel
     ));
 
- //   goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
-  //  goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
+//    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+ //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
 
     shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel

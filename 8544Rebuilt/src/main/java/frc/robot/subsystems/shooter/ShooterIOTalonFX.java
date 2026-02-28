@@ -28,11 +28,13 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // TODO>>>..
     private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
-    private static final double kV = (1.0 / kMeasuredKv) * 10; // Convert to V per RPS
-    private static final double kV_Boost = 0.0;
-    private static final double kS = 0.33;
-    private static final double kP = 0.2778;
+    //private static final double kV = (1.0 / kMeasuredKv) * 5; // Convert to V per RPS
+    //private static final double kV = (1.0 / kMeasuredKv) * 5; // Convert to V per RPS
+    private static final double kV = 0.155; // For 32.1 rps
 
+    private static final double kS = 1.8; // AMps // 0.33 was
+    //private static final double kP = 10.0 / 32.1; // 0.2778; 36 is target rps of motor
+    private static final double kP = 10.0 / 5.6; // 0.2778; 36 is target rps of motor
     // Raw voltage to RPM
     // 
 
@@ -90,7 +92,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Closed loop settings for velocity control
     leaderConfig.Slot0
         .withKS(kS) // Add V output to overcome static friction
-        .withKV(kV + kV_Boost) // Velocity target of 1 rps results in kV Volts output
+        .withKV(kV) // Velocity target of 1 rps results in kV Volts output
         .withKP(kP) // An error of 1 rps results in KP Volts output
         .withKI(0.0) // Avoid non-zero: No output for integrated error
         .withKD(0.0); // Output for error derivative
@@ -136,7 +138,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Outputs
     inOutData.busVoltage = (float) leaderTalon.getSupplyCurrent().getValueAsDouble();
     inOutData.outputDuty = (float) leaderTalon.getDutyCycle().getValueAsDouble(); // -1 to 1 percent applied of bus voltage
-    inOutData.outputCurrent = (float) leaderTalon.getStatorCurrent().getValueAsDouble();
+    inOutData.outputCurrent = (float) leaderTalon.getTorqueCurrent().getValueAsDouble();
     inOutData.outputVoltage = (float) leaderTalon.getMotorVoltage().getValueAsDouble();
 
     inOutData.feedForward = currentFeedForward;
