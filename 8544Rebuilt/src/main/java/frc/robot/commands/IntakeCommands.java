@@ -37,7 +37,7 @@ public class IntakeCommands {
             intake.runArmOpenLoop(0.0);
           }
 
-          final double intakeFeedDuty = 1.0;
+          final double intakeFeedDuty = 0.7;
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
           if (intakeFuel ^ expelFuel) {
