@@ -11,7 +11,13 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.units.measure.Angle;
+
+import com.ctre.phoenix6.hardware.CANcoder;
+
 import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 
 public class ClimberIOFlex implements ClimberIO {
 
@@ -19,17 +25,24 @@ public class ClimberIOFlex implements ClimberIO {
     private static final double nominalFF = Constants.NeoVortex.nominalFF;
     private static final double Ks = 0.120;
     private static final int stallLimit = 40;
-
+    private static double climberPosition = 0;
+    //private final double cancoderPosition=0;
+    
     private final SparkFlex motorController;    
     private final AbsoluteEncoder motorEncoder;
     private final SparkClosedLoopController closedLoop;
     private final SparkFlexConfig motorConfig;
+    private final CANcoder cancoder;
+
+
 
   public ClimberIOFlex(int canId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
     motorEncoder = motorController.getAbsoluteEncoder();// TODO should be external encoder??
     closedLoop = motorController.getClosedLoopController();
-    
+
+    cancoder = new CANcoder(31, TunerConstants.kCANBus);
+    climberPosition = cancoder.getPosition().getValueAsDouble();
     motorConfig = new SparkFlexConfig();
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig.smartCurrentLimit(stallLimit);
@@ -66,6 +79,8 @@ public class ClimberIOFlex implements ClimberIO {
     inOutData.velocity = (float) motorEncoder.getVelocity();
     inOutData.position = (float) motorEncoder.getPosition();
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
+    //cancoder
+    inOutData.climberPosition = (double) climberPosition;
 
     // Fault codes
     Faults faults = motorController.getFaults();
@@ -81,6 +96,7 @@ public class ClimberIOFlex implements ClimberIO {
     inOutData.outputDuty = (float) motorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) motorController.getOutputCurrent();
     inOutData.outputVoltage = (float) (motorController.getAppliedOutput() * nominalVoltage);
+
   }
 
   public void setPosition(double rotations) {

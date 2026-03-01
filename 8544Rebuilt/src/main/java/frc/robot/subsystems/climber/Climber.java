@@ -20,6 +20,14 @@ public class Climber extends SubsystemBase {
   private final double minPositionLimit = 0;   // Rotations
   private final double maxPositionLimit = 0.5; // Rotations
 
+
+  public DoubleSupplier climberRealPositionSupplier =
+    () -> {
+      // TODO provide in degrees, use rotations for now
+      //return Units.rotationsToDegrees(climberInputs.absolutePosition);
+      return climberInputs.climberPosition;
+    };
+
   // Zero faces to the front of robot
   public DoubleSupplier armPositionSupplier =
     () -> {
@@ -27,6 +35,7 @@ public class Climber extends SubsystemBase {
       //return Units.rotationsToDegrees(climberInputs.absolutePosition);
       return climberInputs.position;
     };
+
 
   public DoubleSupplier armSetPointSupplier =
     () -> {
@@ -89,6 +98,7 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Climber Position", climberInputs.position);
     SmartDashboard.putNumber("Climber Setpoint", climberInputs.positionSetPoint);
     SmartDashboard.putNumber("Climber Motor Temp", climberInputs.motorTemperature);
+    SmartDashboard.putNumber("Climber Encoder Position", climberInputs.climberPosition);
   }
 
 
@@ -97,6 +107,7 @@ private void setupDefaultDashboard()
   SmartDashboard.setDefaultNumber("Climber Position", climberInputs.position);
   SmartDashboard.setDefaultNumber("Climber SetPoint", climberInputs.positionSetPoint);
   SmartDashboard.setDefaultNumber("Climber Motor Temp", climberInputs.motorTemperature);
+  SmartDashboard.setDefaultNumber("Climber Encoder Position", climberInputs.climberPosition);
 }
 
 }
