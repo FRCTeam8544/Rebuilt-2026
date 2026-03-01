@@ -153,6 +153,32 @@ public class Shooter extends SubsystemBase{
 
       shooterIO.setVelocity(motorVelocitySetPoint);
     }
+
+// --- ADDED FOR LED CONTROL DURING SHOOTING ---
+    // Minimum motor RPM setpoint to be considered "spinning up"
+    private static final double FLYWHEEL_SETPOINT_MIN_MOTOR_RPM = 100;
+    // Motor RPM tolerance for "at setpoint" (launch-ready)
+    private static final double LAUNCH_TOLERANCE_MOTOR_RPM = 150;
+
+    /**
+     * Returns true when the flywheel is at its commanded velocity setpoint within tolerance,
+     * indicating the robot is ready to launch.
+     */
+    public boolean isAtLaunchSetpoint() {
+      return shooterInputs.velocitySetPoint > FLYWHEEL_SETPOINT_MIN_MOTOR_RPM
+          && Math.abs(shooterInputs.motorVelocity - shooterInputs.velocitySetPoint)
+              < LAUNCH_TOLERANCE_MOTOR_RPM;
+    }
+
+    /**
+     * Returns true when the flywheel is spinning and the feed is actively running,
+     * indicating the robot is actively launching.
+     */
+    public boolean isShooting() {
+      boolean feedActive = feedInputs.voltageSetPoint > 0.5 || feedInputs.velocitySetPoint > 50;
+      return shooterInputs.flywheelVelocity > 100 && feedActive;
+    }
+// --- END  ---
   
   public boolean isFlywheelOverspeed() {
     

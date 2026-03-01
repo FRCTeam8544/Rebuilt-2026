@@ -65,6 +65,14 @@ public class Intake extends SubsystemBase {
     intakeIO.setVoltage(0);
   }
 
+// --- ADDED FOR LED CONTROL DURING INTAKE ---
+  /** Returns true if the intake feed is actively running (voltage or velocity commanded). */
+  public boolean isFeedIntaking() {
+    return Math.abs(intakeFeedInputs.voltageSetPoint) > 0.5
+        || intakeFeedInputs.velocitySetPoint > 50;
+  }
+// --- END  ---
+
   @Override
   public void periodic() {
     intakeIO.updateInputs(intakeInputs);

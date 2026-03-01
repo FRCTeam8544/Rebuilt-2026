@@ -18,6 +18,7 @@ import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.climber.*;
+import frc.robot.subsystems.leds.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -36,6 +37,7 @@ public class RobotContainer {
   private final Feeder feeder;
   private final Shooter shooter;
   private final Climber climber;
+  private final Leds leds;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -80,7 +82,13 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-
+        leds = new Leds(
+            new LedIOCANdle(),
+            intake::isFeedIntaking,
+            shooter::isAtLaunchSetpoint,
+            shooter::isShooting,
+            climber::isAtClimbPosition,
+            climber::isClimbing);
         break;
 
       case SIM:
@@ -92,6 +100,13 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        leds = new Leds(
+            new LedIOSim(),
+            intake::isFeedIntaking,
+            shooter::isAtLaunchSetpoint,
+            shooter::isShooting,
+            climber::isAtClimbPosition,
+            climber::isClimbing);
         break;
 
       default:
@@ -103,6 +118,13 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        leds = new Leds(
+            new LedIO() {},
+            intake::isFeedIntaking,
+            shooter::isAtLaunchSetpoint,
+            shooter::isShooting,
+            climber::isAtClimbPosition,
+            climber::isClimbing);
         break;
     }
 
