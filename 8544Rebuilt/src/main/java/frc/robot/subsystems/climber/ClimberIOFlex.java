@@ -43,6 +43,7 @@ public class ClimberIOFlex implements ClimberIO {
 
     cancoder = new CANcoder(31, TunerConstants.kCANBus);
     climberPosition = cancoder.getPosition().getValueAsDouble();
+
     motorConfig = new SparkFlexConfig();
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig.smartCurrentLimit(stallLimit);
@@ -80,7 +81,7 @@ public class ClimberIOFlex implements ClimberIO {
     inOutData.position = (float) motorEncoder.getPosition();
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
     //cancoder
-    inOutData.climberPosition = (double) climberPosition;
+    inOutData.climberPosition = (float) climberPosition;
 
     // Fault codes
     Faults faults = motorController.getFaults();

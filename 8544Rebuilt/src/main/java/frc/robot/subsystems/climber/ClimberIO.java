@@ -11,6 +11,7 @@ public interface ClimberIO {
 
     public float velocity = 0.0f;
     public float position = 0.0f;
+    public float climberPosition = 0.0f;
 
     public float motorTemperature = 0.0f;
 
@@ -31,7 +32,7 @@ public interface ClimberIO {
 
     public double positionSetPoint = 0.0;
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
-    public double climberPosition = 0.0;
+
   }
 
   public default void updateInputs(ClimberIOInputs inOutData) {}
