@@ -142,13 +142,14 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.feedForward = currentFeedForward;
   }
 
-  // Set shooter target velocity in RPM, using closed loop with feedforward.
+  // Set shooter target motor velocity in RPM, using closed loop current control.
   @Override
   public void setVelocity(double rpm) {
 
-    // Woops double velocity reduction....request already converts to the expected motor rpm
-    //double adjustedRpm = Flywheel.kOutputToDriveGearRatio * rpm;
-    double adjustedRpm = rpm;// Double reduction.......Flywheel.kOutputToDriveGearRatio * rpm;
+    // Todo add arbitrary feedforward to smooth out the loop?
+
+    // Request is already in motor velocity rpm, not flywheel.
+    double adjustedRpm = rpm;
       
     velocityTorqueRequest.Velocity = adjustedRpm / 60.0; // CTR uses revolutions per second
 
