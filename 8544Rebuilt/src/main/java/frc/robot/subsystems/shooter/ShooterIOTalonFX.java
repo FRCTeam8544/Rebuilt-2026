@@ -146,16 +146,10 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void setVelocity(double rpm) {
 
-    // Adjust for output overdrive gearing. The request is relative to the desired flywheel output rpm.
-    // This will decrease the requested motor RPM so that the output flywheel is at the requested rpm.
-    double adjustedRpm = Flywheel.kOutputToDriveGearRatio * rpm;
-    /*
-    Raw feed forward style
-    final double flywheelFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel
-    final double scaledFeedForward = flywheelFeedForward * rpm + kS;
-    currentFeedForward = scaledFeedForward;
-    closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, currentFeedForward);*/
-    
+    // Woops double velocity reduction....request already converts to the expected motor rpm
+    //double adjustedRpm = Flywheel.kOutputToDriveGearRatio * rpm;
+    double adjustedRpm = rpm;// Double reduction.......Flywheel.kOutputToDriveGearRatio * rpm;
+      
     velocityTorqueRequest.Velocity = adjustedRpm / 60.0; // CTR uses revolutions per second
 
     // Control requests must be sent in pairs to control the leader and follower together.
