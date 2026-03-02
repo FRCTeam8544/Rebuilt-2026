@@ -148,9 +148,8 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void setVelocity(double rpm) {
 
-    // Adjust for output overdrive gearing. The request is relative to the desired flywheel output rpm.
-    // This will decrease the requested motor RPM so that the output flywheel is at the requested rpm.
-    double adjustedRpm = Flywheel.kOutputToDriveGearRatio * rpm;
+    // The request is relative to the desired flywheel output rpm.
+    double adjustedRpm = rpm;// OOOPSS!!! double convert Flywheel.kOutputToDriveGearRatio * rpm;
     /*
     Raw feed forward style
     final double flywheelFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel

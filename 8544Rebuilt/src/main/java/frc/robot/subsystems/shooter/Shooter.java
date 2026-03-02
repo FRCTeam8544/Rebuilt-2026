@@ -229,9 +229,12 @@ public class Shooter extends SubsystemBase{
 
       // Scale requested flywheel RPM to shooter motor RPM
       shooterInputs.voltageSetPoint = 0.0;
-      shooterInputs.velocitySetPoint = adjustedRpm * Flywheel.kOutputToDriveGearRatio;
-
-      shooterIO.setVelocity(shooterInputs.velocitySetPoint);
+      shooterInputs.velocitySetPoint = adjustedRpm;
+      
+      // This will decrease the requested motor RPM so that the output flywheel is at the requested rpm.
+      final double motorAdjustedRpm = Flywheel.kOutputToDriveGearRatio * rpm;
+  
+      shooterIO.setVelocity(motorAdjustedRpm);
     }
 
     // -------------------  FEED --------------------------------
