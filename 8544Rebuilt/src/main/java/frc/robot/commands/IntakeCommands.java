@@ -13,6 +13,14 @@ public class IntakeCommands {
 
   private IntakeCommands() {}
 
+  public static Command stopMotors(Intake intake) {
+    return Commands.run(
+        () -> {
+          intake.stopMotors();
+        },
+        intake);
+  }
+
   public static Command openLoopControl(
     Intake intake,
     Trigger intakeTrigger,
@@ -20,7 +28,8 @@ public class IntakeCommands {
       return Commands.run(
         () -> {
 
-          final double intakeFeedDuty = 0.6;
+          final double intakeFeedDuty = 0.7;
+
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
           if (intakeFuel ^ expelFuel) {
@@ -39,13 +48,6 @@ public class IntakeCommands {
         intake);
       }
 
-  public static Command stopMotors(Intake intake) {
-    return Commands.run(
-        () -> {
-          intake.stopOpenLoop();
-        },
-        intake);
-  }
 
   public static Command closedPositionControl(
       Intake intake,

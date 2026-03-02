@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.Feeder.*;  //TODO move to new FeederCommands.java
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -20,27 +20,22 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ShooterCommands {
 
-    private static final double FF_START_DELAY = 2.0; // Secs
-    private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
 
     private ShooterCommands() {}
 
     public static Command stopMotors(Shooter shooter) {
         return Commands.run(
         () -> {
+                shooter.stopFeed();
                 shooter.stopShooter();
             },
             shooter);
     }
 
-    // Use this command to tune Ks by increasing voltage until the flywheel
-    // begins to slightly turn, then back off a bit.
-    // This term will be used in the PID with feedforward control later.
-    public static Command openVoltageControl(Shooter shooter,  
-                                         Trigger flywheelTrigger,
-                                         Trigger decreaseVoltTrigger,
-                                         Trigger increaseVoltTrigger
-                                         )
+    // Use this command to tune do basic flywheel control
+    public static Command openVoltageControl(Shooter shooter,
+                                         Trigger increaseVoltTrigger,
+                                         Trigger decreaseVoltTrigger)
     {
         return Commands.run(
         () -> {
@@ -59,60 +54,50 @@ public class ShooterCommands {
                 }
             }
             
-            if (flywheelTrigger.getAsBoolean()) {
-                shooter.runOpenLoop();
-            }
-            else {
-                shooter.stopShooter();
-            }
-            
+            shooter.runOpenLoop();
         },
         shooter);
     }
 
-    // Replace with kraken impplementation
- /*   public static Command buttonShoot( Shooter shooter,
-                                       Trigger flywheelTrigger,
+    public static Command buttonShoot( Shooter shooter,
+                                       Trigger shootTrigger,
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp)
     {
         return Commands.run(
         () -> {
 
-            final int rpmAdjustStep = 5;
-            final int shooterNominalRpm = 3000;
+            final int rpmAdjustStep = 100 / 50;
+            final double shooterNominalRpm = 3000;
+
+            // These Rpms are used to tune the flywheel
+            //final int shooterNominalRpm = 2700;
+           // final double shooterLowNominalRpm = 337.5;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
 
             if (adjustUp ^ adjustDown)
             {
                 if (adjustUp) {
-                    //shooter.shooterRpmAdjust(rpmAdjustStep);
-                    shooter.tuneIncreaseShootVoltage();
+                    shooter.shooterRpmAdjust(rpmAdjustStep);
                 }
                 else
                 {
-                    //shooter.shooterRpmAdjust(-rpmAdjustStep);
-                    shooter.tuneDecreaseShootVoltage();
+                    shooter.shooterRpmAdjust(-rpmAdjustStep);
                 }
             }
 
-            shooter.runOpenLoop();  //may remove
-
-            if (flywheelTrigger.getAsBoolean())
+            if (shootTrigger.getAsBoolean())
             {
-                shooter.runOpenLoop();
+                shooter.runAtRpm(shooterNominalRpm);
             }
             else {
                 shooter.stopShooter();
             }
-
-
-
-
         },
         shooter);
-    } */
+    } 
+
     
   /**
    * Measures the velocity feedforward constants for the shooter motors.
@@ -124,6 +109,9 @@ public class ShooterCommands {
     List<Double> voltageSamples = new LinkedList<>();
     
     Timer timer = new Timer();
+
+    final double FF_START_DELAY = 2.0; // Secs
+    final double FF_RAMP_RATE = 0.1; // Volts/Sec
 
     return Commands.sequence(
         // Reset data
