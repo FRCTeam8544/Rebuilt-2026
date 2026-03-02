@@ -24,7 +24,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Used to sycnronize control requests to the shooter motor paring
     private static final int kMotorPairControlUpdateTimeSyncHz = 100;
 
-    private static final int kStatorCurrentLimit = 80;
+    private static final int kStatorCurrentLimit = 20;
 
     // TODO>>>..
     private static final double kMeasuredKv = 590.0;
@@ -48,14 +48,14 @@ public class ShooterIOTalonFX implements ShooterIO {
     
     // Setup common control request objects that will be reused for each loop iteration.
 
-    openLoopRequest = new DutyCycleOut(0).withEnableFOC(true);
+    openLoopRequest = new DutyCycleOut(0);//.withEnableFOC(true);
 
     // Needs motor config time request or something? TODO
     velocityTorqueRequest = new VelocityTorqueCurrentFOC(0.0)
       .withVelocity(0.0)
-      .withSlot(0)
-      .withUseTimesync(true)  // Use this with request updateFreq 0 hz
-      .withUpdateFreqHz(0); // MotorConfig must have set freq rate to use this.
+      .withSlot(0);
+   //   .withUseTimesync(true)  // Use this with request updateFreq 0 hz
+   //   .withUpdateFreqHz(0); // MotorConfig must have set freq rate to use this.
 
     // Use aligned follow request because the follower motor config is inverted already.
     // Even though motor config is already inverted, use the Opposed alignment config to
@@ -78,7 +78,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       .withMotorOutput(
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                                  .withInverted(InvertedValue.CounterClockwise_Positive)
-                                 .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
+                              //   .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
 
     // Closed loop settings for velocity control
@@ -100,7 +100,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       .withMotorOutput(
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                                 .withInverted(InvertedValue.Clockwise_Positive)
-                                .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
+                             //   .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
     followTalon.getConfigurator().apply(followConfig); // Apply follow config
 
@@ -115,7 +115,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.flywheelVelocity = inOutData.motorVelocity * Flywheel.kDriveToOutputGearRatio;
     inOutData.leaderMotorTemperature = (float) leaderTalon.getDeviceTemp().getValueAsDouble();
     inOutData.followMotorTemperature = (float) followTalon.getDeviceTemp().getValueAsDouble();
-
+    inOutData.maxFlywheelSpeedHit = inOutData.flywheelVelocity > Flywheel.kMaxShooterRPM;
+    
     // Fault codes
     inOutData.faultSupplyUnderVoltage = leaderTalon.getFault_Undervoltage().getValue() || followTalon.getFault_Undervoltage().getValue();
     inOutData.faultBridgeBrownout = leaderTalon.getFault_BridgeBrownout().getValue() || followTalon.getFault_BridgeBrownout().getValue();

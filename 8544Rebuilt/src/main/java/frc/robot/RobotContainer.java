@@ -11,17 +11,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.ClimberCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
-import java.util.function.BooleanSupplier;
+import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.shooter.*;
+import frc.robot.subsystems.climber.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -32,13 +29,17 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // Subsystems
   private final Drive drive;
+  private final Intake intake;
   private final Shooter shooter;
+  private final Climber climber;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
   private final CommandXboxController goose = new CommandXboxController(1);
+
   private final Trigger aButtonGoose = new Trigger(goose.a());
   private final Trigger bButtonGoose = new Trigger(goose.b());
   private final Trigger yButtonGoose = new Trigger(goose.y());
@@ -60,7 +61,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
+    intake = new Intake();
     shooter = new Shooter();
+    climber = new Climber();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -74,6 +77,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
         break;
 
       case SIM:
@@ -161,32 +165,30 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // Calibration shooter
-   // goose.back().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
-    
-   shooter.setDefaultCommand(
+    intake.setDefaultCommand(
+        IntakeCommands.openLoopControl(
+            intake,
+            leftBackGoose, // retract arm
+            rightBackGoose, // extend arm
+            aButtonGoose,   // intake Fuel
+            yButtonGoose    // expel Fuel
+    ));
+
+    shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
                                              rightTriggerGoose, // Feed shooter
                                              dpadDownTriggerGoose, dpadUpTriggerGoose,
-                                             dpadLeftTriggerGoose, dpadRightTriggerGoose,
-                                             startButtonGoose)
+                                             dpadLeftTriggerGoose, dpadRightTriggerGoose
+                                             )
     );
 
-    // Raw feed and shooter voltage tuning
-   /* goose.leftTrigger().whileTrue(
-        ShooterCommands.openVoltageControl(shooter, 
-                                            dpadUpTriggerGoose, // Feed trigger
-                                            yButtonGoose, aButtonGoose, 
-                                            xButtonGoose, bButtonGoose));
+   
+    climber.setDefaultCommand(
+        ClimberCommands.openVoltageControl(climber,
+                                           backButtonGoose, startButtonGoose));
 
-    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
-*/
-
-   /* shooter.setDefaultCommand(ShooterCommands.buttonShoot(
-              shooter,
-              leftBackGoose, 
-              aButtonGoose));*/
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

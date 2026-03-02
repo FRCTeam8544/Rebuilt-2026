@@ -113,8 +113,7 @@ public class ShooterCommands {
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp,
                                        Trigger feedAdjustDown,
-                                       Trigger feedAdjustUp,
-                                       Trigger resetShooterDefaults)
+                                       Trigger feedAdjustUp)
     {
         return Commands.run(
         () -> {
@@ -125,7 +124,7 @@ public class ShooterCommands {
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
 
-            if (!resetShooterDefaults.getAsBoolean())
+           /// if (!resetShooterDefaults.getAsBoolean())
             {
                 if (adjustUp ^ adjustDown)
                 {
@@ -140,10 +139,10 @@ public class ShooterCommands {
                     }
                 }
             }
-            else {
-                shooter.resetShooterDefaultVoltage();
-                shooter.resetFeedDefaultRpm();
-            }
+          //  else {
+             //   shooter.resetShooterDefaultVoltage();
+             //   shooter.resetFeedDefaultRpm();
+        //    }
 
             if (shootTrigger.getAsBoolean())
             {
@@ -157,28 +156,28 @@ public class ShooterCommands {
             boolean feedAdjDown = feedAdjustDown.getAsBoolean();
             if (feedAdjDown ^ feedAdjUp) {
                 if (feedAdjUp) {
-                    //shooter.tuneIncreaseFeedVoltage();
-                    shooter.feedRpmAdjust(rpmAdjustStep);
+                    shooter.tuneIncreaseFeedVoltage();
+                    //shooter.feedRpmAdjust(rpmAdjustStep);
                 }
                 else {
-                    //shooter.tuneDecreaseFeedVoltage();
-                   shooter.feedRpmAdjust(-rpmAdjustStep);
+                    shooter.tuneDecreaseFeedVoltage();
+                   //shooter.feedRpmAdjust(-rpmAdjustStep);
                 }
             }
 
             if (feedTrigger.getAsBoolean())
             {
-                shooter.runFeed(feedNominalRpm);
-               // shooter.runFeedOpenLoop(0.6);
+               // shooter.runFeed(feedNominalRpm);
+                shooter.runFeedOpenLoop();
             }
             else {
-                shooter.runFeed(0);
+                shooter.stopFeed();
             }
         },
         shooter);
     } 
 
-    public static Command joystickVoltsShoot( Shooter shooter, 
+  /*  public static Command joystickVoltsShoot( Shooter shooter, 
                                     DoubleSupplier x_LeftSupplier, DoubleSupplier y_LeftSupplier,
                                     DoubleSupplier x_RightSupplier, DoubleSupplier y_RightSupplier ) {
         return Commands.run(
@@ -197,7 +196,7 @@ public class ShooterCommands {
           
         },
         shooter);
-    }
+    }*/
 
     
   /**
