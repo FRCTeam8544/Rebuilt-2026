@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,12 +21,27 @@ public class Shooter extends SubsystemBase{
       public static final double kOutputToDriveGearRatio = 1.0 / kDriveToOutputGearRatio;
     }
 
-    public static final int leftMotorCanID = 24;
-    public static final int rightMotorCanID = 25;
+    
+    private static final int leftMotorCanID = 24;
+    private static final int rightMotorCanID = 25;
 
     private final ShooterIO shooterIO;
     private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
+
+    // --- Suppliers / Triggers ---
+
+    // Provide the current commanded voltage
+    public DoubleSupplier voltageSetPointSupplier =
+      () -> {
+        return shooterInputs.voltageSetPoint;
+      };
+
+   // provide current roller wheel RPM
+   public DoubleSupplier rpmSupplier = 
+      () -> {
+        return shooterInputs.flywheelVelocity;
+      };
 
     private double tuneShootVoltage = 0.0;
     private final double tuneShootVoltStep = 0.25 / 50; // 1/4 volt per second
@@ -63,7 +80,7 @@ public class Shooter extends SubsystemBase{
 
 
 
-    public void runShooterOpenLoop()
+    public void runOpenLoop()
     {
       runShooterOpenLoop( tuneShootVoltage / Constants.KrakenX60.nominalVoltage ); // Will be adjusted internally
     }

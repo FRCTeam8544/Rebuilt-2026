@@ -10,15 +10,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.FeederCommands;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Intake.*;
-import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.Feeder.*;
+import frc.robot.subsystems.shooter.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -32,7 +30,8 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
-  private Intake intake;
+  private final Intake intake;
+  private final Arm arm;
   private final Shooter shooter;
   private final Feeder feeder;
 
@@ -60,7 +59,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    intake = new Intake();
+    intake = new Intake(); // Intake rollers
+    arm = new Arm(); // Arm / Hopper deploy
+
     shooter = new Shooter();
     feeder = new Feeder();
 
@@ -131,6 +132,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
+    // ------- Driver Controls ------
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -163,49 +167,42 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+
+    // ----- Operator Controls -------
+    
+    arm.setDefaultCommand(
+        ArmCommands.openLoopControl(
+            arm,
+            leftBackGoose, // retract arm
+            rightBackGoose // extend arm
+    ));
+    
     intake.setDefaultCommand(
         IntakeCommands.openLoopControl(
             intake,
-            leftBackGoose, // retract arm
-            rightBackGoose, // extend arm
-            aButtonGoose,   // intake Fuel
-            yButtonGoose    // expel Fuel
+            aButtonGoose, // intake fuel
+            yButtonGoose // expel fuel
     ));
 
-    /*intake.setDefaultCommand(
-        IntakeCommands.closedPositionControl(
-            intake,
-            leftBackGoose,
-            rightBackGoose,
-            aButtonGoose,
-            yButtonGoose
-    ));*/
-
-    shooter.setDefaultCommand(
-        ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
-                                            
-                                             dpadDownTriggerGoose, dpadUpTriggerGoose,
-                                    
-                                             startButtonGoose)
-    );
 
     feeder.setDefaultCommand(
-        FeederCommands.buttonFeed(feeder, rightTriggerGoose, 
-          dpadRightTriggerGoose, 
-         dpadLeftTriggerGoose, bButtonGoose
+        FeederCommands.buttonFeed(
+            feeder,
+            rightTriggerGoose, // Fuel feed roller to shooter flywheel
+            bButtonGoose,      // Reverse feed 
+            dpadLeftTriggerGoose,   // Decrease feed speed
+            dpadRightTriggerGoose   // Increase feed speed
           )
     );
 
-    // Raw feed and shooter voltage tuning
-   /* goose.leftTrigger().whileTrue(
-        ShooterCommands.openVoltageControl(shooter, 
-                                            dpadUpTriggerGoose, // Feed trigger
-                                            yButtonGoose, aButtonGoose, 
-                                            xButtonGoose, bButtonGoose));
-
-    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
-*/
-
+    shooter.setDefaultCommand(
+        ShooterCommands.openVoltageControl(
+            shooter,
+            leftTriggerGoose, // Shooter flywheel
+            dpadDownTriggerGoose, // Decrease flywheel speed
+            dpadUpTriggerGoose    // Increase flywheel speed
+          )
+    );
   
   }
 

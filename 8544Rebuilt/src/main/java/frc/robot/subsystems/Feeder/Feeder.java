@@ -1,16 +1,16 @@
 package frc.robot.subsystems.Feeder;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
 import frc.robot.Constants;
-import frc.robot.subsystems.Feeder.*;;
+import frc.robot.subsystems.shooter.Shooter.Flywheel;
+
 public class Feeder extends SubsystemBase{
-
-
 
     // Feed is feed through a 20 to 1 gearbox, but the speed is monitored through the internal
     // encoder
@@ -20,15 +20,29 @@ public class Feeder extends SubsystemBase{
       public static final double kMaxFeedRPM = Constants.NeoVortex.freeSpeedRPM * kDriveToOutputGearRatio;
     }
 
-    public static final int feedMotorCanID = 26;
-
+    private static final int feedMotorCanID = 26;
     private final FeederIO feedIO;
     private final FeedIOInputsAutoLogged feedInputs = new FeedIOInputsAutoLogged();
 
-    private double tuneFeedVoltage = 10.0;
-    private final double tuneFeedVoltStep = 1.0 / 50.0; // 1 volt per second
+    // Voltage Feeder tunables
+    private final double kNominalFeedFoltage = 10.0;
+    private double tuneFeedVoltage = kNominalFeedFoltage;
+    private final double tuneFeedVoltStep = 1.0 / Constants.tickUpdatesPerSecond; // 1 volt per second
 
-   private double tuneFeedRpmAdjust = 0.0;
+    // --- Suppliers / Triggers ---
+
+    // Provide the current commanded voltage
+    public DoubleSupplier voltageSetPointSupplier =
+      () -> {
+        return feedInputs.voltageSetPoint;
+      };
+
+   // provide current roller wheel RPM
+   public DoubleSupplier rpmSupplier = 
+      () -> {
+        return feedInputs.wheelVelocity;
+      };
+
    
     public Feeder()
     {
@@ -40,8 +54,8 @@ public class Feeder extends SubsystemBase{
 
     public void tuneIncreaseFeedVoltage() {
       tuneFeedVoltage += tuneFeedVoltStep;
-      if (tuneFeedVoltage > 12.0) {
-        tuneFeedVoltage = 12.0;
+      if (tuneFeedVoltage > Constants.kNominalVoltage) {
+        tuneFeedVoltage = Constants.kNominalVoltage;
       }
       else if (tuneFeedVoltage < 0.0) {
         tuneFeedVoltage = 0.0;
@@ -52,70 +66,52 @@ public class Feeder extends SubsystemBase{
       tuneFeedVoltage -= tuneFeedVoltStep;
       if (tuneFeedVoltage < 0.0) {
         tuneFeedVoltage = 0.0;
-      } else if (tuneFeedVoltage > 12.0) {
-        tuneFeedVoltage = 12.0;
+      } else if (tuneFeedVoltage > Constants.kNominalVoltage) {
+        tuneFeedVoltage = Constants.kNominalVoltage;
       }
     }
 
-
-    public void runFeedOpenLoop()
+    public void runOpenLoop()
     {
-      runFeedOpenLoop( tuneFeedVoltage / Constants.Neo550.nominalVoltage);
+      runOpenLoop( tuneFeedVoltage / Constants.Neo550.nominalVoltage);
     }
 
-
-        public void runFeedOpenLoopReverse()
+    public void runOpenLoopReverse()
     {
-      runFeedOpenLoop( tuneFeedVoltage / Constants.Neo550.nominalVoltage);
+      runOpenLoop( -1 * (tuneFeedVoltage / Constants.Neo550.nominalVoltage));
     }
 
-
-    public void runFeedOpenLoop(double duty)
+    public void runOpenLoop(double duty)
     {
       double adjustedDuty = duty;
 
-    /*  if (adjustedDuty != 0.0) {
-        adjustedDuty += tuneFeedVoltage / Constants.NeoVortex.nominalVoltage;
-      }*/
-
-       // Prevent duty beyond 1 to 0
-      adjustedDuty = Math.min(adjustedDuty, 1.0);
-      if ( adjustedDuty < 0.0) {
-        adjustedDuty = 0.0;
+      if (adjustedDuty > 1.0) {
+        adjustedDuty = 1.0;
+      }
+      else if (adjustedDuty < -1.0) {
+        adjustedDuty = -1.0;
       }
 
-      // Prevent out of spec RPM
-     // if (Math.abs(feedInputs.wheelVelocity) > FeedWheel.kMaxFeedRPM) {
-      //////  adjustedDuty = 0.0;
-      //}
-
-      double scaledVolts = duty * Constants.NeoVortex.nominalVoltage;
+      double scaledVolts = duty * Constants.kNominalVoltage;
       feedIO.setVoltage(scaledVolts);
 
       feedInputs.voltageSetPoint = scaledVolts;
       feedInputs.velocitySetPoint = 0.0;
     }
 
-    public void resetFeedDefaultVoltage() {
-      tuneFeedVoltage = 0.0;
-    }
-
-    public void resetFeedDefaultRpm() {
-      tuneFeedRpmAdjust = 0.0;
-    }
-
-    public void feedRpmAdjust(double rpmAdjust) {
-      tuneFeedRpmAdjust += rpmAdjust;
+    public void resetTuneDefaultVoltage() {
+      tuneFeedVoltage = kNominalFeedFoltage;
     }
 
     // -------------------  FEED --------------------------------
 
-    public void runFeed(double rpm)
+    public void runAtRpm(double rpm)
     {
       double adjustedRpm = rpm;
-      if (rpm > 0.0)
+      // Limit wheel RPM while preserving direction
+      if (Math.abs(rpm) > FeedWheel.kMaxFeedRPM)
       {
-        adjustedRpm += tuneFeedRpmAdjust;
+        adjustedRpm = Math.copySign(FeedWheel.kMaxFeedRPM, adjustedRpm);
       }
 
       // Prevent out of spec RPM
@@ -125,12 +121,12 @@ public class Feeder extends SubsystemBase{
       }
 
       feedInputs.voltageSetPoint = 0.0;
-      feedInputs.velocitySetPoint = adjustedRpm;
+      feedInputs.velocitySetPoint = adjustedRpm * Flywheel.kOutputToDriveGearRatio;
 
       feedIO.setVelocity(feedInputs.velocitySetPoint);
     }
 
-    public void stopFeed() {
+    public void stopMotors() {
       
       feedInputs.voltageSetPoint = 0.0;
       feedInputs.velocitySetPoint = 0.0;

@@ -2,69 +2,77 @@ package frc.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.Arm.ArmIO;
-import frc.robot.subsystems.Arm.ArmIOMax;
 
-
-
-import static edu.wpi.first.units.Units.Rotations;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
 
+  private static final int armCanId = 27;
+  private final ArmIO armIO;
+  private final ArmIOInputsAutoLogged armInputs = new ArmIOInputsAutoLogged();
 
-  public static final double kMaxIntakeRPM = 2000; //100:1 gearbox
+  // Provide the current arm position in rotations
+  public DoubleSupplier armPositionSupplier =
+    () -> {
+      return armInputs.position;
+    };
 
-
-  public static final int armCanId = 27;
-  public final ArmIO ArmIO;
-  public final ArmIOInputsAutoLogged ArmInputs = new ArmIOInputsAutoLogged();
-
+  // Provide the current arm position set point in rotations
+  public DoubleSupplier armPositionSetPointSupplier = 
+    () -> {
+      return armInputs.positionSetPoint;
+    };
 
   public Arm() {
-    this.ArmIO = new ArmIOMax(armCanId);
+    this.armIO = new ArmIOMax(armCanId);
 
   }
 
-  public void runArmOpenLoop(double duty) {
+  // Open loop control
+
+  public void runOpenLoop(double duty) {
     
-   // final double forwardLimit = 0.95; // Zero is "straight up" 870
-   // final double backwardLimit = 0.07; // Stow position
-
     double adjustedDuty = duty;
-    adjustedDuty = Math.min(adjustedDuty, 1.0);
-    adjustedDuty = Math.max(adjustedDuty, -1.0);
+    if (adjustedDuty > 1.0) {
+      adjustedDuty = 1.0;
+    }
+    else if (adjustedDuty < -1.0) {
+      adjustedDuty = -1.0;
+    }
 
-    ArmInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
-    ArmInputs.positionSetPoint = 0.0;
+    armInputs.voltageSetPoint = adjustedDuty * Constants.kNominalVoltage;
+    armInputs.positionSetPoint = 0.0;
 
-      ArmIO.setVoltage(ArmInputs.voltageSetPoint);
-   
-  }
-
-
-
-  public void runArm(double rotations) {
-    ArmInputs.positionSetPoint = rotations;
-    ArmInputs.voltageSetPoint = 0.0;
-    ArmIO.setPosition(ArmInputs.positionSetPoint);
-  } 
-
-
-  public void holdArmPosition() {
-    ArmInputs.positionSetPoint = ArmInputs.position;
-    ArmIO.setPosition(ArmInputs.position);
+    armIO.setVoltage(armInputs.voltageSetPoint);
   }
 
   public void stopOpenLoop() {
-    ArmIO.setVoltage(0);
+    runOpenLoop(0);
+  }
+
+  // Closed loop control
+
+  public void runToPosition(double rotations) {
+    armInputs.positionSetPoint = rotations;
+    armInputs.voltageSetPoint = 0.0;
+    armIO.setPosition(armInputs.positionSetPoint);
+  } 
+
+  public void holdPosition() {
+    armInputs.positionSetPoint = armInputs.position;
+    armIO.setPosition(armInputs.position);
+  }
+
+  public void stopMotors() {
+    armIO.setVoltage(0.0);
   }
 
   @Override
   public void periodic() {
-    ArmIO.updateInputs(ArmInputs);
-    Logger.processInputs("Intake/Arm",ArmInputs);
-    
+    armIO.updateInputs(armInputs);
+    Logger.processInputs("Arm",armInputs);
   }
+  
 }

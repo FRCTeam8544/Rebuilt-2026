@@ -20,30 +20,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ShooterCommands {
 
-    private static final double DEADBAND = 0.1;
     private static final double FF_START_DELAY = 2.0; // Secs
     private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
 
     private ShooterCommands() {}
 
-    private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
-        // Apply deadband
-        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-        Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
-
-        // Square magnitude for more precise control
-        linearMagnitude = linearMagnitude * linearMagnitude;
-
-        // Return new linear velocity
-        return new Pose2d(Translation2d.kZero, linearDirection)
-            .transformBy(new Transform2d(linearMagnitude, 0.0, Rotation2d.kZero))
-            .getTranslation();
-    }
-
     public static Command stopMotors(Shooter shooter) {
         return Commands.run(
         () -> {
-                
                 shooter.stopShooter();
             },
             shooter);
@@ -52,10 +36,10 @@ public class ShooterCommands {
     // Use this command to tune Ks by increasing voltage until the flywheel
     // begins to slightly turn, then back off a bit.
     // This term will be used in the PID with feedforward control later.
-    public static Command openVoltageControl(Shooter shooter,
-                                         
-                                         Trigger increaseVoltTrigger,
-                                         Trigger decreaseVoltTrigger
+    public static Command openVoltageControl(Shooter shooter,  
+                                         Trigger flywheelTrigger,
+                                         Trigger decreaseVoltTrigger,
+                                         Trigger increaseVoltTrigger
                                          )
     {
         return Commands.run(
@@ -75,18 +59,22 @@ public class ShooterCommands {
                 }
             }
             
-
-            shooter.runShooterOpenLoop();
-
+            if (flywheelTrigger.getAsBoolean()) {
+                shooter.runOpenLoop();
+            }
+            else {
+                shooter.stopShooter();
+            }
+            
         },
         shooter);
     }
 
-    public static Command buttonShoot( Shooter shooter,
-                                       Trigger shootTrigger,
+    // Replace with kraken impplementation
+ /*   public static Command buttonShoot( Shooter shooter,
+                                       Trigger flywheelTrigger,
                                        Trigger rpmAdjustDown,
-                                       Trigger rpmAdjustUp,
-                                       Trigger resetShooterDefaults)
+                                       Trigger rpmAdjustUp)
     {
         return Commands.run(
         () -> {
@@ -96,31 +84,24 @@ public class ShooterCommands {
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
 
-           /// if (!resetShooterDefaults.getAsBoolean())
+            if (adjustUp ^ adjustDown)
             {
-                if (adjustUp ^ adjustDown)
+                if (adjustUp) {
+                    //shooter.shooterRpmAdjust(rpmAdjustStep);
+                    shooter.tuneIncreaseShootVoltage();
+                }
+                else
                 {
-                    if (adjustUp) {
-                        //shooter.shooterRpmAdjust(rpmAdjustStep);
-                        shooter.tuneIncreaseShootVoltage();
-                    }
-                    else
-                    {
-                        //shooter.shooterRpmAdjust(-rpmAdjustStep);
-                        shooter.tuneDecreaseShootVoltage();
-                    }
+                    //shooter.shooterRpmAdjust(-rpmAdjustStep);
+                    shooter.tuneDecreaseShootVoltage();
                 }
             }
 
-            shooter.runShooterOpenLoop();  //may remove
-          //  else {
-             //   shooter.resetShooterDefaultVoltage();
-             //   shooter.resetFeedDefaultRpm();
-        //    }
+            shooter.runOpenLoop();  //may remove
 
-            if (shootTrigger.getAsBoolean())
+            if (flywheelTrigger.getAsBoolean())
             {
-                shooter.runShooterOpenLoop();
+                shooter.runOpenLoop();
             }
             else {
                 shooter.stopShooter();
@@ -131,29 +112,7 @@ public class ShooterCommands {
 
         },
         shooter);
-    } 
-
-  /*  public static Command joystickVoltsShoot( Shooter shooter, 
-                                    DoubleSupplier x_LeftSupplier, DoubleSupplier y_LeftSupplier,
-                                    DoubleSupplier x_RightSupplier, DoubleSupplier y_RightSupplier ) {
-        return Commands.run(
-        () -> {
-            
-            // Get shooter linear velocity
-            Translation2d shootLinearVelocity =
-            getLinearVelocityFromJoysticks(x_RightSupplier.getAsDouble(), y_RightSupplier.getAsDouble());              
-            shooter.runShooterOpenLoop(shootLinearVelocity.getY());
-            
-            // Get feed linear velocity
-            Translation2d feedLinearVelocity =
-            getLinearVelocityFromJoysticks(x_LeftSupplier.getAsDouble(), y_LeftSupplier.getAsDouble());
-             
-            shooter.runFeedOpenLoop(feedLinearVelocity.getY());
-          
-        },
-        shooter);
-    }*/
-
+    } */
     
   /**
    * Measures the velocity feedforward constants for the shooter motors.

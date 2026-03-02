@@ -1,8 +1,7 @@
 package frc.robot.subsystems.Arm;
 
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -10,48 +9,52 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import frc.robot.Constants;
 
 public class ArmIOMax implements ArmIO {
 
-  private static final int kFeedMaxRpm = 5676;
-  private static final int stallLimit = 30;
+  private static final int stallLimit = 15;
 
-  private final SparkMax rollerMotorController;
+  private final SparkMax armMotorController;
 
-  private final RelativeEncoder rollerEncoder;
+  private final AbsoluteEncoder armEncoder;
   private final SparkClosedLoopController closedLoop;
-  private final SparkMaxConfig rollerMotorConfig;
+  private final SparkMaxConfig armMotorConfig;
 
-  public ArmIOMax(int rollerCanId) {
-    rollerMotorController = new SparkMax(rollerCanId, MotorType.kBrushless);
 
-    rollerEncoder = rollerMotorController.getEncoder();
-    closedLoop = rollerMotorController.getClosedLoopController();
+  public ArmIOMax(int armCanId) {
+    armMotorController = new SparkMax(armCanId, MotorType.kBrushless);
 
-    rollerMotorConfig = new SparkMaxConfig();
-    rollerMotorConfig.idleMode(IdleMode.kBrake);
-    rollerMotorConfig.smartCurrentLimit(stallLimit);
-    rollerMotorConfig.voltageCompensation(12);
-    rollerMotorConfig.inverted(true);
-    rollerMotorConfig.softLimit.forwardSoftLimitEnabled(false);
-    rollerMotorConfig.softLimit.reverseSoftLimitEnabled(false);
-   /* rollerMotorConfig
+    armEncoder = armMotorController.getAbsoluteEncoder();
+    closedLoop = armMotorController.getClosedLoopController();
+
+    armMotorConfig = new SparkMaxConfig();
+    armMotorConfig.idleMode(IdleMode.kBrake);
+    armMotorConfig.smartCurrentLimit(stallLimit);
+    armMotorConfig.voltageCompensation(12);
+    armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
+    armMotorConfig.softLimit.forwardSoftLimit(kArmUpperLimit);
+    armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+    armMotorConfig.softLimit.reverseSoftLimit(kArmLowerLimit);
+
+    armMotorConfig.encoder.positionConversionFactor(1);
+    armMotorConfig.encoder.velocityConversionFactor(1);
+
+   /* armMotorConfig
         .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        // Velocity control
+        .positionWrappingEnabled(false)
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        // Position control
         .p(0.0001, ClosedLoopSlot.kSlot0) //was 0.0008
         .i(0.00000, ClosedLoopSlot.kSlot0)
         .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
 */
-       rollerMotorConfig.encoder.positionConversionFactor(1);
-       rollerMotorConfig.encoder.velocityConversionFactor(1);
+    
     // armMotorConfig.closedLoop.feedForward.kS(kS);
-   //  rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
+   //  armMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
     //                                          ClosedLoopSlot.kSlot0);
 
-    rollerMotorController.configure(
-        rollerMotorConfig,
+    armMotorController.configure(
+        armMotorConfig,
         com.revrobotics.ResetMode.kResetSafeParameters,
         com.revrobotics.PersistMode.kPersistParameters);
   }
@@ -59,11 +62,12 @@ public class ArmIOMax implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inOutData) {
     inOutData.connected = true;
-    inOutData.velocity = (float) rollerEncoder.getVelocity();
-    inOutData.motorTemperature = (float) rollerMotorController.getMotorTemperature();
+    inOutData.velocity = (float) armEncoder.getVelocity();
+    inOutData.position = (float) armEncoder.getPosition();
+    inOutData.motorTemperature = (float) armMotorController.getMotorTemperature();
 
     // Fault codes
-    Faults armFaults = rollerMotorController.getFaults();
+    Faults armFaults = armMotorController.getFaults();
     inOutData.faultCan = armFaults.can;
     inOutData.faultTemperature = armFaults.temperature;
     inOutData.faultSensor = armFaults.sensor;
@@ -72,28 +76,21 @@ public class ArmIOMax implements ArmIO {
     inOutData.faultFirmware = armFaults.firmware;
 
     // Outputs
-    inOutData.busVoltage = (float) rollerMotorController.getBusVoltage();
+    inOutData.busVoltage = (float) armMotorController.getBusVoltage();
     inOutData.outputDuty =
-        (float) rollerMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
-    inOutData.outputCurrent = (float) rollerMotorController.getOutputCurrent();
-    inOutData.outputVoltage = (float) rollerMotorController.getAppliedOutput() * 12.0f;
+        (float) armMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
+    inOutData.outputCurrent = (float) armMotorController.getOutputCurrent();
+    inOutData.outputVoltage = (float) armMotorController.getAppliedOutput() * 12.0f;
   }
   
   // @Override
-  public void setVelocity(double rpm) {
-   /* double adjustedRpm = rpm;
-    if (rpm > kFeedMaxRpm) {
-      adjustedRpm = kFeedMaxRpm;
-    }
-    else if (rpm < -kFeedMaxRpm) {
-      adjustedRpm = -kFeedMaxRpm;
-    }*/
-
-    closedLoop.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+  public void setPosition(double rotations) {
+    closedLoop.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   @Override
   public void setVoltage(double volts) {
-    rollerMotorController.setVoltage(volts);
+    armMotorController.setVoltage(volts);
   }
+
 }

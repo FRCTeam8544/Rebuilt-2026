@@ -15,26 +15,24 @@ public class IntakeCommands {
 
   public static Command openLoopControl(
     Intake intake,
-    Trigger armInTrigger,
-    Trigger armOutTrigger,
     Trigger intakeTrigger,
     Trigger expelTrigger) {
       return Commands.run(
         () -> {
 
-          final double intakeFeedDuty = 1.0;
+          final double intakeFeedDuty = 0.6;
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
           if (intakeFuel ^ expelFuel) {
             if (intakeFuel) {
-              intake.runIntakeOpenLoop(intakeFeedDuty);
+              intake.runOpenLoop(intakeFeedDuty);
             }
             else {
-              intake.runIntakeOpenLoop(-intakeFeedDuty);
+              intake.runOpenLoop(-intakeFeedDuty);
             }
           }
           else {
-            intake.runIntakeOpenLoop(0.0);
+            intake.runOpenLoop(0.0);
           }
 
         },
@@ -45,39 +43,38 @@ public class IntakeCommands {
     return Commands.run(
         () -> {
           intake.stopOpenLoop();
-          intake.runIntakeFeed(0);
         },
         intake);
   }
 
-
   public static Command closedPositionControl(
       Intake intake,
-      Trigger extendTrigger,
-      Trigger retractTrigger,
       Trigger intakeTrigger,
       Trigger expelTrigger
       ) {
     return Commands.run(
         () -> {
         
-          boolean inCmd = intakeTrigger.getAsBoolean();
-          boolean outCmd = expelTrigger.getAsBoolean();
-          if (inCmd ^ outCmd) {
-            if (inCmd) {
-              intake.runIntakeFeed(400);
+          final double intakeSpeedRpm = 420;
+          boolean inPressed = intakeTrigger.getAsBoolean();
+          boolean outPressed = expelTrigger.getAsBoolean();
+
+          if (inPressed ^ outPressed) {
+            if (inPressed) {
+              intake.runAtRpm(intakeSpeedRpm);
             }
             else {
-              intake.runIntakeFeed(-400);
+              intake.runAtRpm(-intakeSpeedRpm);
             }
           }
           else {
-            intake.runIntakeFeed(0);
+            intake.stopMotors();
           }
 
         },
         intake);
   }
+
   }
 
   
