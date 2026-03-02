@@ -10,7 +10,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
+import frc.robot.subsystems.climber.*;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.units.measure.Angle;
 
@@ -25,7 +25,6 @@ public class ClimberIOFlex implements ClimberIO {
     private static final double nominalFF = Constants.NeoVortex.nominalFF;
     private static final double Ks = 0.120;
     private static final int stallLimit = 40;
-    private static double climberPosition = 0;
     //private final double cancoderPosition=0;
     
     private final SparkFlex motorController;    
@@ -42,7 +41,6 @@ public class ClimberIOFlex implements ClimberIO {
     closedLoop = motorController.getClosedLoopController();
 
     cancoder = new CANcoder(31, TunerConstants.kCANBus);
-    climberPosition = cancoder.getPosition().getValueAsDouble();
 
     motorConfig = new SparkFlexConfig();
     motorConfig.idleMode(IdleMode.kBrake);
@@ -80,8 +78,8 @@ public class ClimberIOFlex implements ClimberIO {
     inOutData.velocity = (float) motorEncoder.getVelocity();
     inOutData.position = (float) motorEncoder.getPosition();
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
-    //cancoder
-    inOutData.climberPosition = (float) climberPosition;
+    //cancode
+    inOutData.climberPosition = (float) cancoder.getPosition().getValueAsDouble();
 
     // Fault codes
     Faults faults = motorController.getFaults();
