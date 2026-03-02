@@ -10,13 +10,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.ClimberCommands;
+import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.climber.*;
 
@@ -36,6 +35,7 @@ public class RobotContainer {
   private final Intake intake;
   private final Feeder feeder;
   private final Shooter shooter;
+  private final Climber climber;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -200,7 +200,7 @@ public class RobotContainer {
 
 
 
-    // Calibration only
+    // Calibration only, replace the default shooter command to use
 //    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
  //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
 
@@ -208,7 +208,7 @@ public class RobotContainer {
         ShooterCommands.buttonShoot(shooter,
                                     leftTriggerGoose, // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
-                                    dpadUpTriggerGoose,   // Increase flywheel speed
+                                    dpadUpTriggerGoose    // Increase flywheel speed
                                   )
     );
    

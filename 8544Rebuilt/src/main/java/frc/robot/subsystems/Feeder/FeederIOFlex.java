@@ -12,9 +12,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkClosedLoopController;
 
 import frc.robot.Constants.NeoVortex;
-import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.Feeder.Feeder.FeedWheel;
-import pabeles.concurrency.IntObjectConsumer;
 
 public class FeederIOFlex implements FeederIO {
   

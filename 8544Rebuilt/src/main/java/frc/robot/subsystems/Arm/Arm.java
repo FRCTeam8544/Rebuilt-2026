@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Arm;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -20,14 +21,16 @@ public class Arm extends SubsystemBase {
     };
 
   // Provide the current arm position set point in rotations
-  public DoubleSupplier armPositionSetPointSupplier = 
+  // Enable when PID control of arm works TODO
+ /* public DoubleSupplier armPositionSetPointSupplier = 
     () -> {
       return armInputs.positionSetPoint;
     };
-
+*/
   public Arm() {
     this.armIO = new ArmIOMax(armCanId);
 
+    setupDefaultDashboard();
   }
 
   // Open loop control
@@ -73,6 +76,18 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     armIO.updateInputs(armInputs);
     Logger.processInputs("Arm",armInputs);
+
+    
+    SmartDashboard.putNumber("Arm Position Setpoint", armInputs.positionSetPoint);
+    SmartDashboard.putNumber("Arm Volts Setpoint", armInputs.voltageSetPoint);
+    SmartDashboard.putNumber("Arm Leader Temp", armInputs.motorTemperature);
   }
+ 
   
+  private void setupDefaultDashboard()
+  {
+    SmartDashboard.setDefaultNumber("Arm Position Setpoint", armInputs.positionSetPoint);
+    SmartDashboard.setDefaultNumber("Arm Volts Setpoint", armInputs.voltageSetPoint);
+    SmartDashboard.setDefaultNumber("Arm Motor Temp", armInputs.motorTemperature);
+  }
 }

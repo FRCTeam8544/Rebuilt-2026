@@ -3,7 +3,6 @@ package frc.robot.commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.Feeder.*;
 
-import java.util.function.DoubleSupplier;
 import java.util.Vector;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,8 +31,8 @@ public class FeederCommands {
         Feeder feeder,
         Trigger feedTrigger,
         Trigger reverseFeedTrigger,
-        Trigger increaseFeedVoltageTrigger,
-        Trigger decreaseFeedVoltageTrigger)
+        Trigger decreaseFeedVoltageTrigger,
+        Trigger increaseFeedVoltageTrigger)
     {
         return Commands.run(
         () -> {

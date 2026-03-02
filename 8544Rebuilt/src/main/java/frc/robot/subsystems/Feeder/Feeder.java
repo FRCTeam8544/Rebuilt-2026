@@ -27,18 +27,12 @@ public class Feeder extends SubsystemBase{
     // Voltage Feeder tunables
     private final double kNominalFeedFoltage = 10.0;
     private double tuneFeedVoltage = kNominalFeedFoltage;
-    private final double tuneFeedVoltStep = 1.0 / Constants.tickUpdatesPerSecond; // 1 volt per second
+    private final double tuneFeedVoltStep = 0.25 / Constants.tickUpdatesPerSecond; // 1/4 volt per second
 
     // --- Suppliers / Triggers ---
 
-    // Provide the current commanded voltage
-    public DoubleSupplier voltageSetPointSupplier =
-      () -> {
-        return feedInputs.voltageSetPoint;
-      };
-
    // provide current roller wheel RPM
-   public DoubleSupplier rpmSupplier = 
+   public DoubleSupplier rollerRpmSupplier = 
       () -> {
         return feedInputs.wheelVelocity;
       };
@@ -141,6 +135,7 @@ public class Feeder extends SubsystemBase{
     
     SmartDashboard.putNumber("Feeder RPM", feedInputs.motorVelocity);
     SmartDashboard.putNumber("Feeder RPM Setpoint", feedInputs.velocitySetPoint);
+    SmartDashboard.putNumber("Feeder Volts Setpoint", feedInputs.voltageSetPoint);
     SmartDashboard.putNumber("Feeder Leader Temp", feedInputs.motorTemperature);
   }
 
@@ -148,7 +143,8 @@ public class Feeder extends SubsystemBase{
   {
     SmartDashboard.setDefaultNumber("Feeder RPM", feedInputs.motorVelocity);
     SmartDashboard.setDefaultNumber("Feeder RPM Setpoint", feedInputs.velocitySetPoint);
-    SmartDashboard.setDefaultNumber("Feeder Leader Temp", feedInputs.motorTemperature);
+    SmartDashboard.setDefaultNumber("Feeder Volts Setpoint", feedInputs.voltageSetPoint);
+    SmartDashboard.setDefaultNumber("Feeder Motor Temp", feedInputs.motorTemperature);
   }
 
 }

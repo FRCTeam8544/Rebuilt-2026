@@ -1,18 +1,13 @@
 package frc.robot.commands;
 
+import frc.robot.Constants;
 import frc.robot.subsystems.shooter.Shooter;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,8 +21,7 @@ public class ShooterCommands {
     public static Command stopMotors(Shooter shooter) {
         return Commands.run(
         () -> {
-                shooter.stopFeed();
-                shooter.stopShooter();
+                shooter.stopMotors();
             },
             shooter);
     }
@@ -92,7 +86,7 @@ public class ShooterCommands {
                 shooter.runAtRpm(shooterNominalRpm);
             }
             else {
-                shooter.stopShooter();
+                shooter.stopMotors();
             }
         },
         shooter);
@@ -124,7 +118,7 @@ public class ShooterCommands {
         // Warmup
         Commands.run(
                 () -> {
-                  shooter.runShooterOpenLoop(0.0);
+                  shooter.runOpenLoop(0.0);
                 },
                 shooter)
             .withTimeout(FF_START_DELAY),
@@ -135,9 +129,9 @@ public class ShooterCommands {
         // Accelerate and gather data
         Commands.run(
                 () -> {
-                  if (shooter.getFlywheelVelocityRPM() < Shooter.Flywheel.kMaxShooterRPM) {
+                  if (!shooter.isFlywheelOverspeed()) {
                     double voltage = timer.get() * FF_RAMP_RATE;
-                    shooter.runShooterOpenLoop(voltage / 12.0);
+                    shooter.runOpenLoop(voltage / Constants.kNominalVoltage);
                     velocitySamples.add(shooter.getShooterFFCharacterizationVelocity());
                     voltageSamples.add(voltage);
                   }
