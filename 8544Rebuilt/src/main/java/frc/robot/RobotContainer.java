@@ -175,9 +175,9 @@ public class RobotContainer {
     ));
 
     // Calibration only
-//    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
- //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
-
+  //  goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+  //  goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
+ 
     shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
                                              rightTriggerGoose, // Feed shooter
@@ -189,7 +189,7 @@ public class RobotContainer {
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
                                            backButtonGoose, startButtonGoose));
-
+ 
   }
 
 

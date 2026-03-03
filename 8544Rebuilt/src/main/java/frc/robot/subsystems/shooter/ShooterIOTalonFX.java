@@ -22,19 +22,19 @@ import frc.robot.subsystems.shooter.Shooter.Flywheel;
 public class ShooterIOTalonFX implements ShooterIO {
     
     // Used to sycnronize control requests to the shooter motor paring
-    private static final int kMotorPairControlUpdateTimeSyncHz = 50;
+    private static final int kMotorPairControlUpdateTimeSyncHz = 100; //was 50
 
-    private static final int kStatorCurrentLimit = 50;
+    private static final int kStatorCurrentLimit = 30; //was 50
 
     // TODO>>>..
     private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
-    private static final double kV = 0.89;
+    private static final double kV =0.06; //was 0.89 0.018
     
-    private static final double kS = 1.74;
-    private static final double kD = 0.1;
-    private static final double kPNominal = 10.0 / 32.1; // 32.1 is target rps of motor
-    private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
-    private static final double kP = kPNominal + kAdjust;
+    private static final double kS = 1.8; // was 1.74
+    private static final double kD = 0.0; //was .1
+    private static final double kPNominal = 10.0 / 56.67; // 32.1 is target rps of motor
+  //  private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
+    private static final double kP = 0.08;//kPNominal; //+ kAdjust;
     // Raw voltage to RPM
     // 
 
@@ -61,9 +61,9 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Needs motor config time request or something? TODO
     velocityTorqueRequest = new VelocityTorqueCurrentFOC(0.0)
       .withVelocity(0.0)
-      .withSlot(0);
-   //   .withUseTimesync(true)  // Use this with request updateFreq 0 hz
-   //   .withUpdateFreqHz(0); // MotorConfig must have set freq rate to use this.
+      .withSlot(0)
+      .withUseTimesync(true)  // Use this with request updateFreq 0 hz
+      .withUpdateFreqHz(0); // MotorConfig must have set freq rate to use this.
 
     // Use aligned follow request because the follower motor config is inverted already.
     // Even though motor config is already inverted, use the Opposed alignment config to
@@ -86,7 +86,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       .withMotorOutput(
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                                  .withInverted(InvertedValue.CounterClockwise_Positive)
-                              //   .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
+                                 .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
 
     // Closed loop settings for velocity control
@@ -108,7 +108,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       .withMotorOutput(
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                                 .withInverted(InvertedValue.Clockwise_Positive)
-                             //   .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
+                                .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
     followTalon.getConfigurator().apply(followConfig); // Apply follow config
 
@@ -140,6 +140,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.outputDuty = (float) leaderTalon.getDutyCycle().getValueAsDouble(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) leaderTalon.getTorqueCurrent().getValueAsDouble();
     inOutData.outputVoltage = (float) leaderTalon.getMotorVoltage().getValueAsDouble();
+    inOutData.outputPower = (float) leaderTalon.getMotorVoltage().getValueAsDouble() * leaderTalon.getTorqueCurrent().getValueAsDouble();
 
     inOutData.feedForward = currentFeedForward;
   }
