@@ -204,13 +204,18 @@ public class RobotContainer {
 //    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
  //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
 
-    shooter.setDefaultCommand(
+    // Until the kraken is released use open voltage control for testing
+     shooter.setDefaultCommand(
+        ShooterCommands.openVoltageControl(shooter, dpadUpTriggerGoose, dpadDownTriggerGoose)
+     );
+
+   /* shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter,
                                     leftTriggerGoose, // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    );
+    );*/
    
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,

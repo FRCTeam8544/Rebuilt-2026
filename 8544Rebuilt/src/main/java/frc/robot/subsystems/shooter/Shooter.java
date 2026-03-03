@@ -25,7 +25,7 @@ public class Shooter extends SubsystemBase{
     private final ShooterIO shooterIO;
     private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
-    private double tuneShootVoltage = 0.0;
+    private double tuneShootVoltage = 3.0;
     private final double tuneShootVoltStep = 0.25 / Constants.tickUpdatesPerSecond; // 1/4 volt per second
 
    private double tuneShootRpmAdjust = 0.0;
