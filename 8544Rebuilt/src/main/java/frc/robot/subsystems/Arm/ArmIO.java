@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
   
-  public static final double kArmUpperLimit = 0.95;
+  public static final double kArmUpperLimit = 0.8;
   public static final double kArmLowerLimit = 0.1;
 
   public static final double kMotorToOutputRatio = 1.0/100.0; // 100 to 1 gearbox
