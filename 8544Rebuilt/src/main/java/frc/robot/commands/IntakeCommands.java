@@ -7,104 +7,76 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Intake.*;
 
 
+
 public class IntakeCommands {
 
 
   private IntakeCommands() {}
 
+  public static Command stopMotors(Intake intake) {
+    return Commands.run(
+        () -> {
+          intake.stopMotors();
+        },
+        intake);
+  }
+
   public static Command openLoopControl(
     Intake intake,
-    Trigger armInTrigger,
-    Trigger armOutTrigger,
     Trigger intakeTrigger,
     Trigger expelTrigger) {
       return Commands.run(
         () -> {
 
-          final double armExtendDuty = 0.6;
-          final double armRetractDuty = -0.8;
-          boolean extendPosition = armOutTrigger.getAsBoolean();
-          boolean retractPosition = armInTrigger.getAsBoolean();
-          // If and only if one button is pressed at a time
-          if (retractPosition ^ extendPosition) {
-            if (extendPosition) {
-              intake.runArmOpenLoop(armExtendDuty); // Set Extend Position
-            } else {
-              intake.runArmOpenLoop(armRetractDuty); // Set Retract Position
-            }
-          }
-          else { 
-            intake.runArmOpenLoop(0.0);
-          }
-
           final double intakeFeedDuty = 0.7;
+
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
           if (intakeFuel ^ expelFuel) {
             if (intakeFuel) {
-              intake.runFeedOpenLoop(intakeFeedDuty);
+              intake.runOpenLoop(intakeFeedDuty);
             }
             else {
-              intake.runFeedOpenLoop(-intakeFeedDuty);
+              intake.runOpenLoop(-intakeFeedDuty);
             }
           }
           else {
-            intake.runFeedOpenLoop(0.0);
+            intake.runOpenLoop(0.0);
           }
 
         },
         intake);
       }
 
-  public static Command stopMotors(Intake intake) {
-    return Commands.run(
-        () -> {
-          intake.stopOpenLoop();
-          intake.runIntakeFeed(0);
-        },
-        intake);
-  }
-
 
   public static Command closedPositionControl(
       Intake intake,
-      Trigger extendTrigger,
-      Trigger retractTrigger,
       Trigger intakeTrigger,
       Trigger expelTrigger
       ) {
     return Commands.run(
         () -> {
-          boolean extendPosition = extendTrigger.getAsBoolean();
-          boolean retractPosition = retractTrigger.getAsBoolean();
-          // If and only if one button is pressed at a time
-          if (retractPosition ^ extendPosition) {
-            if (extendPosition) {
-              intake.runIntakeArm(0.8); // Set Extend Position
-            } else {
-              intake.runIntakeArm(0.2); // Set Retract Position
-            }
-           } else { intake.holdArmPosition();
+        
+          final double intakeSpeedRpm = 420;
+          boolean inPressed = intakeTrigger.getAsBoolean();
+          boolean outPressed = expelTrigger.getAsBoolean();
 
-           }
-          
-          boolean inCmd = intakeTrigger.getAsBoolean();
-          boolean outCmd = expelTrigger.getAsBoolean();
-          if (inCmd ^ outCmd) {
-            if (inCmd) {
-              intake.runIntakeFeed(400);
+          if (inPressed ^ outPressed) {
+            if (inPressed) {
+              intake.runAtRpm(intakeSpeedRpm);
             }
             else {
-              intake.runIntakeFeed(-400);
+              intake.runAtRpm(-intakeSpeedRpm);
             }
           }
           else {
-            intake.runIntakeFeed(0);
+            intake.stopMotors();
           }
 
         },
         intake);
   }
+
   }
 
   

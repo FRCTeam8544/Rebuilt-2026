@@ -32,7 +32,7 @@ public interface ShooterIO {
     public float outputCurrent = 0;
     public float outputVoltage = 0;
     public double outputPower = 0;
-    public double velocitySetPoint = 0.0; // Requested flywheel output RPM
+    public double flywheelVelocitySetPoint = 0.0; // Requested flywheel output RPM
     public double voltageSetPoint= 0.0; // Motor voltage, usually not directly controlled
   }
 

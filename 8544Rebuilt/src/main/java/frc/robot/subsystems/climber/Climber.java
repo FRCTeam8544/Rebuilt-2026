@@ -20,15 +20,21 @@ public class Climber extends SubsystemBase {
   private final double minPositionLimit = 0;   // Rotations
   private final double maxPositionLimit = 0.5; // Rotations
 
-  // Zero faces to the front of robot
-  public DoubleSupplier armPositionSupplier =
+  
+  public DoubleSupplier outputVoltageSupplier = 
+    () -> {
+      return climberInputs.outputVoltage;
+    };
+
+  // Zero faces to the just below front of robot
+  public DoubleSupplier positionSupplier =
     () -> {
       // TODO provide in degrees, use rotations for now
       //return Units.rotationsToDegrees(climberInputs.absolutePosition);
       return climberInputs.position;
     };
 
-  public DoubleSupplier armSetPointSupplier =
+  public DoubleSupplier positionSetPointSupplier =
     () -> {
       // TODO provide in degrees, use rotations for now
       //return Units.rotationsToDegrees(climberInputs.positionSetPoint);

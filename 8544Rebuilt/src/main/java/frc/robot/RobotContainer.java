@@ -10,13 +10,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.ClimberCommands;
+import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.climber.*;
 
@@ -32,7 +31,9 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private final Arm arm;
   private final Intake intake;
+  private final Feeder feeder;
   private final Shooter shooter;
   private final Climber climber;
 
@@ -62,6 +63,8 @@ public class RobotContainer {
   public RobotContainer() {
 
     intake = new Intake();
+    arm = new Arm();
+    feeder = new Feeder();
     shooter = new Shooter();
     climber = new Climber();
 
@@ -133,6 +136,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
+    // ----- Driver Controls ------
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -165,25 +171,43 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+
+    // ----- Operator Controls -------
+    
+    arm.setDefaultCommand(
+        ArmCommands.openLoopControl(
+            arm,
+            leftBackGoose, // retract arm
+            rightBackGoose // extend arm
+    ));
+    
     intake.setDefaultCommand(
         IntakeCommands.openLoopControl(
             intake,
-            leftBackGoose, // retract arm
-            rightBackGoose, // extend arm
-            aButtonGoose,   // intake Fuel
-            yButtonGoose    // expel Fuel
+            aButtonGoose, // intake fuel
+            yButtonGoose // expel fuel
     ));
 
-    // Calibration only
-  //  goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
-  //  goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
+    feeder.setDefaultCommand(
+        FeederCommands.buttonFeed(
+            feeder,
+            rightTriggerGoose, // Fuel feed roller to shooter flywheel
+            bButtonGoose,      // Reverse feed 
+            dpadLeftTriggerGoose,   // Decrease feed speed
+            dpadRightTriggerGoose   // Increase feed speed
+          )
+    );
+
+    // Calibration only, replace the default shooter command to use, and disable climber cmd
+    //  goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+    //  goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
  
     shooter.setDefaultCommand(
-        ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
-                                             rightTriggerGoose, // Feed shooter
-                                             dpadDownTriggerGoose, dpadUpTriggerGoose,
-                                             dpadLeftTriggerGoose, dpadRightTriggerGoose
-                                             )
+        ShooterCommands.buttonShoot(shooter,
+                                    leftTriggerGoose,     // Run Shooter flywheel
+                                    dpadDownTriggerGoose, // Decrease flywheel speed
+                                    dpadUpTriggerGoose    // Increase flywheel speed
+                                  )
     );
    
     climber.setDefaultCommand(
