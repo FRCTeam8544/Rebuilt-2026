@@ -82,13 +82,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        leds = new Leds(
-            new LedIOCANdle(),
-            intake::isFeedIntaking,
-            shooter::isAtLaunchSetpoint,
-            shooter::isShooting,
-            climber::isAtClimbPosition,
-            climber::isClimbing);
+        leds = new Leds(new LedIOCANdle());
         break;
 
       case SIM:
@@ -100,13 +94,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        leds = new Leds(
-            new LedIOSim(),
-            intake::isFeedIntaking,
-            shooter::isAtLaunchSetpoint,
-            shooter::isShooting,
-            climber::isAtClimbPosition,
-            climber::isClimbing);
+        leds = new Leds(new LedIOSim());
         break;
 
       default:
@@ -118,13 +106,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        leds = new Leds(
-            new LedIO() {},
-            intake::isFeedIntaking,
-            shooter::isAtLaunchSetpoint,
-            shooter::isShooting,
-            climber::isAtClimbPosition,
-            climber::isClimbing);
+        leds = new Leds(new LedIO() {});
         break;
     }
 

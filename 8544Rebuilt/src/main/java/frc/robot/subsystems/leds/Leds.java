@@ -1,7 +1,5 @@
 package frc.robot.subsystems.leds;
 
-import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,11 +28,23 @@ public class Leds extends SubsystemBase {
     private static final int[] RED         = {255,   0,   0};
     private static final int[] BLUE        = {  0,   0, 255};
     private static final int[] BLUE_PURPLE = {100,   0, 200}; // blue-purple blend
-    private static final int[] ORANGE_RED  = {255,  69,   0}; // orange-red blend
+    private static final int[] ORANGE_RED  = {255,  69,   0}; // CSS OrangeRed
     private static final int[] GREEN       = {  0, 200,   0};
     private static final int[] YELLOW      = {200, 200,   0};
 
-    // Priority order (highest last in this enum is fine — see computeState())
+    /**
+     * Mechanical action states signalled by commands.
+     * The subsystem merges these with robot-mode state to determine the final animation.
+     */
+    public enum MechanicalState {
+        NONE,
+        INTAKING,
+        IN_LAUNCH_TOLERANCE,
+        SHOOTING,
+        IN_CLIMB_TOLERANCE,
+        CLIMBING
+    }
+
     private enum LedState {
         STARTUP,
         E_STOPPED,
@@ -55,38 +65,27 @@ public class Leds extends SubsystemBase {
     private final LedIO ledIO;
     private final LedIOInputsAutoLogged ledInputs = new LedIOInputsAutoLogged();
 
-    private final BooleanSupplier isIntaking;
-    private final BooleanSupplier isInLaunchTolerance;
-    private final BooleanSupplier isShooting;
-    private final BooleanSupplier isInClimbTolerance;
-    private final BooleanSupplier isClimbing;
-
     private final double startupTimestamp;
+    private MechanicalState requestedMechanicalState = MechanicalState.NONE;
 
     /**
      * Creates the LED subsystem.
      *
      * @param io the LED IO implementation
-     * @param isIntaking supplier that returns true when the intake feed is active
-     * @param isInLaunchTolerance supplier that returns true when the shooter flywheel is at its setpoint
-     * @param isShooting supplier that returns true when the robot is actively launching
-     * @param isInClimbTolerance supplier that returns true when the climber is in an engaged position
-     * @param isClimbing supplier that returns true when the climber is actively being driven
      */
-    public Leds(
-            LedIO io,
-            BooleanSupplier isIntaking,
-            BooleanSupplier isInLaunchTolerance,
-            BooleanSupplier isShooting,
-            BooleanSupplier isInClimbTolerance,
-            BooleanSupplier isClimbing) {
+    public Leds(LedIO io) {
         this.ledIO = io;
-        this.isIntaking = isIntaking;
-        this.isInLaunchTolerance = isInLaunchTolerance;
-        this.isShooting = isShooting;
-        this.isInClimbTolerance = isInClimbTolerance;
-        this.isClimbing = isClimbing;
         this.startupTimestamp = Timer.getFPGATimestamp();
+    }
+
+    /**
+     * Called by commands to signal the current mechanical action.
+     * Set to {@link MechanicalState#NONE} when no action is active.
+     *
+     * @param state the current mechanical state
+     */
+    public void setMechanicalState(MechanicalState state) {
+        requestedMechanicalState = state;
     }
 
     @Override
@@ -96,6 +95,7 @@ public class Leds extends SubsystemBase {
 
         LedState state = computeState();
         Logger.recordOutput("Leds/State", state.name());
+        Logger.recordOutput("Leds/MechanicalState", requestedMechanicalState.name());
 
         applyAnimation(state);
     }
@@ -130,28 +130,21 @@ public class Leds extends SubsystemBase {
             return LedState.AUTO;
         }
 
-        // 5. Teleop sub-states — checked highest priority first
+        // 5. Teleop — mechanical state (set by commands) takes priority, then timing checks
         if (DriverStation.isTeleopEnabled()) {
-            if (isClimbing.getAsBoolean()) {
-                return LedState.CLIMBING;
-            }
-            if (isInClimbTolerance.getAsBoolean()) {
-                return LedState.IN_CLIMB_TOLERANCE;
-            }
-            if (isShooting.getAsBoolean()) {
-                return LedState.SHOOTING;
-            }
-            if (isInLaunchTolerance.getAsBoolean()) {
-                return LedState.IN_LAUNCH_TOLERANCE;
-            }
-            if (isIntaking.getAsBoolean()) {
-                return LedState.INTAKING;
-            }
-            double matchTime = DriverStation.getMatchTime();
-            if (matchTime >= 0 && matchTime <= ENDGAME_TIME_SECONDS) {
-                return LedState.TELEOP_ENDGAME;
-            }
-            return LedState.TELEOP_DEFAULT;
+            return switch (requestedMechanicalState) {
+                case CLIMBING            -> LedState.CLIMBING;
+                case IN_CLIMB_TOLERANCE  -> LedState.IN_CLIMB_TOLERANCE;
+                case SHOOTING            -> LedState.SHOOTING;
+                case IN_LAUNCH_TOLERANCE -> LedState.IN_LAUNCH_TOLERANCE;
+                case INTAKING            -> LedState.INTAKING;
+                case NONE -> {
+                    double matchTime = DriverStation.getMatchTime();
+                    yield (matchTime >= 0 && matchTime <= ENDGAME_TIME_SECONDS)
+                            ? LedState.TELEOP_ENDGAME
+                            : LedState.TELEOP_DEFAULT;
+                }
+            };
         }
 
         return LedState.TELEOP_DEFAULT;
@@ -188,8 +181,6 @@ public class Leds extends SubsystemBase {
                 boolean isRed = alliance.isPresent()
                         && alliance.get() == DriverStation.Alliance.Red;
                 int[] allianceColor = isRed ? RED : BLUE;
-                // Wave in alliance color; WHITE is the "leading edge" in the two-color spec
-                // but CANdle only supports one color — use the alliance color to stay identifiable
                 ledIO.setWave(allianceColor[0], allianceColor[1], allianceColor[2], WAVE_FAST_HZ);
             }
 

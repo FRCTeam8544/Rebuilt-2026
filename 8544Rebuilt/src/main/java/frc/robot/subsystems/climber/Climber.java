@@ -71,28 +71,6 @@ public class Climber extends SubsystemBase {
     climberIO.setPosition(climberInputs.positionSetPoint);
   }
 
-// --- ADDED FOR LED CONTROL DURING CLIMBING ---
-  // Climber position (in rotations) above which the arm is considered engaged for climbing
-  private static final double CLIMB_ENGAGED_POSITION_ROTATIONS = 0.15;
-  // Minimum voltage magnitude to be considered actively climbing
-  private static final double CLIMBING_MIN_VOLTAGE_VOLTS = 1.0;
-
-  /**
-   * Returns true when the climber arm has been extended past the engagement threshold,
-   * indicating the robot is in or near a climbing position.
-   */
-  public boolean isAtClimbPosition() {
-    return climberInputs.position > CLIMB_ENGAGED_POSITION_ROTATIONS;
-  }
-
-  /**
-   * Returns true when the climber is being actively driven with open-loop voltage.
-   */
-  public boolean isClimbing() {
-    return Math.abs(climberInputs.voltageSetPoint) > CLIMBING_MIN_VOLTAGE_VOLTS;
-  }
-// --- END  ---
-
   public void runArmOpenLoop(double duty) {
     double adjustedDuty = duty;
     if (adjustedDuty > 1.0)
