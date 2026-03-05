@@ -189,16 +189,18 @@ public class RobotContainer {
         IntakeCommands.openLoopControl(
             intake,
             aButtonGoose, // intake fuel
-            yButtonGoose // expel fuel
+            yButtonGoose, // expel fuel
+            leds
     ));
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose,      // Reverse feed 
+            bButtonGoose,      // Reverse feed
             dpadLeftTriggerGoose,   // Decrease feed speed
-            dpadRightTriggerGoose   // Increase feed speed
+            dpadRightTriggerGoose,  // Increase feed speed
+            leds
           )
     );
 
@@ -223,7 +225,7 @@ public class RobotContainer {
    
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose));
+                                           backButtonGoose, startButtonGoose, leds));
 
   }
 
