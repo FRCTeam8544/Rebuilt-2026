@@ -11,8 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.spark.SparkBase.Faults;
-
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.shooter.Shooter.Flywheel;
@@ -24,11 +22,19 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Used to sycnronize control requests to the shooter motor paring
     private static final int kMotorPairControlUpdateTimeSyncHz = 50;
 
-    private static final int kStatorCurrentLimit = 20;
+    private static final int kStatorCurrentLimit = 50;
 
     // TODO>>>..
-    private static final double kMeasuredKv = 590.0;
-    private static final double kS = 0.1435; // TODO tune Static mechanism friction
+    private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
+    private static final double kV = 0.89;
+    
+    private static final double kS = 1.74;
+    private static final double kD = 0.1;
+    private static final double kPNominal = 10.0 / 32.1; // 32.1 is target rps of motor
+    private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
+    private static final double kP = kPNominal + kAdjust;
+    // Raw voltage to RPM
+    // 
 
     private final TalonFX leaderTalon;
     private final TalonFXConfiguration leaderConfig;
@@ -83,11 +89,11 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // Closed loop settings for velocity control
     leaderConfig.Slot0
-        .withKS(0.1) // Add V output to overcome static friction
-        .withKV(0.0) // Velocity target of 1 rps results in kV Volts output
-        .withKP(0.0) // An error of 1 rps results in KP Volts output
+        .withKS(kS) // Add V output to overcome static friction
+        .withKV(kV) // Velocity target of 1 rps results in kV Volts output
+        .withKP(kP) // An error of 1 rps results in KP Volts output
         .withKI(0.0) // Avoid non-zero: No output for integrated error
-        .withKD(0.0); // Output for error derivative
+        .withKD(kD); // Output for error derivative
 
     // Apply leader config
     leaderTalon.getConfigurator().apply(leaderConfig);
@@ -130,27 +136,21 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Outputs
     inOutData.busVoltage = (float) leaderTalon.getSupplyCurrent().getValueAsDouble();
     inOutData.outputDuty = (float) leaderTalon.getDutyCycle().getValueAsDouble(); // -1 to 1 percent applied of bus voltage
-    inOutData.outputCurrent = (float) leaderTalon.getStatorCurrent().getValueAsDouble();
+    inOutData.outputCurrent = (float) leaderTalon.getTorqueCurrent().getValueAsDouble();
     inOutData.outputVoltage = (float) leaderTalon.getMotorVoltage().getValueAsDouble();
 
     inOutData.feedForward = currentFeedForward;
   }
 
-  // Set shooter target velocity in RPM, using closed loop with feedforward.
+  // Set shooter target motor velocity in RPM, using closed loop current control.
   @Override
   public void setVelocity(double rpm) {
 
-    // Adjust for output overdrive gearing. The request is relative to the desired flywheel output rpm.
-    // This will decrease the requested motor RPM so that the output flywheel is at the requested rpm.
-    double adjustedRpm = Flywheel.kOutputToDriveGearRatio * rpm;
-    /*
-    Raw feed forward style
-    final double flywheelFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel
-    final double scaledFeedForward = flywheelFeedForward * rpm + kS;
-    currentFeedForward = scaledFeedForward;
-    closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, currentFeedForward);*/
-    
-    
+    // Todo add arbitrary feedforward to smooth out the loop?
+
+    // Request is already in motor velocity rpm, not flywheel.
+    double adjustedRpm = rpm;
+      
     velocityTorqueRequest.Velocity = adjustedRpm / 60.0; // CTR uses revolutions per second
 
     // Control requests must be sent in pairs to control the leader and follower together.

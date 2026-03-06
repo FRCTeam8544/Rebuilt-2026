@@ -1,26 +1,18 @@
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.climber;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import frc.robot.Constants;
+public interface ClimberIO {
 
-
-public interface IntakeIO {
-
-  public static final double kMotorToOutputRatio = 1.0/12.0; // 12 to 1 gearbox
-  public static final double kOutputToMotorRatio = 1.0 / kMotorToOutputRatio;
-
-  public static final double kMaxIntakeRPM = Constants.Neo.freeSpeedRPM * kMotorToOutputRatio;
   @AutoLog
-  public static class IntakeIOInputs {
+  public static class ClimberIOInputs {
     // Inputs
     public boolean connected = false;
 
     public float velocity = 0.0f;
     public float position = 0.0f;
-    public float motorTemperature = 0.0f;
 
-    public double velocitySetPoint = 0;
+    public float motorTemperature = 0.0f;
 
     // Fault codes
     public boolean faultSensor;
@@ -31,17 +23,19 @@ public interface IntakeIO {
     public boolean faultFirmware;
 
     // Outputs
+    public double feedForward = 0.0;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
     public float outputCurrent = 0;
     public float outputVoltage = 0;
 
-    public double positionSetPoint = 0.0; // Position in rotations
+    public double positionSetPoint = 0.0;
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
   }
 
-  public default void updateInputs(IntakeIOInputs inOutData) {}
+  public default void updateInputs(ClimberIOInputs inOutData) {}
+
+  public default void setPosition(double rotations) {}
 
   public default void setVoltage(double volts) {}
-  public default void setVelocity(double rpm) {}
 }

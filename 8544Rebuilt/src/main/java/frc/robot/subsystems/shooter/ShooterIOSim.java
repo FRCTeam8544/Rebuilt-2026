@@ -27,7 +27,7 @@ public class ShooterIOSim implements ShooterIO{
     inOutData.outputDuty = 0.0f; // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = 0.0f;
     inOutData.outputVoltage = 0.0f;
-    inOutData.velocitySetPoint = 0.0f; // Percent of max motor speed (0...1)
+    inOutData.flywheelVelocitySetPoint = 0.0f; 
     inOutData.voltageSetPoint = 0.0f; // Motor voltage, usually not directly controlled
     
   }

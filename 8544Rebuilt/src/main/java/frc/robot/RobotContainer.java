@@ -10,18 +10,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.subsystems.climber.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -35,9 +31,11 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private final Arm arm;
   private final Intake intake;
+  private final Feeder feeder;
   private final Shooter shooter;
-  private final Vision vision;
+  private final Climber climber;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -56,6 +54,7 @@ public class RobotContainer {
   private final Trigger dpadLeftTriggerGoose = new Trigger(goose.povLeft());
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
+  private final Trigger backButtonGoose = new Trigger(goose.back());
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -64,7 +63,10 @@ public class RobotContainer {
   public RobotContainer() {
 
     intake = new Intake();
+    arm = new Arm();
+    feeder = new Feeder();
     shooter = new Shooter();
+    climber = new Climber();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -79,13 +81,6 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        vision =
-            new Vision(
-                drive.robotPoseSupplier,
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVision(
-                    VisionConstants.CenterApriltag, VisionConstants.robotToCamera0));
-
         break;
 
       case SIM:
@@ -97,15 +92,6 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-
-        vision =
-            new Vision(
-                drive.robotPoseSupplier,
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.CenterApriltag,
-                    VisionConstants.robotToCamera0,
-                    drive::getPose));
         break;
 
       default:
@@ -117,10 +103,6 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-                
-        vision =
-            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
-
         break;
     }
 
@@ -154,6 +136,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
+    // ----- Driver Controls ------
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -186,43 +171,56 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+
+    // ----- Operator Controls -------
+    
+    arm.setDefaultCommand(
+        ArmCommands.openLoopControl(
+            arm,
+            leftBackGoose, // retract arm
+            rightBackGoose // extend arm
+    ));
+    
     intake.setDefaultCommand(
         IntakeCommands.openLoopControl(
             intake,
-            leftBackGoose, // retract arm
-            rightBackGoose, // extend arm
-            aButtonGoose,   // intake Fuel
-            yButtonGoose    // expel Fuel
+            aButtonGoose, // intake fuel
+            yButtonGoose // expel fuel
     ));
 
-    /*intake.setDefaultCommand(
-        IntakeCommands.closedPositionControl(
-            intake,
-            leftBackGoose,
-            rightBackGoose,
-            aButtonGoose,
-            yButtonGoose
-    ));*/
-
-    shooter.setDefaultCommand(
-        ShooterCommands.buttonShoot(shooter, leftTriggerGoose, // Shooter flywheel
-                                             rightTriggerGoose, // Feed shooter
-                                             dpadDownTriggerGoose, dpadUpTriggerGoose,
-                                             dpadLeftTriggerGoose, dpadRightTriggerGoose,
-                                             startButtonGoose)
+    feeder.setDefaultCommand(
+        FeederCommands.buttonFeed(
+            feeder,
+            rightTriggerGoose, // Fuel feed roller to shooter flywheel
+            bButtonGoose,      // Reverse feed 
+            dpadLeftTriggerGoose,   // Decrease feed speed
+            dpadRightTriggerGoose   // Increase feed speed
+          )
     );
 
-    // Raw feed and shooter voltage tuning
-   /* goose.leftTrigger().whileTrue(
-        ShooterCommands.openVoltageControl(shooter, 
-                                            dpadUpTriggerGoose, // Feed trigger
-                                            yButtonGoose, aButtonGoose, 
-                                            xButtonGoose, bButtonGoose));
 
-    goose.leftTrigger().whileFalse(ShooterCommands.stopMotors(shooter));
-*/
 
-  
+    // Calibration only, replace the default shooter command to use
+//    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+ //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
+
+    // Until the kraken is released use open voltage control for testing
+     shooter.setDefaultCommand(
+        ShooterCommands.openVoltageControl(shooter, dpadUpTriggerGoose, dpadDownTriggerGoose)
+     );
+
+   /* shooter.setDefaultCommand(
+        ShooterCommands.buttonShoot(shooter,
+                                    leftTriggerGoose, // Run Shooter flywheel
+                                    dpadDownTriggerGoose, // Decrease flywheel speed
+                                    dpadUpTriggerGoose    // Increase flywheel speed
+                                  )
+    );*/
+   
+    climber.setDefaultCommand(
+        ClimberCommands.openVoltageControl(climber,
+                                           backButtonGoose, startButtonGoose));
+
   }
 
 
