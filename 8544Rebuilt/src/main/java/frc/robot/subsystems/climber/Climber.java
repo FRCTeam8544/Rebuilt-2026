@@ -20,25 +20,15 @@ public class Climber extends SubsystemBase {
   private final double minPositionLimit = 0;   // Rotations
   private final double maxPositionLimit = 0.5; // Rotations
 
-  // Provide the encoder position, this will exceed 0 to 1
-  public DoubleSupplier encoderPositionSupplier =
-    () -> {
-      // TODO provide in degrees, use rotations for now
-      //return Units.rotationsToDegrees(climberInputs.absolutePosition);
-      return climberInputs.encoderPosition;
-    };
 
   // Zero faces to the front of robot
   // Positive towards the rear of the robot
-  public DoubleSupplier hookPositionSupplier =
+  public DoubleSupplier positionSupplier =
     () -> {
-      // TODO provide in degrees, use rotations for now
-      //return Units.rotationsToDegrees(climberInputs.absolutePosition);
       return climberInputs.position;
     };
-
-
-  public DoubleSupplier hookSetPointSupplier =
+  
+  public DoubleSupplier positionSetPointSupplier =
     () -> {
       // TODO provide in degrees, use rotations for now
       //return Units.rotationsToDegrees(climberInputs.positionSetPoint);

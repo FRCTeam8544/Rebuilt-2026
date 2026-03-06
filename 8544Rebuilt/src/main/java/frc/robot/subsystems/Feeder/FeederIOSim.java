@@ -1,11 +1,12 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.Feeder;
 
+import frc.robot.subsystems.Feeder.FeederIO.FeedIOInputs;
 
-public class FeedIOSim implements FeedIO {
+public class FeederIOSim implements FeederIO {
   
 
 
-  public FeedIOSim() {
+  public FeederIOSim() {
   }
 
   @Override

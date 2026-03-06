@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.Feeder;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -12,11 +12,9 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkClosedLoopController;
 
 import frc.robot.Constants.NeoVortex;
-import frc.robot.subsystems.shooter.ShooterIO;
-import frc.robot.subsystems.shooter.Shooter.FeedWheel;
-import pabeles.concurrency.IntObjectConsumer;
+import frc.robot.subsystems.Feeder.Feeder.FeedWheel;
 
-public class FeedIOFlex implements FeedIO {
+public class FeederIOFlex implements FeederIO {
   
     private static final int stallLimit = 40;
 
@@ -30,7 +28,7 @@ public class FeedIOFlex implements FeedIO {
     private final SparkClosedLoopController closedLoop;
     private final SparkFlexConfig motorConfig;
 
-  public FeedIOFlex(int canId) {
+  public FeederIOFlex(int canId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
     motorEncoder = motorController.getEncoder();
     closedLoop = motorController.getClosedLoopController();
@@ -86,9 +84,9 @@ public class FeedIOFlex implements FeedIO {
   
   @Override
   public void setVelocity(double rpm) {
-    final double flywheelFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel
-    final double scaledFeedForward = flywheelFeedForward * rpm + kS;
-    currentFeedForward = scaledFeedForward;
+    final double feederFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel
+    final double scaledfeederFeedForward = feederFeedForward * rpm + kS;
+    currentFeedForward = scaledfeederFeedForward;
     closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, currentFeedForward);
   }
 
