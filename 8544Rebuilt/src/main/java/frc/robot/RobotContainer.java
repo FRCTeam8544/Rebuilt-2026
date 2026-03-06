@@ -18,6 +18,7 @@ import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.climber.*;
+import frc.robot.subsystems.vision.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -36,6 +37,8 @@ public class RobotContainer {
   private final Feeder feeder;
   private final Shooter shooter;
   private final Climber climber;
+
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -81,6 +84,13 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
+        vision =
+            new Vision(
+                drive.robotPoseSupplier,
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(
+                    VisionConstants.CenterApriltag, VisionConstants.robotToCamera0));
+
         break;
 
       case SIM:
@@ -92,6 +102,15 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        vision =
+            new Vision(
+                drive.robotPoseSupplier,
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.CenterApriltag,
+                    VisionConstants.robotToCamera0,
+                    drive::getPose));
         break;
 
       default:
@@ -103,6 +122,9 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        vision =
+            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
 
