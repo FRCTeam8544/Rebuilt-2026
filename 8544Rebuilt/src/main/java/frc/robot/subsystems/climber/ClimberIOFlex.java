@@ -14,7 +14,10 @@ import frc.robot.subsystems.climber.*;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.units.measure.Angle;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
@@ -25,36 +28,39 @@ public class ClimberIOFlex implements ClimberIO {
     private static final double nominalFF = Constants.NeoVortex.nominalFF;
     private static final double Ks = 0.120;
     private static final int stallLimit = 40;
-    //private final double cancoderPosition=0;
     
-    private final SparkFlex motorController;    
-    private final AbsoluteEncoder motorEncoder;
-    private final SparkClosedLoopController closedLoop;
+    private final SparkFlex motorController;
     private final SparkFlexConfig motorConfig;
+
     private final CANcoder cancoder;
+    private final CANcoderConfiguration cancoderConfig;
 
+    // Converts from Cancoder position 0 to N rotations to the hook rotations
+    public final double encoderToHookPositionRatio = 2.0; // TODO tune!!
+    public final double hookPositionToEncoderPositionRatio = 1.0 / encoderToHookPositionRatio;
 
-
-  public ClimberIOFlex(int canId) {
+  public ClimberIOFlex(int canId, int encoderCanId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
-    motorEncoder = motorController.getAbsoluteEncoder();// TODO should be external encoder??
-    closedLoop = motorController.getClosedLoopController();
 
-    cancoder = new CANcoder(31, TunerConstants.kCANBus);
+    cancoder = new CANcoder(encoderCanId, TunerConstants.kCANBus);
+    cancoderConfig = new CANcoderConfiguration()
+        .withMagnetSensor(
+            new MagnetSensorConfigs()
+              .withSensorDirection(SensorDirectionValue.Clockwise_Positive) // TODO?
+        );
+   // cancoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinusHalf;
+
+    cancoder.getConfigurator().apply(cancoderConfig);
 
     motorConfig = new SparkFlexConfig();
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig.smartCurrentLimit(stallLimit);
     motorConfig.voltageCompensation(nominalVoltage);
-    motorConfig.softLimit.forwardSoftLimitEnabled(false); //was true
+    motorConfig.softLimit.forwardSoftLimitEnabled(false);
     motorConfig.softLimit.reverseSoftLimitEnabled(false);
-    motorConfig.closedLoop.positionWrappingEnabled(true);
- //   motorConfig.softLimit.forwardSoftLimit(0.8);
-  //  motorConfig.softLimit.reverseSoftLimit(0.2);
-  //  motorConfig.encoder.positionConversionFactor(1.0/100.0);
-  //  motorConfig.encoder.velocityConversionFactor(1.0/100.0);
 
-    motorConfig.closedLoop
+    // REV encoder will no longer be used.
+    /*motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           // Position Control
           .p(150.00, ClosedLoopSlot.kSlot0)
@@ -62,10 +68,10 @@ public class ClimberIOFlex implements ClimberIO {
           .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
           .d(0.00000, ClosedLoopSlot.kSlot0);
           
-       //   motorConfig.closedLoop.feedForward.kS(Ks, ClosedLoopSlot.kSlot0);
+    motorConfig.closedLoop.feedForward.kS(Ks, ClosedLoopSlot.kSlot0);
           
- //   motorConfig.closedLoop.feedForward.kV(12 * nominalFF,
-  //                                        ClosedLoopSlot.kSlot0);
+    motorConfig.closedLoop.feedForward.kV(12 * nominalFF,
+                                          ClosedLoopSlot.kSlot0);*/
    
                                           
     motorController.configure(motorConfig, 
@@ -75,11 +81,10 @@ public class ClimberIOFlex implements ClimberIO {
 
   public void updateInputs(ClimberIOInputs inOutData) {
     inOutData.connected = true;
-    inOutData.velocity = (float) motorEncoder.getVelocity();
-    inOutData.position = (float) motorEncoder.getPosition();
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
-    //cancode
-    inOutData.climberPosition = (float) cancoder.getPosition().getValueAsDouble();
+    inOutData.velocity = cancoder.getVelocity().getValueAsDouble() / 60.0; // rps -> rpm
+    inOutData.encoderPosition = cancoder.getPosition().getValueAsDouble();
+    inOutData.position = (float) inOutData.encoderPosition / encoderToHookPositionRatio;
 
     // Fault codes
     Faults faults = motorController.getFaults();
@@ -98,9 +103,27 @@ public class ClimberIOFlex implements ClimberIO {
 
   }
 
+  public void setBrakeMode(boolean enableMotorBrake) {
+
+    if (enableMotorBrake) {
+      motorConfig.idleMode(IdleMode.kBrake);
+    }
+    else {
+      motorConfig.idleMode(IdleMode.kCoast);
+    }
+
+    // Do not persist the configuration. It is too slow to do during operation
+    motorController.configure(motorConfig, 
+                              com.revrobotics.ResetMode.kNoResetSafeParameters,
+                              com.revrobotics.PersistMode.kNoPersistParameters);
+  }
+
   public void setPosition(double rotations) {
 
-    closedLoop.setSetpoint(rotations, ControlType.kPosition,ClosedLoopSlot.kSlot0);
+    // TODO USE WPILib PID loop implementation to control the climber
+    // USE the "hook" position from inOutData as that is a synthetic absolute encoder with range 0 to 1
+    // That will not wrap.
+   // closedLoop.setSetpoint(rotations, ControlType.kPosition,ClosedLoopSlot.kSlot0);
   }
 
   public void setVoltage(double volts) {

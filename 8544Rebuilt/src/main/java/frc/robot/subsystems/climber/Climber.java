@@ -12,7 +12,7 @@ import frc.robot.Constants;
 public class Climber extends SubsystemBase {
 
   private static final int climberCanId = 29;
- //private static final int climberCanCoderId = 84;??
+ private static final int encoderCanId = 31;
   
   private final ClimberIO climberIO;
   private final ClimberIOInputsAutoLogged climberInputs = new ClimberIOInputsAutoLogged();
@@ -20,16 +20,17 @@ public class Climber extends SubsystemBase {
   private final double minPositionLimit = 0;   // Rotations
   private final double maxPositionLimit = 0.5; // Rotations
 
-
-  public DoubleSupplier climberRealPositionSupplier =
+  // Provide the encoder position, this will exceed 0 to 1
+  public DoubleSupplier encoderPositionSupplier =
     () -> {
       // TODO provide in degrees, use rotations for now
       //return Units.rotationsToDegrees(climberInputs.absolutePosition);
-      return climberInputs.climberPosition;
+      return climberInputs.encoderPosition;
     };
 
   // Zero faces to the front of robot
-  public DoubleSupplier armPositionSupplier =
+  // Positive towards the rear of the robot
+  public DoubleSupplier hookPositionSupplier =
     () -> {
       // TODO provide in degrees, use rotations for now
       //return Units.rotationsToDegrees(climberInputs.absolutePosition);
@@ -37,7 +38,7 @@ public class Climber extends SubsystemBase {
     };
 
 
-  public DoubleSupplier armSetPointSupplier =
+  public DoubleSupplier hookSetPointSupplier =
     () -> {
       // TODO provide in degrees, use rotations for now
       //return Units.rotationsToDegrees(climberInputs.positionSetPoint);
@@ -50,9 +51,19 @@ public class Climber extends SubsystemBase {
     };
 
   public Climber() {
-    this.climberIO = new ClimberIOFlex(climberCanId);
+    this.climberIO = new ClimberIOFlex(climberCanId,encoderCanId);
     
     setupDefaultDashboard();
+  }
+
+  public void enableCoastMode() {
+    climberIO.setBrakeMode(false);
+    climberInputs.motorBrakeEnabled = false;
+  }
+
+  public void enableBrakeMode() {
+    climberIO.setBrakeMode(true);
+    climberInputs.motorBrakeEnabled = true;
   }
 
   public void runArmToPosition(double rotations) {
@@ -98,7 +109,7 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Climber Position", climberInputs.position);
     SmartDashboard.putNumber("Climber Setpoint", climberInputs.positionSetPoint);
     SmartDashboard.putNumber("Climber Motor Temp", climberInputs.motorTemperature);
-    SmartDashboard.putNumber("Climber Encoder Position", climberInputs.climberPosition);
+    SmartDashboard.putNumber("Climber Encoder Position", climberInputs.encoderPosition);
   }
 
 
@@ -107,7 +118,7 @@ private void setupDefaultDashboard()
   SmartDashboard.setDefaultNumber("Climber Position", climberInputs.position);
   SmartDashboard.setDefaultNumber("Climber SetPoint", climberInputs.positionSetPoint);
   SmartDashboard.setDefaultNumber("Climber Motor Temp", climberInputs.motorTemperature);
-  SmartDashboard.setDefaultNumber("Climber Encoder Position", climberInputs.climberPosition);
+  SmartDashboard.setDefaultNumber("Climber Encoder Position", climberInputs.encoderPosition);
 }
 
 }

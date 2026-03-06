@@ -8,10 +8,10 @@ public interface ClimberIO {
   public static class ClimberIOInputs {
     // Inputs
     public boolean connected = false;
-
-    public float velocity = 0.0f;
-    public float position = 0.0f;
-    public float climberPosition = 0.0f;
+    public boolean motorBrakeEnabled = false;
+    public double velocity = 0.0f;
+    public double position = 0.0f;
+    public double encoderPosition = 0.0f;
 
     public float motorTemperature = 0.0f;
 
@@ -34,6 +34,8 @@ public interface ClimberIO {
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
 
   }
+
+  public default void setBrakeMode(boolean enableMotorBrake) {}
 
   public default void updateInputs(ClimberIOInputs inOutData) {}
 
