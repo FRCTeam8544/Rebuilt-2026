@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkBase.Faults;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.shooter.Shooter.Flywheel;
@@ -26,6 +27,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     private static final int kStatorCurrentLimit = 30; //was 50
 
+    private final double boostFeedForwardInAmps = 0.00; // TODO tune this
     // TODO>>>..
     private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
     private static final double kV =0.06; //was 0.89 0.018
@@ -43,6 +45,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX followTalon;
     private final TalonFXConfiguration followConfig;
 
+    private InterpolatingDoubleTreeMap feedForwardRpmMapping = new InterpolatingDoubleTreeMap();
     private double currentFeedForward = 0.0;
 
     // Leader Control requests
@@ -112,6 +115,18 @@ public class ShooterIOTalonFX implements ShooterIO {
       );
     followTalon.getConfigurator().apply(followConfig); // Apply follow config
 
+    buildRpmMapping();
+  }
+
+  // Build custom feedforward mapping to account for non-linear kV due to mechanism shake
+  private void buildRpmMapping() {
+
+    feedForwardRpmMapping.put(0.0, 0.0);
+    feedForwardRpmMapping.put(1800.0, 0.0);
+    feedForwardRpmMapping.put(1900.0, boostFeedForwardInAmps);
+    feedForwardRpmMapping.put(2300.0, boostFeedForwardInAmps);
+    feedForwardRpmMapping.put(2400.0, 0.0);
+    feedForwardRpmMapping.put(Constants.KrakenX60.freeSpeedRPM, 0.0);
   }
 
   // Update shooter motor inputs
@@ -159,6 +174,9 @@ public class ShooterIOTalonFX implements ShooterIO {
     closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, currentFeedForward);*/
     
     velocityTorqueRequest.Velocity = adjustedRpm / 60.0; // CTR uses revolutions per second
+
+    currentFeedForward = feedForwardRpmMapping.get(velocityTorqueRequest.Velocity);
+    velocityTorqueRequest.FeedForward = currentFeedForward;
 
     // Control requests must be sent in pairs to control the leader and follower together.
     leaderTalon.setControl(velocityTorqueRequest);
