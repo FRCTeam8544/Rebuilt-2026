@@ -31,10 +31,10 @@ public class ArmIOMax implements ArmIO {
     armMotorConfig.idleMode(IdleMode.kBrake);
     armMotorConfig.smartCurrentLimit(stallLimit);
     armMotorConfig.voltageCompensation(12);
-    armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
-    armMotorConfig.softLimit.forwardSoftLimit(kArmUpperLimit);
-    armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
-    armMotorConfig.softLimit.reverseSoftLimit(kArmLowerLimit);
+    armMotorConfig.softLimit.forwardSoftLimitEnabled(false);
+    armMotorConfig.softLimit.forwardSoftLimit(kArmLowerLimit);
+    armMotorConfig.softLimit.reverseSoftLimitEnabled(false);
+    armMotorConfig.softLimit.reverseSoftLimit(kArmUpperLimit);
 
     armMotorConfig.encoder.positionConversionFactor(1);
     armMotorConfig.encoder.velocityConversionFactor(1);

@@ -30,7 +30,7 @@ public class IntakeCommands {
       return Commands.run(
         () -> {
 
-          final double intakeFeedDuty = 0.7;
+          final double intakeFeedDuty = 0.9;
 
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();

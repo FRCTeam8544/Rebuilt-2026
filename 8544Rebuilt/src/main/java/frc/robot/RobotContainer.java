@@ -19,6 +19,7 @@ import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.climber.*;
 import frc.robot.subsystems.leds.*;
+import frc.robot.subsystems.vision.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -38,6 +39,8 @@ public class RobotContainer {
   private final Shooter shooter;
   private final Climber climber;
   private final Leds leds;
+
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController maverick = new CommandXboxController(0);
@@ -83,6 +86,14 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         leds = new Leds(new LedIOCANdle());
+
+        vision =
+            new Vision(
+                drive.robotPoseSupplier,
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(
+                    VisionConstants.CenterApriltag, VisionConstants.robotToCamera0));
+
         break;
 
       case SIM:
@@ -95,6 +106,15 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         leds = new Leds(new LedIOSim());
+
+        vision =
+            new Vision(
+                drive.robotPoseSupplier,
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.CenterApriltag,
+                    VisionConstants.robotToCamera0,
+                    drive::getPose));
         break;
 
       default:
@@ -107,6 +127,9 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         leds = new Leds(new LedIO() {});
+
+        vision =
+            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
 
@@ -204,29 +227,22 @@ public class RobotContainer {
           )
     );
 
+    // Shooter buttons
+    shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
 
-
-    // Calibration only, replace the default shooter command to use
-//    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
- //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
-
-    // Until the kraken is released use open voltage control for testing
-     shooter.setDefaultCommand(
-        ShooterCommands.openVoltageControl(shooter, dpadUpTriggerGoose, dpadDownTriggerGoose)
-     );
-
-   /* shooter.setDefaultCommand(
+    leftTriggerGoose.whileTrue(
         ShooterCommands.buttonShoot(shooter,
-                                    leftTriggerGoose, // Run Shooter flywheel
+                                    leftTriggerGoose,     // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    );*/
-   
+    ).toggleOnFalse(
+        ShooterCommands.gentleStopFlywheel(shooter)
+    );
+
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
                                            backButtonGoose, startButtonGoose, leds));
-
   }
 
 
