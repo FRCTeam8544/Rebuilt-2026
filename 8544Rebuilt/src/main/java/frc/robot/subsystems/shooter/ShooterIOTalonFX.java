@@ -30,13 +30,13 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final double boostFeedForwardInAmps = 0.00; // TODO tune this
     // TODO>>>..
     private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
-    private static final double kV =0.06; //was 0.89 0.018
+    private static final double kV = 0.009; //was 0.89 0.018 0.06
     
     private static final double kS = 1.8; // was 1.74
     private static final double kD = 0.0; //was .1
     private static final double kPNominal = 10.0 / 56.67; // 32.1 is target rps of motor
   //  private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
-    private static final double kP = 0.08;//kPNominal; //+ kAdjust;
+    private static final double kP = 1.12;//kPNominal; //+ kAdjust; //was .08
     // Raw voltage to RPM
     // 
 
