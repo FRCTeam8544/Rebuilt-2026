@@ -5,16 +5,17 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
   
-  public static final double kArmUpperLimit = 0.8;
-  public static final double kArmLowerLimit = 0.12;
+  public static final double kArmForwardLimit = 0.8;
+  public static final double kArmReverseLimit = 0.12;
 
-  public static final double kMotorToOutputRatio = 1.0/100.0; // 100 to 1 gearbox
+  public static final double kMotorToOutputRatio = 3.0; // 100 to 1 gearbox
   public static final double kOutputToMotorRatio = 1.0 / kMotorToOutputRatio;
 
   @AutoLog
   public static class ArmIOInputs {
     // Inputs
     public boolean connected = false;
+    public boolean motorBrakeEnabled = false;
 
     public float velocity = 0.0f;
     public float position = 0.0f;

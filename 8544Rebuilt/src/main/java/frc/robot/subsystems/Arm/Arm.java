@@ -10,6 +10,11 @@ import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
 
+  // ARM coordinates, assuming encoder is on the gearbox output
+  // Clockwise motor movement will bring the arm up.
+  // Counterclockwise motor movement will bring arm down.
+  // Approximately a 3 to 1 gear ratio.
+
   private static final int armCanId = 27;
   private final ArmIO armIO;
   private final ArmIOInputsAutoLogged armInputs = new ArmIOInputsAutoLogged();
@@ -80,7 +85,10 @@ public class Arm extends SubsystemBase {
     
     SmartDashboard.putNumber("Arm Position Setpoint", armInputs.positionSetPoint);
     SmartDashboard.putNumber("Arm Volts Setpoint", armInputs.voltageSetPoint);
-    SmartDashboard.putNumber("Arm Leader Temp", armInputs.motorTemperature);
+    SmartDashboard.putNumber("Arm Motor Temp", armInputs.motorTemperature);
+    
+    // Controls
+    SmartDashboard.putBoolean("Arm Brake Enabled", armInputs.motorBrakeEnabled);
   }
  
   
