@@ -21,6 +21,9 @@ import org.photonvision.*;
 public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
+
+   // public float distanceToHubMeters = 0.0f;
+
     public boolean connected = false;
     public TargetObservation latestTargetObservation =
         new TargetObservation(new Rotation2d(), new Rotation2d());

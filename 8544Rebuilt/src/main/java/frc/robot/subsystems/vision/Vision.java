@@ -14,14 +14,17 @@
 package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
+import frc.robot.subsystems.drive.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,6 +34,8 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.*;
 
@@ -78,6 +83,12 @@ public class Vision extends SubsystemBase {
     return false;
     // return !(camera0Disabled && camera1Disabled);
   }
+
+ 
+  public void AutoFlywheelSpeed() {
+   double distanceToHub = getHubDistance().get().doubleValue();
+   double ShooterAutoSetRPM = distanceToHub * 313.5 + 2255;
+  }  
 
   @Override
   public void periodic() {
@@ -194,6 +205,18 @@ public class Vision extends SubsystemBase {
       }
 
       // Log camera datadata
+      double distance = getHubDistance().get().doubleValue();
+         double distanceToHub = getHubDistance().get().doubleValue();
+         double distanceToFrontRobot = distanceToHub - 0.3429;
+   double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255;
+
+      Logger.recordOutput(
+          "Vision/distanceToHubMeters", distance );
+      Logger.recordOutput(
+          "Vision/ShooterAutoSetRPM", ShooterAutoSetRPM );
+            Logger.recordOutput(
+          "Vision/distTOFrontRobot", distanceToFrontRobot );
+
       Logger.recordOutput(
           "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
           tagPoses.toArray(new Pose3d[tagPoses.size()]));
@@ -244,4 +267,12 @@ public class Vision extends SubsystemBase {
       return nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
     };
   }
+
+    public Supplier<Double> getHubDistance() {
+
+    return () -> {
+      return nav.getDistancefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
+    };
+  }
+
 }

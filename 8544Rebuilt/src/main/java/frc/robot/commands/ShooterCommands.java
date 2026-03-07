@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -64,7 +65,7 @@ public class ShooterCommands {
         () -> {
 
             final int rpmAdjustStep = 100 / 50;
-
+             
             final double shooterNominalRpm = 3000; //for tuning=2720, normal operation = 3000
            
 

@@ -6,6 +6,7 @@ package frc.robot.subsystems.vision;
 
 // import frc.robot.util.LogUtil;
 
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -69,6 +70,30 @@ public class Navigation {
     // log current pose, selected tag, approach angle
     // LogUtil.logData("Climber", climberInOutData);
   }
+
+
+
+  public double getDistancefromHub(DriverStation.Alliance alliance) {
+    // This method will be called once per scheduler run
+    // navigationIO.updateInputs(climberInOutData);
+    Translation2d HubTargetCentroid;
+    final Translation2d currentPose = robotPoseSupplier.get().getTranslation();
+    if (alliance == Alliance.Blue) {
+      HubTargetCentroid = blueHubCentroid;
+
+    } else {
+      HubTargetCentroid = redHubCentroid;
+    }
+  //  Translation2d distanceVector = HubTargetCentroid.getDistance(currentPose);
+    return HubTargetCentroid.getDistance(currentPose);
+
+    // Log summary data
+    // log current pose, selected tag, approach angle
+    // LogUtil.logData("Climber", climberInOutData);
+  }
+
+
+
 
   // Get the Pose2d for the given tag number if it exists
   private Optional<Pose2d> getTagPose(int tagNumber) {
