@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -47,6 +48,10 @@ public class Vision extends SubsystemBase {
   private final Integer[] missedUpdateCount;
   private boolean camera0Disabled = false, camera1Disabled = false;
   private Navigation nav;
+
+ double distanceToHub = getHubDistance().get().doubleValue();
+ double distanceToFrontRobot = distanceToHub - 0.3429;
+ double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255;
 
   public Vision(Supplier<Pose2d> robotPoseSupplier, VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -85,10 +90,11 @@ public class Vision extends SubsystemBase {
   }
 
  
-  public void AutoFlywheelSpeed() {
-   double distanceToHub = getHubDistance().get().doubleValue();
-   double ShooterAutoSetRPM = distanceToHub * 313.5 + 2255;
-  }  
+  public DoubleSupplier AutoFlywheelSpeed =
+  () -> {return ShooterAutoSetRPM; 
+  };
+
+ 
 
   @Override
   public void periodic() {
@@ -205,13 +211,9 @@ public class Vision extends SubsystemBase {
       }
 
       // Log camera datadata
-      double distance = getHubDistance().get().doubleValue();
-         double distanceToHub = getHubDistance().get().doubleValue();
-         double distanceToFrontRobot = distanceToHub - 0.3429;
-   double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255;
 
       Logger.recordOutput(
-          "Vision/distanceToHubMeters", distance );
+          "Vision/distanceToHubMeters", distanceToHub );
       Logger.recordOutput(
           "Vision/ShooterAutoSetRPM", ShooterAutoSetRPM );
             Logger.recordOutput(

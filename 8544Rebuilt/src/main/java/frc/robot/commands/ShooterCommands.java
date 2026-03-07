@@ -2,12 +2,15 @@ package frc.robot.commands;
 
 import frc.robot.Constants;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.vision.*;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,6 +60,8 @@ public class ShooterCommands {
     }
 
     public static Command buttonShoot( Shooter shooter,
+                                        DoubleSupplier distanceSupplier,
+                                        BooleanSupplier AutoToggleSupplier,
                                        Trigger shootTrigger,
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp)
@@ -66,14 +71,17 @@ public class ShooterCommands {
 
             final int rpmAdjustStep = 100 / 50;
              
-            final double shooterNominalRpm = 3000; //for tuning=2720, normal operation = 3000
-           
+            final double shooterNominalRpm = 3000; //TODO shuffleboard toggle between auto/manual
+            double shooterRpmAuto = distanceSupplier.getAsDouble();
 
             // These Rpms are used to tune the flywheel
             //final int shooterNominalRpm = 2720;
            // final double shooterLowNominalRpm = 337.5;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
+            boolean FlywheelAutoRPMLocal = AutoToggleSupplier.getAsBoolean();
+
+
 
             if (adjustUp ^ adjustDown)
             {
@@ -88,8 +96,15 @@ public class ShooterCommands {
 
             if (shootTrigger.getAsBoolean())
             {
-                shooter.runAtRpm(shooterNominalRpm);
+               if(FlywheelAutoRPMLocal = true) { 
+                shooter.runAtRpm(shooterRpmAuto);
+               }
+               else {shooter.runAtRpm(shooterNominalRpm);
             }
+
+            }
+
+
             else {
                 shooter.stopMotors();
             }

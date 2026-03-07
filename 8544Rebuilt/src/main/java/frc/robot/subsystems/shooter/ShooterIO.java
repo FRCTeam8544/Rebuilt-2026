@@ -26,6 +26,7 @@ public interface ShooterIO {
 
     // Outputs
     public boolean maxFlywheelSpeedHit = false;
+    public boolean FlywheelAutoRPMToggle = true;
     public double feedForward = 0.0;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -46,6 +47,13 @@ public class Shooter extends SubsystemBase{
     () -> {
       return Math.max(shooterInputs.leaderMotorTemperature, shooterInputs.followMotorTemperature);
     };
+    
+
+  public BooleanSupplier flywheelAutoToggleBooleanSupplier =
+  () -> {
+    return shooterInputs.FlywheelAutoRPMToggle;
+
+  };
 
    // Shooter
     public Shooter()
