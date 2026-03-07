@@ -34,10 +34,14 @@ public class IntakeCommands {
 
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
-          boolean active = intakeFuel ^ expelFuel;
-          if (active) {
-            leds.setMechanicalState(Leds.MechanicalState.INTAKING);
-            intake.runOpenLoop(intakeFuel ? intakeFeedDuty : -intakeFeedDuty);
+          if (intakeFuel ^ expelFuel) {
+            if (intakeFuel) {
+              leds.setMechanicalState(Leds.MechanicalState.INTAKING);
+              intake.runOpenLoop(intakeFeedDuty);
+            } else {
+              leds.setMechanicalState(Leds.MechanicalState.NONE);
+              intake.runOpenLoop(-intakeFeedDuty);
+            }
           }
           else {
             leds.setMechanicalState(Leds.MechanicalState.NONE);
@@ -60,11 +64,14 @@ public class IntakeCommands {
           final double intakeSpeedRpm = 420;
           boolean inPressed = intakeTrigger.getAsBoolean();
           boolean outPressed = expelTrigger.getAsBoolean();
-          boolean active = inPressed ^ outPressed;
-
-          if (active) {
-            leds.setMechanicalState(Leds.MechanicalState.INTAKING);
-            intake.runAtRpm(inPressed ? intakeSpeedRpm : -intakeSpeedRpm);
+          if (inPressed ^ outPressed) {
+            if (inPressed) {
+              leds.setMechanicalState(Leds.MechanicalState.INTAKING);
+              intake.runAtRpm(intakeSpeedRpm);
+            } else {
+              leds.setMechanicalState(Leds.MechanicalState.NONE);
+              intake.runAtRpm(-intakeSpeedRpm);
+            }
           }
           else {
             leds.setMechanicalState(Leds.MechanicalState.NONE);
