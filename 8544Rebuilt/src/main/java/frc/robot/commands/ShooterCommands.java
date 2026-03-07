@@ -109,7 +109,9 @@ public class ShooterCommands {
                 shooter.stopMotors();
             }
         },
-        shooter);
+        shooter).finallyDo( () -> { shooter.resetShooterDefaultRpm(); 
+        }); // reset rpm setpoint of shooter
+    
     } 
 
   public static Command gentleStopFlywheel(Shooter shooter)

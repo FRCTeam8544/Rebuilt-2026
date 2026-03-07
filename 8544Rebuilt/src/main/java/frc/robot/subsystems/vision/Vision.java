@@ -49,9 +49,9 @@ public class Vision extends SubsystemBase {
   private boolean camera0Disabled = false, camera1Disabled = false;
   private Navigation nav;
 
- double distanceToHub = getHubDistance().get().doubleValue();
- double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
- double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255; // constant function for RPM
+ double ShooterAutoSetRPM = 0;
+   
+
 
   public Vision(Supplier<Pose2d> robotPoseSupplier, VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -90,9 +90,7 @@ public class Vision extends SubsystemBase {
   }
 
  
-  public DoubleSupplier AutoFlywheelSpeed =
-  () -> {return ShooterAutoSetRPM; 
-  };
+
 
  
 
@@ -212,7 +210,7 @@ public class Vision extends SubsystemBase {
 // calculation for ShooterAutoRPM
 double distanceToHub = getHubDistance().get().doubleValue();
  double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
- double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255; // constant function for RPM
+ ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255; // constant function for RPM
       // Log camera datadata
 
       Logger.recordOutput(
@@ -220,7 +218,7 @@ double distanceToHub = getHubDistance().get().doubleValue();
       Logger.recordOutput(
           "Vision/ShooterAutoSetRPM", ShooterAutoSetRPM );
             Logger.recordOutput(
-          "Vision/distTOFrontRobot", distanceToFrontRobot );
+          "Vision/distToFrontRobot", distanceToFrontRobot );
 
       Logger.recordOutput(
           "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
@@ -279,5 +277,8 @@ double distanceToHub = getHubDistance().get().doubleValue();
       return nav.getDistancefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
     };
   }
+    public DoubleSupplier AutoFlywheelSpeed =
+  () -> {return ShooterAutoSetRPM; 
+  };
 
 }
