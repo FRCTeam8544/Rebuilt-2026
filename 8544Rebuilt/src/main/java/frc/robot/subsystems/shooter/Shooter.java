@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase{
     () -> {
       return Math.max(shooterInputs.leaderMotorTemperature, shooterInputs.followMotorTemperature);
     };
-    
+
 
   public BooleanSupplier flywheelAutoToggleBooleanSupplier =
   () -> {
@@ -189,11 +189,12 @@ public class Shooter extends SubsystemBase{
     
     SmartDashboard.putNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
     SmartDashboard.putNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
-
+    SmartDashboard.getBoolean("AutoShootRPMToggle", shooterInputs.FlywheelAutoRPMToggle);
   }
 
   private void setupDefaultDashboard()
   {
+    SmartDashboard.setDefaultBoolean("AutoShootRPMToggle", shooterInputs.FlywheelAutoRPMToggle);
     SmartDashboard.setDefaultNumber("Shooter RPM", shooterInputs.flywheelVelocity);
     SmartDashboard.setDefaultNumber("Shooter RPM Setpoint", shooterInputs.flywheelVelocitySetPoint);
     SmartDashboard.setDefaultNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);

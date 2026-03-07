@@ -50,8 +50,8 @@ public class Vision extends SubsystemBase {
   private Navigation nav;
 
  double distanceToHub = getHubDistance().get().doubleValue();
- double distanceToFrontRobot = distanceToHub - 0.3429;
- double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255;
+ double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
+ double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255; // constant function for RPM
 
   public Vision(Supplier<Pose2d> robotPoseSupplier, VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -209,7 +209,10 @@ public class Vision extends SubsystemBase {
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
-
+// calculation for ShooterAutoRPM
+double distanceToHub = getHubDistance().get().doubleValue();
+ double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
+ double ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255; // constant function for RPM
       // Log camera datadata
 
       Logger.recordOutput(

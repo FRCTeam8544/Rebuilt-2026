@@ -96,7 +96,7 @@ public class ShooterCommands {
 
             if (shootTrigger.getAsBoolean())
             {
-               if(FlywheelAutoRPMLocal = true) { 
+               if(FlywheelAutoRPMLocal) { 
                 shooter.runAtRpm(shooterRpmAuto);
                }
                else {shooter.runAtRpm(shooterNominalRpm);
