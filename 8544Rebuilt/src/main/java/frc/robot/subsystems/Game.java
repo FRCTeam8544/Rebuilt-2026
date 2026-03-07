@@ -7,13 +7,13 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Game {
+public class Game extends SubsystemBase{
 private static final String Blue = null;
 private static final String Red = null;
-String gameData;
-gameData = DriverStation.getGameSpecificMessage();
-if(gameData.length() > 0)
+String gameData ;// DriverStation.getGameSpecificMessage();
+if (!gameData.isEmpty())
 {
   switch (gameData.charAt(0))
   {
@@ -32,7 +32,7 @@ if(gameData.length() > 0)
 }
 
 
-
+@Override
 
     public void periodic() {
 
