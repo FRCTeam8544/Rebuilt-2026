@@ -1,43 +1,40 @@
 package frc.robot.subsystems.shooter;
 
-public class ShooterIOSim implements ShooterIO{
- 
-  
-  public ShooterIOSim() {
-  }
+import frc.robot.Constants;
+import frc.robot.subsystems.shooter.Shooter.Flywheel;
 
-  public void updateInputs(ShooterIOInputs inOutData)
-  {
-    inOutData.connected = false;
-    inOutData.motorVelocity = 0;
-    inOutData.flywheelVelocity = 0;
-    inOutData.leaderMotorTemperature = 0;
-    inOutData.followMotorTemperature = 0;
+/**
+ * Simulated shooter IO. Models flywheel velocity as proportional to applied voltage — no physics
+ * engine needed, just enough fidelity for overspeed protection and launch speed scaling.
+ */
+public class ShooterIOSim implements ShooterIO {
 
-    // Fault codes
-   /* inOutData.faultSensor = false;
-    inOutData.faultCan = false;
-    inOutData.faultTemperature = false;
-    inOutData.faultGateDriver = false;
-    inOutData.faultEscEeprom = false;
-    inOutData.faultFirmware = false;
-    */
-    // Outputs
-    inOutData.busVoltage = 0.0f;
-    inOutData.outputDuty = 0.0f; // -1 to 1 percent applied of bus voltage
+  private double appliedVoltageVolts = 0.0;
+
+  @Override
+  public void updateInputs(ShooterIOInputs inOutData) {
+    inOutData.connected = true;
+
+    // Proportional motor velocity: fraction of free speed based on applied voltage
+    double fractionOfMax = appliedVoltageVolts / Constants.kNominalVoltage;
+    inOutData.motorVelocity = Constants.KrakenX60.freeSpeedRPM * fractionOfMax;
+    inOutData.flywheelVelocity = inOutData.motorVelocity * Flywheel.kDriveToOutputGearRatio;
+
+    inOutData.busVoltage = (float) Constants.kNominalVoltage;
+    inOutData.outputVoltage = (float) appliedVoltageVolts;
+    inOutData.outputDuty = (float) fractionOfMax;
     inOutData.outputCurrent = 0.0f;
-    inOutData.outputVoltage = 0.0f;
-    inOutData.flywheelVelocitySetPoint = 0.0f; 
-    inOutData.voltageSetPoint = 0.0f; // Motor voltage, usually not directly controlled
-    
   }
 
-  
   @Override
   public void setVelocity(double rpm) {
+    // Convert motor RPM setpoint to equivalent voltage
+    double equivalentVoltage = (rpm / Constants.KrakenX60.freeSpeedRPM) * Constants.kNominalVoltage;
+    appliedVoltageVolts = equivalentVoltage;
   }
 
   @Override
   public void setVoltage(double volts) {
+    appliedVoltageVolts = volts;
   }
 }

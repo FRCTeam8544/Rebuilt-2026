@@ -25,9 +25,8 @@ public class Intake extends SubsystemBase {
       return intakeInputs.velocitySetPoint;
     };
 
-  public Intake() {
-   
-    this.intakeIO = new IntakeIOMax(intakeCanId);
+  public Intake(IntakeIO intakeIO) {
+    this.intakeIO = intakeIO;
   }
 
   // Open loop control
