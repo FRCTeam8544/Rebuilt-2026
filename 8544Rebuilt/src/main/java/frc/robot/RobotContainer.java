@@ -204,7 +204,6 @@ public class RobotContainer {
     leftTriggerGoose.whileTrue(
         ShooterCommands.buttonShoot(shooter,
                                     leftTriggerGoose,     // Run Shooter flywheel
-                                    leftTriggerGoose,     // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
