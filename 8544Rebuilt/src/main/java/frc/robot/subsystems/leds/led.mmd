@@ -1,0 +1,77 @@
+---
+title: LED Subsystem — Architecture & State Machine
+---
+flowchart TD
+    subgraph Architecture["Architecture (every 20 ms)"]
+        direction TB
+        IC["IntakeCommands<br>─────────────<br>INTAKING when motor running<br>NONE when idle"]
+        FC["FeederCommands<br>─────────────<br>SHOOTING when forward feed<br>NONE otherwise"]
+        CC["ClimberCommands<br>─────────────<br>CLIMBING when arm moving<br>NONE when idle"]
+        LEDS["Leds.java<br>(SubsystemBase)<br>─────────────<br>setMechanicalState()<br>computeState()<br>applyAnimation()"]
+        IO{{"LedIO<br>(interface)"}}
+        REAL["LedIOCANdle<br>─────────────<br>CANdle CAN ID 20<br>LEDs 8–107<br>Phoenix 6 controls"]
+        SIM["LedIOSim<br>(no-op)"]
+
+        IC -->|"setMechanicalState()"| LEDS
+        FC -->|"setMechanicalState()"| LEDS
+        CC -->|"setMechanicalState()"| LEDS
+        LEDS -->|"setSolid / setBreath<br>setStrobe / setWave"| IO
+        IO --> REAL
+        IO --> SIM
+    end
+
+    subgraph Priority["State Priority — computeState() (highest wins)"]
+        direction TB
+
+        P1{"t < 30 s<br>since boot?"}
+        S_STARTUP["🌫 STARTUP<br>Breath WHITE 2 Hz"]
+
+        P2{"E-Stopped?"}
+        S_ESTOP["🔴 E_STOPPED<br>Solid RED"]
+
+        P3{"Disabled?"}
+        P3A{"Battery<br>< 11 V?"}
+        P3B{"Alliance<br>known?"}
+        S_BATT["🟠 DISABLED_LOW_BATTERY<br>Strobe ORANGE-RED 5 Hz"]
+        S_NOAL["🟣 DISABLED_NO_ALLIANCE<br>Wave BLUE-PURPLE 6 Hz"]
+        S_BLUE["🔵 DISABLED_BLUE<br>Wave BLUE 6 Hz"]
+        S_RED["🔴 DISABLED_RED<br>Wave RED 6 Hz"]
+
+        P4{"Auto<br>enabled?"}
+        S_AUTO["🟣 AUTO<br>Wave BLUE-PURPLE 15 Hz"]
+
+        P5{"Teleop<br>enabled?"}
+        P5A{"MechanicalState?"}
+        P5F{"matchTime<br>≤ 5 s?"}
+        S_CLIMB["🟡 CLIMBING<br>Strobe YELLOW 10 Hz<br>[ClimberCommands]"]
+        S_CLIMBTOL["🟡 IN_CLIMB_TOLERANCE<br>Wave YELLOW 15 Hz<br>[not yet wired — planned: climber angle]"]
+        S_SHOOT["🟢 SHOOTING<br>Strobe GREEN 10 Hz<br>[FeederCommands]"]
+        S_LAUNCHTOL["🟢 IN_LAUNCH_TOLERANCE<br>Wave GREEN 15 Hz<br>[not yet wired — planned: vision alignment]"]
+        S_INTAKE["🟣 INTAKING<br>Strobe BLUE-PURPLE 5 Hz<br>[IntakeCommands]"]
+        S_ENDGAME["⚪ TELEOP_ENDGAME<br>Wave ALLIANCE COLOR 15 Hz"]
+        S_DEFAULT["🟣 TELEOP_DEFAULT<br>Strobe BLUE-PURPLE 10 Hz"]
+
+        P1 -->|yes| S_STARTUP
+        P1 -->|no| P2
+        P2 -->|yes| S_ESTOP
+        P2 -->|no| P3
+        P3 -->|yes| P3A
+        P3A -->|yes| S_BATT
+        P3A -->|no| P3B
+        P3B -->|"no (no DS)"| S_NOAL
+        P3B -->|Blue| S_BLUE
+        P3B -->|Red| S_RED
+        P3 -->|no| P4
+        P4 -->|yes| S_AUTO
+        P4 -->|no| P5
+        P5 -->|yes| P5A
+        P5A -->|CLIMBING| S_CLIMB
+        P5A -->|IN_CLIMB_TOLERANCE| S_CLIMBTOL
+        P5A -->|SHOOTING| S_SHOOT
+        P5A -->|IN_LAUNCH_TOLERANCE| S_LAUNCHTOL
+        P5A -->|INTAKING| S_INTAKE
+        P5A -->|NONE| P5F
+        P5F -->|yes| S_ENDGAME
+        P5F -->|no| S_DEFAULT
+        P5 -->|no| S_DEFAULT
+    end

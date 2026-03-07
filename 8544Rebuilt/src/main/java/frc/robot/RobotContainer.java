@@ -18,6 +18,7 @@ import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.climber.*;
+import frc.robot.subsystems.leds.*;
 import frc.robot.subsystems.vision.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -37,6 +38,7 @@ public class RobotContainer {
   private final Feeder feeder;
   private final Shooter shooter;
   private final Climber climber;
+  private final Leds leds;
 
   private final Vision vision;
 
@@ -83,6 +85,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        leds = new Leds(new LedIOCANdle());
 
         vision =
             new Vision(
@@ -102,6 +105,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        leds = new Leds(new LedIOSim());
 
         vision =
             new Vision(
@@ -122,6 +126,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        leds = new Leds(new LedIO() {});
 
         vision =
             new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
@@ -207,16 +212,18 @@ public class RobotContainer {
         IntakeCommands.openLoopControl(
             intake,
             aButtonGoose, // intake fuel
-            yButtonGoose // expel fuel
+            yButtonGoose, // expel fuel
+            leds
     ));
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose,      // Reverse feed 
+            bButtonGoose,      // Reverse feed
             dpadLeftTriggerGoose,   // Decrease feed speed
-            dpadRightTriggerGoose   // Increase feed speed
+            dpadRightTriggerGoose,  // Increase feed speed
+            leds
           )
     );
 
@@ -235,12 +242,7 @@ public class RobotContainer {
 
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose));
- 
-    // Shooter Calibration only, replace the default shooter command to use
-    // Move to test mode TODO?
-    //    goose.leftTriggerGoose().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
-    //   goose.leftTriggerGoose().whileFalse(ShooterCommands.stopMotors(shooter));
+                                           backButtonGoose, startButtonGoose, leds));
   }
 
 

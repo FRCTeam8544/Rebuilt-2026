@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.climber.*;
+import frc.robot.subsystems.leds.Leds;
 
 
 public class ClimberCommands {
@@ -51,7 +52,8 @@ public class ClimberCommands {
   public static Command openVoltageControl(
       Climber climber,
       Trigger extendTrigger,
-      Trigger retractTrigger
+      Trigger retractTrigger,
+      Leds leds
       ) {
     return Commands.run(
         () -> {
@@ -60,6 +62,7 @@ public class ClimberCommands {
           double climberDuty = 0.3;
           // If and only if one button is pressed at a time
           if (retractPosition ^ extendPosition) {
+            leds.setMechanicalState(Leds.MechanicalState.CLIMBING);
             if (extendPosition) {
               climber.runArmOpenLoop(climberDuty); // Extend
             } else {
@@ -67,6 +70,7 @@ public class ClimberCommands {
             }
            }
            else {
+              leds.setMechanicalState(Leds.MechanicalState.NONE);
               climber.runArmOpenLoop(0);
            }
         },

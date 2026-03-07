@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import frc.robot.Constants;
 import frc.robot.subsystems.Feeder.*;
+import frc.robot.subsystems.leds.Leds;
 
 import java.util.Vector;
 
@@ -71,7 +72,8 @@ public class FeederCommands {
                                        Trigger feedTrigger,
                                        Trigger reversefeedTrigger,
                                        Trigger feedAdjustDown,
-                                       Trigger feedAdjustUp
+                                       Trigger feedAdjustUp,
+                                       Leds leds
                                        )
     {
         final double nominalRpm = 300; // Wheel RPM request
@@ -104,18 +106,21 @@ public class FeederCommands {
             {
                 double rpm = nominalRpm + currentRpmAdjust.firstElement().doubleValue();
                 if (reversefeedTrigger.getAsBoolean()) {
+                    leds.setMechanicalState(Leds.MechanicalState.NONE);
                     feeder.runAtRpm(rpm * reverseRpmFactor);
                 }
                 else {
+                    leds.setMechanicalState(Leds.MechanicalState.SHOOTING);
                     feeder.runAtRpm(rpm);
                 }
             }
             else {
+                leds.setMechanicalState(Leds.MechanicalState.NONE);
                 feeder.stopMotors();
             }
         },
         feeder);
-    } 
+    }
 
 }
 

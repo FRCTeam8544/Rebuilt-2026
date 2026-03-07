@@ -156,19 +156,20 @@ public class Shooter extends SubsystemBase{
     }
 
   public boolean isFlywheelOverspeed() {
-    
+
       // Safety limit RPM
       if (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM) {
         shooterInputs.maxFlywheelSpeedHit = true;
       }
       // After overspeed event, only allow use when flywheel is well below max speed to avoid pulsing the wheel
-      else if ((shooterInputs.maxFlywheelSpeedHit) &&  
+      else if ((shooterInputs.maxFlywheelSpeedHit) &&
                (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM - 500)) {
         shooterInputs.maxFlywheelSpeedHit = false;
       }
 
       return shooterInputs.maxFlywheelSpeedHit;
   }
+
 
   @Override
   public void periodic() {
