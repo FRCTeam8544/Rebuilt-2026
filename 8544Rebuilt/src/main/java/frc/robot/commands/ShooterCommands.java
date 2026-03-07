@@ -65,7 +65,7 @@ public class ShooterCommands {
 
             final int rpmAdjustStep = 100 / 50;
 
-            final double shooterNominalRpm = 2720; //for tuning=2720, normal operation = 3000
+            final double shooterNominalRpm = 3000; //for tuning=2720, normal operation = 3000
            
 
             // These Rpms are used to tune the flywheel
