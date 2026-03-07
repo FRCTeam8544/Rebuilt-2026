@@ -220,36 +220,27 @@ public class RobotContainer {
           )
     );
 
-
-
-    // Calibration only, replace the default shooter command to use
-//    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
- //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
+    // Shooter buttons
+    shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
 
     leftTriggerGoose.whileTrue(
-        ShooterCommands.openVoltageControl(shooter, dpadUpTriggerGoose, dpadDownTriggerGoose)
-    );
-    leftTriggerGoose.whileFalse(
-        ShooterCommands.stopMotors(shooter)
-    );
-
-    // Until the kraken is released use open voltage control for testing
-   //  shooter.setDefaultCommand(
-     //   ShooterCommands.openVoltageControl(shooter, dpadUpTriggerGoose, dpadDownTriggerGoose)
-     //);
-
-   /* shooter.setDefaultCommand(
         ShooterCommands.buttonShoot(shooter,
-                                    leftTriggerGoose, // Run Shooter flywheel
+                                    leftTriggerGoose,     // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    );*/
-   
+    ).toggleOnFalse(
+        ShooterCommands.gentleStopFlywheel(shooter)
+    );
+
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
                                            backButtonGoose, startButtonGoose));
-
+ 
+    // Shooter Calibration only, replace the default shooter command to use
+    // Move to test mode TODO?
+    //    goose.leftTriggerGoose().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+    //   goose.leftTriggerGoose().whileFalse(ShooterCommands.stopMotors(shooter));
   }
 
 

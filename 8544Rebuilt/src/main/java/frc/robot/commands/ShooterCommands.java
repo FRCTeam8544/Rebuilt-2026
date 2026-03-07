@@ -7,7 +7,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -62,10 +64,12 @@ public class ShooterCommands {
         () -> {
 
             final int rpmAdjustStep = 100 / 50;
-            final double shooterNominalRpm = 3000;
+
+            final double shooterNominalRpm = 3000; //for tuning=2720, normal operation = 3000
+           
 
             // These Rpms are used to tune the flywheel
-            //final int shooterNominalRpm = 2700;
+            //final int shooterNominalRpm = 2720;
            // final double shooterLowNominalRpm = 337.5;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
@@ -92,7 +96,46 @@ public class ShooterCommands {
         shooter);
     } 
 
-    
+  public static Command gentleStopFlywheel(Shooter shooter)
+  {
+    double breakDisableRpm = 500; // Below this RPM friction will take the wheel to zero
+    double maxBrakeVoltage = -2.0; // Must be negative: Maximum voltage to apply to stop the flywheel over time
+    double breakApplyTimeSeconds = 1; // Time to full breaking power
+    double breakTimeoutSeconds = 10.0; // Time limit to break the wheel
+    // Limit voltage rate change over time aka gentle breaking
+    SlewRateLimiter voltageLimiter = new SlewRateLimiter(
+                                        Math.abs(maxBrakeVoltage) / breakApplyTimeSeconds); 
+    return Commands.sequence(
+        // "Stop" Pidd control
+        Commands.runOnce(
+        () -> {
+              shooter.stopMotors();
+              voltageLimiter.reset(0); // Start braking at zero volts
+            }),
+        Commands.run(
+        () -> {
+            if (shooter.flywheelRpmSupplier.getAsDouble() > breakDisableRpm) {
+                double duty = voltageLimiter.calculate(maxBrakeVoltage) / Constants.kNominalVoltage;
+                shooter.runOpenLoop(duty);
+            }
+            else {
+                shooter.stopMotors();
+            }
+        },
+        shooter).finallyDo( () -> { shooter.stopMotors(); }) // Ensure flywheel stops under all conditions
+    ).withTimeout(breakTimeoutSeconds).withName("Braking");
+  }
+
+  // Default, not running the flywheel state
+  public static Command idleFlywheel(Shooter shooter)
+  {
+    return Commands.run(
+        () -> {
+            shooter.stopMotors();
+        },
+        shooter).withName("Idle");
+  }
+
   /**
    * Measures the velocity feedforward constants for the shooter motors.
    *
