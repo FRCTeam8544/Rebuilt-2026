@@ -198,14 +198,12 @@ public class RobotContainer {
           )
     );
 
-    // Calibration only, replace the default shooter command to use, and disable climber cmd
-    //  goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
-    //  goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
-
+    // Shooter buttons
     shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
 
     leftTriggerGoose.whileTrue(
         ShooterCommands.buttonShoot(shooter,
+                                    leftTriggerGoose,     // Run Shooter flywheel
                                     leftTriggerGoose,     // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
@@ -218,6 +216,9 @@ public class RobotContainer {
         ClimberCommands.openVoltageControl(climber,
                                            backButtonGoose, startButtonGoose));
  
+    // Shooter Calibration only, replace the default shooter command to use
+    //    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
+    //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
   }
 
 
