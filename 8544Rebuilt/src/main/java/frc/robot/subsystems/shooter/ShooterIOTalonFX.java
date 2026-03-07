@@ -25,7 +25,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Used to sycnronize control requests to the shooter motor paring
     private static final int kMotorPairControlUpdateTimeSyncHz = 100; //was 50
 
-    private static final int kStatorCurrentLimit = 30; //was 50
+    private static final int kStatorCurrentLimit = 120; //was 50
 
     private final double boostFeedForwardInAmps = 0.00; // TODO tune this
     // TODO>>>..
@@ -33,10 +33,10 @@ public class ShooterIOTalonFX implements ShooterIO {
     private static final double kV = 0.009; //was 0.89 0.018 0.06
     
     private static final double kS = 1.8; // was 1.74
-    private static final double kD = 0.0; //was .1
+    private static final double kD = 0.1; //was .1
     private static final double kPNominal = 10.0 / 56.67; // 32.1 is target rps of motor
   //  private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
-    private static final double kP = 1.12;//kPNominal; //+ kAdjust; //was .08
+    private static final double kP = 14.00;//kPNominal; //+ kAdjust; //was .08
     // Raw voltage to RPM
     // 
 
