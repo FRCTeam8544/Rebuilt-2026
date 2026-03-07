@@ -35,7 +35,7 @@ public class VisionConstants {
   public static final int INVALID_APRIL_TAG = -1;
 
   // Camera names, must match names configured on coprocessor
-  public static String CenterApriltag = "Arducam3";
+  public static String CenterApriltag = "Arducam_OV9782_USB_Camera";
   //  public static String rightChassisApriltag = "rightChassisApriltag";
 
   // Robot to camera transforms - Need to be configured relative to gyro
@@ -43,9 +43,9 @@ public class VisionConstants {
   // Gyro will be offset from this.
   public static Transform3d robotToCamera0 = // left camera - white
       new Transform3d(
-          Units.inchesToMeters(13.75),
+          Units.inchesToMeters(0),
           Units.inchesToMeters(14.5),
-          Units.inchesToMeters(10.375),
+          Units.inchesToMeters(30),
           new Rotation3d(0.0, 0, 0));
   /*  public static Transform3d robotToCamera1 = // right camera - black/blue
   new Transform3d(
