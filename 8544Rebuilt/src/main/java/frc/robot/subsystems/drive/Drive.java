@@ -153,6 +153,9 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double velocityMetersPerSec =  modules[0].getVelocityMetersPerSec();
+    Logger.recordOutput("SwerveStates/LinearVelocity", velocityMetersPerSec);
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
