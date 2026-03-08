@@ -31,7 +31,7 @@ public class LedIOCANdle implements LedIO {
     private String currentAnimation = "NONE";
 
     public LedIOCANdle() {
-        candle = new CANdle(CAN_ID, TunerConstants.kCANBus.getName());
+        candle = new CANdle(CAN_ID, TunerConstants.kCANBus);
     }
 
     @Override
