@@ -8,39 +8,63 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import frc.robot.Constants;
+import frc.robot.util.SparkUtil;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.FeedbackSensor;
 
 public class ArmIOMax implements ArmIO {
 
   private static final int stallLimit = 15;
+  private static final int configAttempts = 5;
+  // Get the zero offset value from rev client TODO
+  // The zero offset is added to the hardware encoder value that is returned by getPosition()
+  // positionCorrectionFactor and velocityCorrectionFactor are ignored for this.
+  private static final double absEncoderZeroOffset = 0.0; 
 
   private final SparkMax armMotorController;
+  private final SparkClosedLoopController closedLoopController;
 
   private final AbsoluteEncoder armEncoder;
-  private final SparkClosedLoopController closedLoop;
   private final SparkMaxConfig armMotorConfig;
 
 
   public ArmIOMax(int armCanId) {
     armMotorController = new SparkMax(armCanId, MotorType.kBrushless);
-
+    closedLoopController = armMotorController.getClosedLoopController();
     armEncoder = armMotorController.getAbsoluteEncoder();
-    closedLoop = armMotorController.getClosedLoopController();
 
+    // Spark max defaults to clockwise rotation from viewing the motor shaft with positive voltage
+    // Due to the pully assembly from the motor to the arm, clockwise motor rotation will cause
+    // the retract the intake ARM towards the shooter. counterclockwise will push the arm out.
+    // By convention positive voltage should push the arm out, turn motor counter-clockwise, so the
+    // motor config should be inverted. This makes positive voltage turn the motor counter-clockwise.
     armMotorConfig = new SparkMaxConfig();
+    armMotorConfig.inverted(true);
     armMotorConfig.idleMode(IdleMode.kBrake);
     armMotorConfig.smartCurrentLimit(stallLimit);
     armMotorConfig.voltageCompensation(12);
-    armMotorConfig.inverted(false); // Positive voltage goes arm forward
+
+    // Encoder
+    armMotorConfig.absoluteEncoder.inverted(false);
+   // armMotorConfig.absoluteEncoder.zeroOffset(absEncoderZeroOffset)
+   // armMotorConfig.encoder.positionConversionFactor(3); // Pullys are 1 motor to 3 arm rotations
+  //  armMotorConfig.encoder.velocityConversionFactor(3);
+
+    // Limits
     armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
     armMotorConfig.softLimit.forwardSoftLimit(kArmForwardLimit);
     armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
     armMotorConfig.softLimit.reverseSoftLimit(kArmReverseLimit);
 
-   // armMotorConfig.encoder.positionConversionFactor(3);
-  //  armMotorConfig.encoder.velocityConversionFactor(3);
+    // Signals
+    armMotorConfig.signals.absoluteEncoderPositionAlwaysOn(true);
+    armMotorConfig.signals.absoluteEncoderVelocityAlwaysOn(true);
 
-   /* armMotorConfig
+    // Closed loop settings
+    armMotorConfig
         .closedLoop
         .positionWrappingEnabled(false)
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -48,16 +72,20 @@ public class ArmIOMax implements ArmIO {
         .p(0.0001, ClosedLoopSlot.kSlot0) //was 0.0008
         .i(0.00000, ClosedLoopSlot.kSlot0)
         .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
-*/
+
     
     // armMotorConfig.closedLoop.feedForward.kS(kS);
-   //  armMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
+    //  armMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
     //                                          ClosedLoopSlot.kSlot0);
 
-    armMotorController.configure(
-        armMotorConfig,
-        com.revrobotics.ResetMode.kResetSafeParameters,
-        com.revrobotics.PersistMode.kPersistParameters);
+    SparkUtil.tryUntilOk(
+        armMotorController, 
+        configAttempts,
+        () -> { return armMotorController.configure(
+                    armMotorConfig,
+                    com.revrobotics.ResetMode.kResetSafeParameters,
+                    com.revrobotics.PersistMode.kPersistParameters); } );
+    
   }
 
   @Override
@@ -81,12 +109,12 @@ public class ArmIOMax implements ArmIO {
     inOutData.outputDuty =
         (float) armMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) armMotorController.getOutputCurrent();
-    inOutData.outputVoltage = (float) armMotorController.getAppliedOutput() * 12.0f;
+    inOutData.outputVoltage = (float) (armMotorController.getAppliedOutput() * Constants.kNominalVoltage);
   }
   
   // @Override
   public void setPosition(double rotations) {
-    closedLoop.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    closedLoopController.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   @Override
