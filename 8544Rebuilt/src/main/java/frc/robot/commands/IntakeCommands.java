@@ -1,11 +1,9 @@
 package frc.robot.commands;
 
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Intake.*;
-
 
 
 public class IntakeCommands {
@@ -35,8 +33,7 @@ public class IntakeCommands {
           if (intakeFuel ^ expelFuel) {
             if (intakeFuel) {
               intake.runOpenLoop(intakeFeedDuty);
-            }
-            else {
+            } else {
               intake.runOpenLoop(-intakeFeedDuty);
             }
           }
@@ -52,20 +49,17 @@ public class IntakeCommands {
   public static Command closedPositionControl(
       Intake intake,
       Trigger intakeTrigger,
-      Trigger expelTrigger
-      ) {
+      Trigger expelTrigger) {
     return Commands.run(
         () -> {
-        
+
           final double intakeSpeedRpm = 420;
           boolean inPressed = intakeTrigger.getAsBoolean();
           boolean outPressed = expelTrigger.getAsBoolean();
-
           if (inPressed ^ outPressed) {
             if (inPressed) {
               intake.runAtRpm(intakeSpeedRpm);
-            }
-            else {
+            } else {
               intake.runAtRpm(-intakeSpeedRpm);
             }
           }

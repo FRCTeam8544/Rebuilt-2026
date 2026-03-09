@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Feeder;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -30,6 +31,12 @@ public class Feeder extends SubsystemBase{
     private final double tuneFeedVoltStep = 0.25 / Constants.tickUpdatesPerSecond; // 1/4 volt per second
 
     // --- Suppliers / Triggers ---
+
+    
+  public BooleanSupplier isFeeding =
+    () -> {
+      return feedInputs.wheelVelocity > 1.0; // RPM
+    };
 
    // provide current roller wheel RPM
    public DoubleSupplier rollerRpmSupplier = 

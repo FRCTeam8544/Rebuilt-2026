@@ -18,6 +18,7 @@ import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.climber.*;
+import frc.robot.subsystems.leds.*;
 import frc.robot.subsystems.vision.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -37,6 +38,7 @@ public class RobotContainer {
   private final Feeder feeder;
   private final Shooter shooter;
   private final Climber climber;
+  private final Leds leds;
 
   private final Vision vision;
 
@@ -58,6 +60,9 @@ public class RobotContainer {
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
   private final Trigger backButtonGoose = new Trigger(goose.back());
+
+  private final Trigger isRobotIntaking;
+  private final Trigger isRobotShooting;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -83,6 +88,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        leds = new Leds(new LedIOCANdle());
 
         vision =
             new Vision(
@@ -102,6 +108,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        leds = new Leds(new LedIOSim());
 
         vision =
             new Vision(
@@ -122,11 +129,18 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        leds = new Leds(new LedIO() {});
 
         vision =
             new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
+
+
+    // Bind robot specific triggers, now that all subsystems have been created
+    isRobotShooting = new Trigger(feeder.isFeeding); // Fuel in the air!!
+    isRobotIntaking = new Trigger(intake.isIntaking); // Feed me seamore!
+
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -197,7 +211,7 @@ public class RobotContainer {
     // ----- Operator Controls -------
     
     arm.setDefaultCommand(
-        ArmCommands.openLoopControl(
+        ArmCommands.closedPositionControl(
             arm,
             leftBackGoose, // retract arm
             rightBackGoose // extend arm
@@ -207,14 +221,14 @@ public class RobotContainer {
         IntakeCommands.openLoopControl(
             intake,
             aButtonGoose, // intake fuel
-            yButtonGoose // expel fuel
+            yButtonGoose  // expel fuel
     ));
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose,      // Reverse feed 
+            bButtonGoose,      // Reverse feed
             dpadLeftTriggerGoose,   // Decrease feed speed
             dpadRightTriggerGoose   // Increase feed speed
           )
@@ -237,12 +251,20 @@ public class RobotContainer {
 
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose));
- 
-    // Shooter Calibration only, replace the default shooter command to use
-    // Move to test mode TODO?
-    //    goose.leftTriggerGoose().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
-    //   goose.leftTriggerGoose().whileFalse(ShooterCommands.stopMotors(shooter));
+                                           backButtonGoose, startButtonGoose, leds));
+
+    // Status
+    
+    isRobotIntaking.whileTrue(
+       Commands.run( () -> { 
+            leds.setMechanicalState(Leds.MechanicalState.INTAKING); }, leds).
+                finallyDo( () -> { leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
+
+    isRobotShooting.whileTrue(
+       Commands.run( () -> {
+            leds.setMechanicalState(Leds.MechanicalState.SHOOTING); }, leds).
+                finallyDo( () -> { leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
+
   }
 
 
