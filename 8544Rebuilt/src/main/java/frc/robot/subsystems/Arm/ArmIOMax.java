@@ -17,8 +17,9 @@ import com.revrobotics.spark.FeedbackSensor;
 
 public class ArmIOMax implements ArmIO {
 
-  private static final int stallLimit = 15;
+  private static final int stallLimit = 10;
   private static final int configAttempts = 5;
+
   // Get the zero offset value from rev client TODO
   // The zero offset is added to the hardware encoder value that is returned by getPosition()
   // positionCorrectionFactor and velocityCorrectionFactor are ignored for this.
@@ -110,6 +111,8 @@ public class ArmIOMax implements ArmIO {
         (float) armMotorController.getAppliedOutput(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) armMotorController.getOutputCurrent();
     inOutData.outputVoltage = (float) (armMotorController.getAppliedOutput() * Constants.kNominalVoltage);
+    inOutData.outputPower = inOutData.outputCurrent * inOutData.outputVoltage;
+    inOutData.outputTorque = inOutData.outputCurrent * (float) Constants.Neo.kTorque_mN_per_Amp;
   }
   
   // @Override
