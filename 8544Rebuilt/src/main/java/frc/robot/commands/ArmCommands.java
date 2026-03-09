@@ -41,8 +41,8 @@ public class ArmCommands {
       return Commands.run(
         () -> {
 
-          final double armExtendDuty = 0.1;
-          final double armRetractDuty = -0.1;
+          final double armExtendDuty = -0.3;
+          final double armRetractDuty = 0.3;
           boolean extendPressed = armOutTrigger.getAsBoolean();
           boolean retractPressed = armInTrigger.getAsBoolean();
           // If and only if one button is pressed at a time
@@ -79,8 +79,8 @@ public class ArmCommands {
           boolean extendPressed = extendTrigger.getAsBoolean();
           boolean retractPressed = retractTrigger.getAsBoolean();
 
-          final double extendPosition = 0.8;
-          final double retractPosition = 0.2;
+          final double extendPosition = 0.78; // 0.8;
+          final double retractPosition = 0.037; //0.2;
 
           // If and only if one button is pressed at a time
           if (retractPressed ^ extendPressed) {

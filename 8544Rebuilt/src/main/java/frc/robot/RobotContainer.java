@@ -202,7 +202,7 @@ public class RobotContainer {
     // ----- Operator Controls -------
     
     arm.setDefaultCommand(
-        ArmCommands.openLoopControl(
+        ArmCommands.closedPositionControl(
             arm,
             leftBackGoose, // retract arm
             rightBackGoose // extend arm

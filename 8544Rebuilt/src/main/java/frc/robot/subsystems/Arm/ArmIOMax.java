@@ -43,7 +43,7 @@ public class ArmIOMax implements ArmIO {
     // By convention positive voltage should push the arm out, turn motor counter-clockwise, so the
     // motor config should be inverted. This makes positive voltage turn the motor counter-clockwise.
     armMotorConfig = new SparkMaxConfig();
-    armMotorConfig.inverted(true);
+    armMotorConfig.inverted(false);
     armMotorConfig.idleMode(IdleMode.kBrake);
     armMotorConfig.smartCurrentLimit(stallLimit);
     armMotorConfig.voltageCompensation(12);
@@ -70,9 +70,9 @@ public class ArmIOMax implements ArmIO {
         .positionWrappingEnabled(false)
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // Position control
-        .p(0.0001, ClosedLoopSlot.kSlot0) //was 0.0008
+        .p(3, ClosedLoopSlot.kSlot0) //was 5
         .i(0.00000, ClosedLoopSlot.kSlot0)
-        .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
+        .d(0.3, ClosedLoopSlot.kSlot0); //0.00001
 
     
     // armMotorConfig.closedLoop.feedForward.kS(kS);
