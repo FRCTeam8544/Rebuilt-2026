@@ -40,8 +40,6 @@ public class ArmIOMax implements ArmIO {
     // Spark max defaults to clockwise rotation from viewing the motor shaft with positive voltage
     // Due to the pully assembly from the motor to the arm, clockwise motor rotation will cause
     // the retract the intake ARM towards the shooter. counterclockwise will push the arm out.
-    // By convention positive voltage should push the arm out, turn motor counter-clockwise, so the
-    // motor config should be inverted. This makes positive voltage turn the motor counter-clockwise.
     armMotorConfig = new SparkMaxConfig();
     armMotorConfig.inverted(false);
     armMotorConfig.idleMode(IdleMode.kBrake);
@@ -70,7 +68,7 @@ public class ArmIOMax implements ArmIO {
         .positionWrappingEnabled(false)
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // Position control
-        .p(3, ClosedLoopSlot.kSlot0) //was 5
+        .p(4, ClosedLoopSlot.kSlot0) //was 5
         .i(0.00000, ClosedLoopSlot.kSlot0)
         .d(0.3, ClosedLoopSlot.kSlot0); //0.00001
 
