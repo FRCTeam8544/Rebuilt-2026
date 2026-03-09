@@ -15,8 +15,8 @@ public class ArmCommands {
     Trigger armOutTrigger) {
       return Commands.run(
         () -> {
-          final double armExtendDuty = 0.5;
-          final double armRetractDuty = -0.5;
+          final double armExtendDuty = -0.5;
+          final double armRetractDuty = 0.5;
           boolean extendPressed = armOutTrigger.getAsBoolean();
           boolean retractPressed = armInTrigger.getAsBoolean();
           // If and only if one button is pressed at a time
