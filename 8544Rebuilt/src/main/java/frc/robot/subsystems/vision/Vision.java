@@ -210,7 +210,7 @@ public class Vision extends SubsystemBase {
 // calculation for ShooterAutoRPM
 double distanceToHub = getHubDistance().get().doubleValue();
  double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
- ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2255; // constant function for RPM
+ ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2110; // constant function for RPM // const was 2255
       // Log camera datadata
 
       Logger.recordOutput(
