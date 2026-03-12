@@ -47,11 +47,14 @@ public class Vision extends SubsystemBase {
   private final Alert[] disconnectedAlerts;
   private final Integer[] missedUpdateCount;
   private boolean camera0Disabled = false, camera1Disabled = false;
-  private Navigation nav;
 
- double ShooterAutoSetRPM = 0;
-   
+  final private Navigation nav;
 
+  // Estimated RPM of shooter given distance to hub
+  private double ShooterAutoSetRPM = 0;
+  
+  // Field relative angle to turn the robot towards the alliance hub
+  private Rotation2d angleToHub = Rotation2d.kZero;
 
   public Vision(Supplier<Pose2d> robotPoseSupplier, VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -88,10 +91,6 @@ public class Vision extends SubsystemBase {
     return false;
     // return !(camera0Disabled && camera1Disabled);
   }
-
- 
-
-
  
 
   @Override
@@ -207,11 +206,19 @@ public class Vision extends SubsystemBase {
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
-// calculation for ShooterAutoRPM
-double distanceToHub = getHubDistance().get().doubleValue();
- double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
- ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2110; // constant function for RPM // const was 2255
+
+      // calculation for ShooterAutoRPM
+      double distanceToHub = getHubDistance().get().doubleValue();
+      double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
+      ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2110; // constant function for RPM // const was 2255
+     
+      // Compute angle to hub
+      angleToHub = nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
+
       // Log camera datadata
+
+      Logger.recordOutput(
+          "Vision/rotationToHub", angleToHub);
 
       Logger.recordOutput(
           "Vision/distanceToHubMeters", distanceToHub );
@@ -267,7 +274,8 @@ double distanceToHub = getHubDistance().get().doubleValue();
   public Supplier<Rotation2d> getHubRotation() {
 
     return () -> {
-      return nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
+      return angleToHub;
+      //return nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
     };
   }
 
