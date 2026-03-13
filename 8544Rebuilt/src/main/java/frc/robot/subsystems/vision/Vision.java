@@ -15,7 +15,7 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 import frc.robot.subsystems.drive.*;
-
+import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -211,7 +211,11 @@ public class Vision extends SubsystemBase {
       double distanceToHub = getHubDistance().get().doubleValue();
       double distanceToFrontRobot = distanceToHub - 0.3429; //account for robot frame meters
       ShooterAutoSetRPM = distanceToFrontRobot * 313.5 + 2110; // constant function for RPM // const was 2255
-     
+      
+      // Clamp RPM request
+      ShooterAutoSetRPM = Math.max(2000, ShooterAutoSetRPM);
+      ShooterAutoSetRPM = Math.min(Shooter.Flywheel.kMaxShooterRPM, ShooterAutoSetRPM);
+      
       // Compute angle to hub
       angleToHub = nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
 
