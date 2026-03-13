@@ -129,7 +129,12 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Motor Temp", armInputs.motorTemperature);
     
     // Controls
-    SmartDashboard.putBoolean("Arm Brake Enabled", armInputs.motorBrakeEnabled);
+    boolean oldBrakeState = armInputs.motorBrakeEnabled;
+    armInputs.motorBrakeEnabled = 
+        SmartDashboard.getBoolean("Arm Brake Enabled", armInputs.motorBrakeEnabled);
+    if (oldBrakeState != armInputs.motorBrakeEnabled) {
+      armIO.setBrakeMode(armInputs.motorBrakeEnabled);
+    }
   }
 
   private void setupDefaultDashboard()
@@ -137,6 +142,8 @@ public class Arm extends SubsystemBase {
     SmartDashboard.setDefaultNumber("Arm Position Setpoint", armInputs.positionSetPoint);
     SmartDashboard.setDefaultNumber("Arm Volts Setpoint", armInputs.voltageSetPoint);
     SmartDashboard.setDefaultNumber("Arm Motor Temp", armInputs.motorTemperature);
+
+    SmartDashboard.setDefaultBoolean("Arm Brake Enabled", armInputs.motorBrakeEnabled);
   }
 
   

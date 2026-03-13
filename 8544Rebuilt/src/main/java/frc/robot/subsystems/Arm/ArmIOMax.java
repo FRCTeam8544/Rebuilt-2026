@@ -49,7 +49,7 @@ public class ArmIOMax implements ArmIO {
     // Encoder
     armMotorConfig.absoluteEncoder.inverted(false);
    // armMotorConfig.absoluteEncoder.zeroOffset(absEncoderZeroOffset)
-   // armMotorConfig.encoder.positionConversionFactor(3); // Pullys are 1 motor to 3 arm rotations
+   // armMotorConfig.encoder.positionConversionFactor(3); // Pullys are 1 motor to 2 arm rotations
   //  armMotorConfig.encoder.velocityConversionFactor(3);
 
     // Limits
@@ -85,6 +85,24 @@ public class ArmIOMax implements ArmIO {
                     com.revrobotics.ResetMode.kResetSafeParameters,
                     com.revrobotics.PersistMode.kPersistParameters); } );
     
+  }
+
+  @Override
+  public void setBrakeMode(boolean enable) {
+    if (enable) {
+      armMotorConfig.idleMode(IdleMode.kBrake);
+    }
+    else {
+      armMotorConfig.idleMode(IdleMode.kCoast);
+    }
+
+    SparkUtil.tryUntilOk(
+        armMotorController, 
+        configAttempts,
+        () -> { return armMotorController.configure(
+                    armMotorConfig,
+                    com.revrobotics.ResetMode.kResetSafeParameters,
+                    com.revrobotics.PersistMode.kNoPersistParameters); } );
   }
 
   @Override

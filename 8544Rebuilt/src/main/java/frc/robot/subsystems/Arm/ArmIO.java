@@ -48,4 +48,6 @@ public interface ArmIO {
 
   public default void setVoltage(double volts) {}
   public default void setPosition(double rotations){}
+
+  public default void setBrakeMode(boolean enable) {}
 }
