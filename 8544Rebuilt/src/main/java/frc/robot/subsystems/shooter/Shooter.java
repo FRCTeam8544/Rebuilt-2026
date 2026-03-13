@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -31,7 +32,21 @@ public class Shooter extends SubsystemBase{
 
    private double tuneShootRpmAdjust = 0.0;
 
+   private double rpmAtSpeedTolerance = 50;
+
    // ---- Suppliers / Triggers ----
+
+   public BooleanSupplier flywheelAtRpmTarget =
+   () -> {
+     if (shooterInputs.flywheelVelocitySetPoint > 0) {
+      return MathUtil.isNear(shooterInputs.flywheelVelocitySetPoint,
+                             shooterInputs.flywheelMeidanVelocity,
+                             rpmAtSpeedTolerance);
+     }
+     else {
+      return false;
+     }
+   };
 
    public DoubleSupplier rpmSetPointSupplier = 
     () -> {

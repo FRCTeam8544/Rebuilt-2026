@@ -11,6 +11,7 @@ public interface ShooterIO {
 
     public double motorVelocity = 0.0f;
     public double flywheelVelocity = 0.0f;
+    public double flywheelMeidanVelocity = 0.0;
     public float leaderMotorTemperature = 0.0f;
     public float followMotorTemperature = 0.0f;
 

@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkBase.Faults;
 
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
@@ -22,6 +23,8 @@ import frc.robot.subsystems.shooter.Shooter.Flywheel;
 
 public class ShooterIOTalonFX implements ShooterIO {
     
+    private MedianFilter rpmMedianFilter = new MedianFilter(5); // Sample window
+
     // Used to sycnronize control requests to the shooter motor paring
     private static final int kMotorPairControlUpdateTimeSyncHz = 100; //was 50
 
@@ -140,6 +143,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.followMotorTemperature = (float) followTalon.getDeviceTemp().getValueAsDouble();
     inOutData.maxFlywheelSpeedHit = inOutData.flywheelVelocity > Flywheel.kMaxShooterRPM;
     
+    inOutData.flywheelMeidanVelocity = rpmMedianFilter.calculate(inOutData.flywheelVelocity);
+
     // Fault codes
     inOutData.faultSupplyUnderVoltage = leaderTalon.getFault_Undervoltage().getValue() || followTalon.getFault_Undervoltage().getValue();
     inOutData.faultBridgeBrownout = leaderTalon.getFault_BridgeBrownout().getValue() || followTalon.getFault_BridgeBrownout().getValue();
