@@ -208,6 +208,8 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
 
+
+
     // ----- Operator Controls -------
     
     arm.setDefaultCommand(
@@ -224,13 +226,26 @@ public class RobotContainer {
             yButtonGoose  // expel fuel
     ));
 
+
+        arm.setDefaultCommand(
+        ArmCommands.oneButtonControl(
+            arm,
+            dpadLeftTriggerGoose // retract arm // extend arm
+    ));
+    
+    intake.setDefaultCommand(
+        IntakeCommands.oneButtonControl(
+            intake,
+            dpadLeftTriggerGoose
+                ));
+
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose,      // Reverse feed
-            dpadLeftTriggerGoose,   // Decrease feed speed
-            dpadRightTriggerGoose   // Increase feed speed
+            bButtonGoose      // Reverse feed
+         //   dpadLeftTriggerGoose,   // Decrease feed speed
+           // dpadRightTriggerGoose   // Increase feed speed
           )
     );
 

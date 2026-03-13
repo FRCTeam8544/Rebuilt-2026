@@ -30,16 +30,16 @@ public class FeederCommands {
     public static Command openVoltageControl(
         Feeder feeder,
         Trigger feedTrigger,
-        Trigger reverseFeedTrigger,
-        Trigger decreaseFeedVoltageTrigger,
-        Trigger increaseFeedVoltageTrigger)
+        Trigger reverseFeedTrigger)
+      //  Trigger decreaseFeedVoltageTrigger,
+       // Trigger increaseFeedVoltageTrigger)
     {
         return Commands.run(
         () -> {
 
-            boolean increaseFeedVolt = increaseFeedVoltageTrigger.getAsBoolean();
-            boolean decreaseFeedVolt = decreaseFeedVoltageTrigger.getAsBoolean();
-            
+         //   boolean increaseFeedVolt = increaseFeedVoltageTrigger.getAsBoolean();
+         //   boolean decreaseFeedVolt = decreaseFeedVoltageTrigger.getAsBoolean();
+ /*            
             if (increaseFeedVolt ^ decreaseFeedVolt) {
                 if (increaseFeedVoltageTrigger.getAsBoolean())
                 {
@@ -50,6 +50,7 @@ public class FeederCommands {
                     feeder.tuneDecreaseFeedVoltage();
                 }
             }
+                */
 
             if (feedTrigger.getAsBoolean())
             {
@@ -69,9 +70,9 @@ public class FeederCommands {
 
     public static Command buttonFeed( Feeder feeder,
                                        Trigger feedTrigger,
-                                       Trigger reversefeedTrigger,
-                                       Trigger feedAdjustDown,
-                                       Trigger feedAdjustUp
+                                       Trigger reversefeedTrigger
+                                       //Trigger feedAdjustDown,
+                                       //Trigger feedAdjustUp
                                        )
     {
         final double nominalRpm = 300; // Wheel RPM request
@@ -85,9 +86,9 @@ public class FeederCommands {
         return Commands.run(
         () -> {
 
-            boolean feedAdjUp = feedAdjustUp.getAsBoolean();
-            boolean feedAdjDown = feedAdjustDown.getAsBoolean();
-            if (feedAdjDown ^ feedAdjUp) {
+      //      boolean feedAdjUp = feedAdjustUp.getAsBoolean();
+      //      boolean feedAdjDown = feedAdjustDown.getAsBoolean();
+    /*        if (feedAdjDown ^ feedAdjUp) {
                 if (feedAdjUp) {
                     double newFeedRpm = currentRpmAdjust.firstElement().doubleValue() + rpmStep;
                     currentRpmAdjust.clear();
@@ -98,7 +99,7 @@ public class FeederCommands {
                     currentRpmAdjust.clear();
                     currentRpmAdjust.add(newFeedRpm);
                 }
-            }
+            } */ 
 
             if (feedTrigger.getAsBoolean())
             {

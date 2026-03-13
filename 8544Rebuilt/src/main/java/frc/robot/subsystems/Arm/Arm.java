@@ -31,6 +31,19 @@ public class Arm extends SubsystemBase {
       return armInputs.position;
     };
 
+  
+/*      public BooleanSupplier armDeployedSupplier =
+    () -> {
+       if(armInputs.position > 0.7) {
+        return true;  }
+        else {
+          return false;
+        }
+      
+        
+       // armInputs.position;
+    }; */
+
   // Provide the current arm position set point in rotations
   // Enable when PID control of arm works TODO
  /* public DoubleSupplier armPositionSetPointSupplier = 

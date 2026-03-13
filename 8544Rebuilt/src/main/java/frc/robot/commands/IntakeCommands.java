@@ -71,7 +71,33 @@ public class IntakeCommands {
         intake);
   }
 
+
+    public static Command oneButtonControl(
+      Intake intake,
+      Trigger onebuttonTrigger
+      ) {
+    return Commands.run(
+        () -> {
+
+          final double intakeSpeedRpm = 420;
+          boolean oneButtonPressed = onebuttonTrigger.getAsBoolean();
+
+            if (oneButtonPressed) {
+              intake.runAtRpm(intakeSpeedRpm);
+            } else {
+              intake.stopMotors();
+            }
+          
+        //  else {
+          //  intake.stopMotors();
+          //}
+
+        },
+        intake);
   }
+
+
+}
 
   
 
