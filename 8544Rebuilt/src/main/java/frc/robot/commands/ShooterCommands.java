@@ -99,7 +99,8 @@ public class ShooterCommands {
                if(FlywheelAutoRPMLocal) { 
                 shooter.runAtRpm(shooterRpmAuto);
                }
-               else {shooter.runAtRpm(shooterNominalRpm);
+               else {
+                shooter.runAtRpm(shooterNominalRpm);
             }
 
             }
@@ -124,7 +125,7 @@ public class ShooterCommands {
     SlewRateLimiter voltageLimiter = new SlewRateLimiter(
                                         Math.abs(maxBrakeVoltage) / breakApplyTimeSeconds); 
     return Commands.sequence(
-        // "Stop" Pidd control
+        // "Stop" Pid control
         Commands.runOnce(
         () -> {
               shooter.stopMotors();
