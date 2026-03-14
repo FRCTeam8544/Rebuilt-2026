@@ -214,36 +214,95 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
 
+
+
     // ----- Operator Controls -------
     
+  
+    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, true),
+     (IntakeCommands.oneButtonControl(intake, true)))
+     .repeatedly()
+     
+     .unless(
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
+         )
+
+     );
+
+         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
+     (IntakeCommands.oneButtonControl(intake, false)))
+     .repeatedly()
+     
+     .unless(  
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
+         )
+
+     );
+
+/*
+    dpadLeftTriggerGoose.onFalse(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
+         (IntakeCommands.oneButtonControl(intake, false)))
+         .repeatedly(
+         )
+         .unless(
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
+         )
+         );  */
+
+/* 
     arm.setDefaultCommand(
         ArmCommands.closedPositionControl(
             arm,
             leftBackGoose, // retract arm
             rightBackGoose // extend arm
-    ));
-    
+    )
+    );  */
+rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+
+));
+
+
+leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+));
+
+aButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, 0.9)
+.finallyDo(
+   () -> {intake.stopMotors();} 
+));
+yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
+.finallyDo(
+   () -> {intake.stopMotors();} 
+));
+
+/* 
     intake.setDefaultCommand(
         IntakeCommands.openLoopControl(
             intake,
             aButtonGoose, // intake fuel
             yButtonGoose  // expel fuel
     ));
+*/
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose,      // Reverse feed
-            dpadLeftTriggerGoose,   // Decrease feed speed
-            dpadRightTriggerGoose   // Increase feed speed
+            bButtonGoose      // Reverse feed
+         //   dpadLeftTriggerGoose,   // Decrease feed speed
+           // dpadRightTriggerGoose   // Increase feed speed
           )
+    
     );
+    
 
     // Shooter buttons
     shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
 
-    leftTriggerGoose.whileTrue(
+    leftTriggerGoose.onTrue(
         ShooterCommands.buttonShoot(shooter,
                                     vision.AutoFlywheelSpeed,
                                     shooter.flywheelAutoToggleBooleanSupplier,

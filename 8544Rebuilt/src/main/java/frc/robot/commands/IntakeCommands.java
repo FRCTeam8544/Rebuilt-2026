@@ -19,6 +19,15 @@ public class IntakeCommands {
         intake);
   }
 
+public static Command runAtDuty(Intake intake, double intakeDuty) {
+return Commands.run(
+  () -> {
+    intake.runOpenLoop(intakeDuty);
+  }
+);
+
+}
+
   public static Command openLoopControl(
     Intake intake,
     Trigger intakeTrigger,
@@ -71,7 +80,34 @@ public class IntakeCommands {
         intake);
   }
 
+
+    public static Command oneButtonControl(
+      Intake intake,
+      Boolean onebuttonTrigger
+      
+      ) {
+    return Commands.run(
+        () -> {
+
+          final double intakeFeedDuty = 0.9;
+          boolean oneButtonPressed = onebuttonTrigger;
+
+            if (oneButtonPressed) {
+              intake.runOpenLoop(intakeFeedDuty);
+            } else {
+              intake.stopMotors();
+            }
+          
+        //  else {
+          //  intake.stopMotors();
+          //}
+
+        },
+        intake);
   }
+
+
+}
 
   
 
