@@ -63,6 +63,7 @@ public class RobotContainer {
 
   private final Trigger isRobotIntaking;
   private final Trigger isRobotShooting;
+  private final Trigger isRobotClimbing;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -140,7 +141,7 @@ public class RobotContainer {
     // Bind robot specific triggers, now that all subsystems have been created
     isRobotShooting = new Trigger(feeder.isFeeding); // Fuel in the air!!
     isRobotIntaking = new Trigger(intake.isIntaking); // Feed me seamore!
-
+    isRobotClimbing = new Trigger(climber.isClimbingSupplier);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -249,7 +250,7 @@ public class RobotContainer {
 
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose, leds));
+                                           backButtonGoose, startButtonGoose));
 
     // Status
     
@@ -262,6 +263,11 @@ public class RobotContainer {
        Commands.run( () -> {
             leds.setMechanicalState(Leds.MechanicalState.SHOOTING); }, leds).
                 finallyDo( () -> { leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
+
+    isRobotClimbing.whileTrue(
+        Commands.run( () -> {
+            leds.setMechanicalState(Leds.MechanicalState.CLIMBING); }, leds).
+                finallyDo( () -> {leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
 
   }
 

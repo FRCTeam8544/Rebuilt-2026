@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.climber.*;
-import frc.robot.subsystems.leds.Leds;
 
 
 public class ClimberCommands {
@@ -18,7 +17,7 @@ public class ClimberCommands {
     return Commands.run(
         () -> {
         //  climber.holdArmPosition();
-          climber.runArmOpenLoop(0);
+          climber.runOpenLoop(0);
         },
         climber);
   }
@@ -36,11 +35,11 @@ public class ClimberCommands {
           // If and only if one button is pressed at a time
           if (retractPosition ^ extendPosition) {
             if (extendPosition) {
-              climber.runArmToPosition(0.7); // Set Extend Position .7
+              climber.runHookToPosition(0.7); // Set Extend Position .7
             } else {
-              climber.runArmToPosition(0.3); // Set Retract Position .3
+              climber.runHookToPosition(0.3); // Set Retract Position .3
             }
-           } else { climber.holdArmPosition();
+           } else { climber.holdHookPosition();
 
            }
           
@@ -52,8 +51,7 @@ public class ClimberCommands {
   public static Command openVoltageControl(
       Climber climber,
       Trigger extendTrigger,
-      Trigger retractTrigger,
-      Leds leds
+      Trigger retractTrigger
       ) {
     return Commands.run(
         () -> {
@@ -62,16 +60,14 @@ public class ClimberCommands {
           double climberDuty = 0.3;
           // If and only if one button is pressed at a time
           if (retractPosition ^ extendPosition) {
-            leds.setMechanicalState(Leds.MechanicalState.CLIMBING);
             if (extendPosition) {
-              climber.runArmOpenLoop(climberDuty); // Extend
+              climber.runOpenLoop(climberDuty); // Extend
             } else {
-              climber.runArmOpenLoop(-climberDuty); // Retract
+              climber.runOpenLoop(-climberDuty); // Retract
             }
            }
            else {
-              leds.setMechanicalState(Leds.MechanicalState.NONE);
-              climber.runArmOpenLoop(0);
+              climber.runOpenLoop(0);
            }
         },
         climber);
