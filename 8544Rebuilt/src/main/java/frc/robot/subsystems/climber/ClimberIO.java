@@ -8,7 +8,10 @@ public interface ClimberIO {
   public static class ClimberIOInputs {
     // Inputs
     public boolean connected = false;
+     
+    // User controls
     public boolean motorBrakeEnabled = false;
+
     public double velocity = 0.0f;
     public double position = 0.0f;
     public double encoderPosition = 0.0f;

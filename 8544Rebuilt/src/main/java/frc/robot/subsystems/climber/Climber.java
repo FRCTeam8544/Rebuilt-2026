@@ -4,9 +4,9 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
@@ -18,7 +18,7 @@ public class Climber extends SubsystemBase {
   private final ClimberIOInputsAutoLogged climberInputs = new ClimberIOInputsAutoLogged();
 
   private final double minPositionLimit = 0;   // Rotations
-  private final double maxPositionLimit = 0.5; // Rotations
+  private final double maxPositionLimit = 2.5; // Rotations TODO!!!
 
 
   // Zero faces to the front of robot
@@ -47,21 +47,25 @@ public class Climber extends SubsystemBase {
   }
 
   public void enableCoastMode() {
-    climberIO.setBrakeMode(false);
-    climberInputs.motorBrakeEnabled = false;
+    setBrakeMode(false);
   }
 
   public void enableBrakeMode() {
-    climberIO.setBrakeMode(true);
-    climberInputs.motorBrakeEnabled = true;
+    setBrakeMode(true);
+  }
+
+  private void setBrakeMode(boolean enable) {
+    // Update the dashboard as if the user did it.
+    // The change will be noticed in the next periodic update and the motor config changed
+    SmartDashboard.putBoolean("Climber Brake Enabled", false);
   }
 
   public void runArmToPosition(double rotations) {
       if (rotations > maxPositionLimit) {
-        rotations = 1.0;
+        rotations = maxPositionLimit;
       }
       else if (rotations < minPositionLimit) {
-        rotations = 0.0;
+        rotations = minPositionLimit;
       }
       climberInputs.voltageSetPoint = 0.0;
       climberInputs.positionSetPoint = (float) rotations;
@@ -100,6 +104,14 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Climber Setpoint", climberInputs.positionSetPoint);
     SmartDashboard.putNumber("Climber Motor Temp", climberInputs.motorTemperature);
     SmartDashboard.putNumber("Climber Encoder Position", climberInputs.encoderPosition);
+
+    
+    boolean oldBrakeMode = climberInputs.motorBrakeEnabled;
+    climberInputs.motorBrakeEnabled = 
+      SmartDashboard.getBoolean("Climber Brake Enabled", climberInputs.motorBrakeEnabled);
+    if (oldBrakeMode != climberInputs.motorBrakeEnabled) {
+      climberIO.setBrakeMode(climberInputs.motorBrakeEnabled);
+    }
   }
 
 
