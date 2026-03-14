@@ -69,6 +69,16 @@ public class ArmCommands {
         arm);
   }
 
+public static Command runToPosition( Arm arm, double armPosition) {
+return Commands.run (
+() -> {
+  arm.runToPosition(armPosition);
+}
+
+);
+
+
+}
   public static Command closedPositionControl(
       Arm arm,
       Trigger extendTrigger,

@@ -19,6 +19,15 @@ public class IntakeCommands {
         intake);
   }
 
+public static Command runAtDuty(Intake intake, double intakeDuty) {
+return Commands.run(
+  () -> {
+    intake.runOpenLoop(intakeDuty);
+  }
+);
+
+}
+
   public static Command openLoopControl(
     Intake intake,
     Trigger intakeTrigger,
