@@ -95,7 +95,11 @@ public class RobotContainer {
                 drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.CenterApriltag, VisionConstants.robotToCamera0));
+                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
+                new VisionIOPhotonVision(
+                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
+                new VisionIOPhotonVision(
+                    VisionConstants.RearModuleB,  VisionConstants.robotToRearModuleB));
 
         break;
 
@@ -115,9 +119,11 @@ public class RobotContainer {
                 drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.CenterApriltag,
-                    VisionConstants.robotToCamera0,
-                    drive::getPose));
+                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam,drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA,drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.RearModuleB,  VisionConstants.robotToRearModuleB,drive::getPose));
         break;
 
       default:

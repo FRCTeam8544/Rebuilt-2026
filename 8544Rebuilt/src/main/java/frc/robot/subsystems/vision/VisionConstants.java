@@ -18,6 +18,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+
 import org.photonvision.*;
 
 public class VisionConstants {
@@ -27,7 +28,6 @@ public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark); // FRC NE
-  // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // Worlds
   //     AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // TODO Define custom school field tag setup... and a way to switch??
@@ -35,26 +35,36 @@ public class VisionConstants {
   public static final int INVALID_APRIL_TAG = -1;
 
   // Camera names, must match names configured on coprocessor
-  public static String CenterApriltag = "Arducam_OV9782_USB_Camera";
+  public static String DriverCam = "DriverCam";
+  public static String RearModuleA = "RearCamModuleA";
+  public static String RearModuleB = "RearCamModuleB";
+
   //  public static String rightChassisApriltag = "rightChassisApriltag";
 
   // Robot to camera transforms - Need to be configured relative to gyro
   // These values are centered on the "robot center"
   // Gyro will be offset from this.
-  public static Transform3d robotToCamera0 = // left camera - white
+  public static Transform3d robotToDriverCam = // Top Driver Seat Camera
       new Transform3d(
           Units.inchesToMeters(0),
           Units.inchesToMeters(14.5),
           Units.inchesToMeters(30),
           new Rotation3d(0.0, 0, 0));
-  /*  public static Transform3d robotToCamera1 = // right camera - black/blue
-  new Transform3d(
-      Units.inchesToMeters(8),
-      Units.inchesToMeters(12.25),
-      Units.inchesToMeters(19.75),
-      new Rotation3d(0.0, 0, 0.0));
-      */
-
+  public static Transform3d robotToRearModuleA = // Rear Left
+      new Transform3d(
+          Units.inchesToMeters(-11.375),
+          Units.inchesToMeters(-10.875),
+          Units.inchesToMeters(7.5),
+          new Rotation3d(0.0, Units.degreesToRadians(15), Units.degreesToRadians(160)));
+  public static Transform3d robotToRearModuleB = // Rear Right
+    new Transform3d(
+        Units.inchesToMeters(-11.375),
+        Units.inchesToMeters(10.875),
+        Units.inchesToMeters(7.5),
+        new Rotation3d(0.0, Units.degreesToRadians(15), Units.degreesToRadians(200)));
+        
+// 20 toe out
+// 15 up
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
   public static double maxZError = 0.75;
