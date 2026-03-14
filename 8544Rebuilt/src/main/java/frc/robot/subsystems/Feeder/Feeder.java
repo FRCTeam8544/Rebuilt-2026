@@ -122,7 +122,7 @@ public class Feeder extends SubsystemBase{
       }
 
       feedInputs.voltageSetPoint = 0.0;
-      feedInputs.velocitySetPoint = adjustedRpm * Flywheel.kOutputToDriveGearRatio;
+      feedInputs.velocitySetPoint = adjustedRpm;
 
       feedIO.setVelocity(feedInputs.velocitySetPoint);
     }
@@ -137,7 +137,7 @@ public class Feeder extends SubsystemBase{
   @Override
   public void periodic() {
     feedIO.updateInputs(feedInputs);
-    Logger.processInputs("Feeder/Feed", feedInputs);
+    Logger.processInputs("Feeder", feedInputs);
     
     
     SmartDashboard.putNumber("Feeder RPM", feedInputs.motorVelocity);
