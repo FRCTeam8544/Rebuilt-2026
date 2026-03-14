@@ -100,11 +100,11 @@ public class ArmCommands {
 
     public static Command oneButtonControl(
       Arm arm,
-      Trigger onebuttonTrigger
+      Boolean onebuttonTrigger
       ) {
     return Commands.run(
         () -> {
-          boolean oneButton = onebuttonTrigger.getAsBoolean();
+          boolean oneButton = onebuttonTrigger;
 
           final double extendPosition = 0.78; // 0.8;
           final double retractPosition = 0.037; //0.2;

@@ -212,12 +212,20 @@ public class RobotContainer {
 
     // ----- Operator Controls -------
     
-    arm.setDefaultCommand(
+
+    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, true),
+     (IntakeCommands.oneButtonControl(intake, true))));
+
+
+    dpadLeftTriggerGoose.toggleOnFalse(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
+         (IntakeCommands.oneButtonControl(intake, false))));
+
+/*    arm.setDefaultCommand(
         ArmCommands.closedPositionControl(
             arm,
             leftBackGoose, // retract arm
             rightBackGoose // extend arm
-    ));
+    )); 
     
     intake.setDefaultCommand(
         IntakeCommands.openLoopControl(
@@ -225,19 +233,7 @@ public class RobotContainer {
             aButtonGoose, // intake fuel
             yButtonGoose  // expel fuel
     ));
-
-
-        arm.setDefaultCommand(
-        ArmCommands.oneButtonControl(
-            arm,
-            dpadLeftTriggerGoose // retract arm // extend arm
-    ));
-    
-    intake.setDefaultCommand(
-        IntakeCommands.oneButtonControl(
-            intake,
-            dpadLeftTriggerGoose
-                ));
+*/
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
@@ -247,12 +243,14 @@ public class RobotContainer {
          //   dpadLeftTriggerGoose,   // Decrease feed speed
            // dpadRightTriggerGoose   // Increase feed speed
           )
+    
     );
+    
 
     // Shooter buttons
     shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
 
-    leftTriggerGoose.whileTrue(
+    leftTriggerGoose.onTrue(
         ShooterCommands.buttonShoot(shooter,
                                     leftTriggerGoose,     // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
