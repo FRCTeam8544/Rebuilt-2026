@@ -248,7 +248,9 @@ public class RobotContainer {
 
 
 rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
-.unless(manualArmOverrideTrigger)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == false  //was true
+)
 .finallyDo(
    () -> {arm.holdPosition();} 
 
@@ -256,7 +258,9 @@ rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
 
 
 leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
-.unless(manualArmOverrideTrigger)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == false //was true
+)
 .finallyDo(
    () -> {arm.holdPosition();} 
 ));
@@ -265,7 +269,7 @@ leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 
 leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
 .unless(
-    () -> !manualArmOverrideTrigger.getAsBoolean() == false
+    () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
 .finallyDo(
    () -> {arm.holdPosition();} 
@@ -273,7 +277,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
 
 rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.3)
 .unless(
-    () -> !manualArmOverrideTrigger.getAsBoolean() == false
+    () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
 .finallyDo(
    () -> {arm.holdPosition();} 
