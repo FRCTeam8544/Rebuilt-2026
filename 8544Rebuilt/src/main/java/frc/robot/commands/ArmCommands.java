@@ -73,6 +73,14 @@ public static Command runToPosition( Arm arm, double armPosition) {
 return Commands.run (
 () -> {
   arm.runToPosition(armPosition);
+});
+}
+
+public static Command runToVoltage( Arm arm, double armVoltage) {
+return Commands.run (
+() -> {
+
+  arm.runOpenLoop(armVoltage);
 }
 
 );

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -29,6 +30,11 @@ public class Arm extends SubsystemBase {
   public DoubleSupplier armPositionSupplier =
     () -> {
       return armInputs.position;
+    };
+
+      public BooleanSupplier manualControlBooleanSupplier =
+    () -> {
+      return armInputs.manualControlEnabled;
     };
 
   
@@ -148,7 +154,13 @@ public class Arm extends SubsystemBase {
     if (oldBrakeState != armInputs.motorBrakeEnabled) {
       armIO.setBrakeMode(armInputs.motorBrakeEnabled);
     }
+
+    armInputs.manualControlEnabled =
+       SmartDashboard.getBoolean("Manual Override Enabled", armInputs.manualControlEnabled);
   }
+
+
+    
 
   private void setupDefaultDashboard()
   {
@@ -157,6 +169,7 @@ public class Arm extends SubsystemBase {
     SmartDashboard.setDefaultNumber("Arm Motor Temp", armInputs.motorTemperature);
 
     SmartDashboard.setDefaultBoolean("Arm Brake Enabled", armInputs.motorBrakeEnabled);
+    SmartDashboard.setDefaultBoolean("Manual Override Enabled", armInputs.manualControlEnabled);
   }
 
   

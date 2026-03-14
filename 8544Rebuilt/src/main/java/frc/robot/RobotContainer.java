@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -61,8 +62,11 @@ public class RobotContainer {
   private final Trigger startButtonGoose = new Trigger(goose.start());
   private final Trigger backButtonGoose = new Trigger(goose.back());
 
+  
+
   private final Trigger isRobotIntaking;
   private final Trigger isRobotShooting;
+  private final Trigger manualArmOverrideTrigger;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -76,6 +80,7 @@ public class RobotContainer {
     shooter = new Shooter();
     climber = new Climber();
 
+    
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -146,6 +151,7 @@ public class RobotContainer {
     // Bind robot specific triggers, now that all subsystems have been created
     isRobotShooting = new Trigger(feeder.isFeeding); // Fuel in the air!!
     isRobotIntaking = new Trigger(intake.isIntaking); // Feed me seamore!
+    manualArmOverrideTrigger = new Trigger(arm.manualControlBooleanSupplier);
 
 
     // Set up auto routines
@@ -224,7 +230,7 @@ public class RobotContainer {
      .repeatedly()
      
      .unless(
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean() ; }
          )
 
      );
@@ -234,30 +240,15 @@ public class RobotContainer {
      .repeatedly()
      
      .unless(  
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean()  ; }
          )
 
      );
 
-/*
-    dpadLeftTriggerGoose.onFalse(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
-         (IntakeCommands.oneButtonControl(intake, false)))
-         .repeatedly(
-         )
-         .unless(
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
-         )
-         );  */
 
-/* 
-    arm.setDefaultCommand(
-        ArmCommands.closedPositionControl(
-            arm,
-            leftBackGoose, // retract arm
-            rightBackGoose // extend arm
-    )
-    );  */
+
 rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
+.unless(manualArmOverrideTrigger)
 .finallyDo(
    () -> {arm.holdPosition();} 
 
@@ -265,9 +256,31 @@ rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
 
 
 leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
+.unless(manualArmOverrideTrigger)
 .finallyDo(
    () -> {arm.holdPosition();} 
 ));
+
+
+
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == false
+)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+));
+
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.3)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == false
+)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+));
+
+
+
 
 aButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, 0.9)
 .finallyDo(
@@ -278,14 +291,7 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
    () -> {intake.stopMotors();} 
 ));
 
-/* 
-    intake.setDefaultCommand(
-        IntakeCommands.openLoopControl(
-            intake,
-            aButtonGoose, // intake fuel
-            yButtonGoose  // expel fuel
-    ));
-*/
+
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
