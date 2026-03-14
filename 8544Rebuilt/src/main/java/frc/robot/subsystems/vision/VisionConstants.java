@@ -36,6 +36,7 @@ public class VisionConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String DriverCam = "DriverCam";
+  public static String FrontRightCam = "FrontRightAprilCam";
   public static String RearModuleA = "RearCamModuleA";
   public static String RearModuleB = "RearCamModuleB";
 
@@ -44,11 +45,17 @@ public class VisionConstants {
   // Robot to camera transforms - Need to be configured relative to gyro
   // These values are centered on the "robot center"
   // Gyro will be offset from this.
-  public static Transform3d robotToDriverCam = // Top Driver Seat Camera
+  public static Transform3d robotToDriverCam = // Top left Seat Camera
       new Transform3d(
           Units.inchesToMeters(0),
           Units.inchesToMeters(14.5),
           Units.inchesToMeters(30),
+          new Rotation3d(0.0, 0, 0));
+  public static Transform3d robotToFrontAprilCam = // Top right Seat Camera
+      new Transform3d(
+          Units.inchesToMeters(0),
+          Units.inchesToMeters(-14.5),
+          Units.inchesToMeters(28),
           new Rotation3d(0.0, 0, 0));
   public static Transform3d robotToRearModuleA = // Rear Left
       new Transform3d(
