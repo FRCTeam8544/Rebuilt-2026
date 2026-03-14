@@ -9,6 +9,31 @@ public class ArmCommands {
 
   private ArmCommands() {}
 
+  public static Command openLoopLimitedVoltage(
+    Arm arm,
+    Trigger armInTrigger,
+    Trigger armOutTrigger) {
+      return Commands.run(
+        () -> {
+          final double armExtendDuty = -0.5;
+          final double armRetractDuty = 0.5;
+          boolean extendPressed = armOutTrigger.getAsBoolean();
+          boolean retractPressed = armInTrigger.getAsBoolean();
+          // If and only if one button is pressed at a time
+          if (retractPressed ^ extendPressed) {
+            if (extendPressed) {
+              arm.runOpenLoopLimited(armExtendDuty); // Set Extend Position
+            } else {
+              arm.runOpenLoopLimited(armRetractDuty); // Set Retract Position
+            }
+          }
+          else { 
+            arm.stopOpenLoop();
+          }
+        },
+        arm );
+    }
+
   public static Command openLoopControl(
     Arm arm,
     Trigger armInTrigger,
@@ -16,8 +41,8 @@ public class ArmCommands {
       return Commands.run(
         () -> {
 
-          final double armExtendDuty = 0.6;
-          final double armRetractDuty = -0.8;
+          final double armExtendDuty = -0.3;
+          final double armRetractDuty = 0.3;
           boolean extendPressed = armOutTrigger.getAsBoolean();
           boolean retractPressed = armInTrigger.getAsBoolean();
           // If and only if one button is pressed at a time
@@ -54,8 +79,8 @@ public class ArmCommands {
           boolean extendPressed = extendTrigger.getAsBoolean();
           boolean retractPressed = retractTrigger.getAsBoolean();
 
-          final double extendPosition = 0.8;
-          final double retractPosition = 0.2;
+          final double extendPosition = 0.78; // 0.8;
+          final double retractPosition = 0.037; //0.2;
 
           // If and only if one button is pressed at a time
           if (retractPressed ^ extendPressed) {

@@ -147,27 +147,29 @@ public class Shooter extends SubsystemBase{
       }
 
       // Scale requested flywheel RPM to shooter motor RPM
-      shooterInputs.voltageSetPoint = 0.0;
       shooterInputs.flywheelVelocitySetPoint = adjustedRpm;
+      shooterInputs.voltageSetPoint = 0.0;
+      
+      // This will decrease the requested motor RPM so that the output flywheel is at the requested rpm.
       final double motorVelocitySetPoint = shooterInputs.flywheelVelocitySetPoint * Flywheel.kOutputToDriveGearRatio;
-
       shooterIO.setVelocity(motorVelocitySetPoint);
     }
-  
+
   public boolean isFlywheelOverspeed() {
-    
+
       // Safety limit RPM
       if (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM) {
         shooterInputs.maxFlywheelSpeedHit = true;
       }
       // After overspeed event, only allow use when flywheel is well below max speed to avoid pulsing the wheel
-      else if ((shooterInputs.maxFlywheelSpeedHit) &&  
+      else if ((shooterInputs.maxFlywheelSpeedHit) &&
                (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM - 500)) {
         shooterInputs.maxFlywheelSpeedHit = false;
       }
 
       return shooterInputs.maxFlywheelSpeedHit;
   }
+
 
   @Override
   public void periodic() {
