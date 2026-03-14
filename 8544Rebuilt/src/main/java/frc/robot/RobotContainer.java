@@ -214,18 +214,27 @@ public class RobotContainer {
     
 
     dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, true),
-     (IntakeCommands.oneButtonControl(intake, true))));
+     (IntakeCommands.oneButtonControl(intake, true)))
+     .unless(
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
+         )
+     );
 
 
     dpadLeftTriggerGoose.toggleOnFalse(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
-         (IntakeCommands.oneButtonControl(intake, false))));
+         (IntakeCommands.oneButtonControl(intake, false)))
+         .unless(
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
+         )
+         );
 
-/*    arm.setDefaultCommand(
+    arm.setDefaultCommand(
         ArmCommands.closedPositionControl(
             arm,
             leftBackGoose, // retract arm
             rightBackGoose // extend arm
-    )); 
+    )
+    ); 
     
     intake.setDefaultCommand(
         IntakeCommands.openLoopControl(
@@ -233,7 +242,7 @@ public class RobotContainer {
             aButtonGoose, // intake fuel
             yButtonGoose  // expel fuel
     ));
-*/
+//*/
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
