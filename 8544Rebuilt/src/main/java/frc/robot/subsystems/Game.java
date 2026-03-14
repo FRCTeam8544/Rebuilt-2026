@@ -9,32 +9,38 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Game extends SubsystemBase{
+public class Game extends SubsystemBase {
+
 private static final String Blue = null;
 private static final String Red = null;
-String gameData ;// DriverStation.getGameSpecificMessage();
-if (!gameData.isEmpty())
+
+public Game () {
+
+}
+
+
+private Alliance autoWinner() {
+String gameData = DriverStation.getGameSpecificMessage();
+if (!gameData.isEmpty());
 {
   switch (gameData.charAt(0))
   {
     case 'B' :
-      //Blue case code
+      //Alliance.Blue=autoWinner(); 
       break;
     case 'R' :
-      //Red case code
+     //Alliance.Red=autoWinner();
       break;
     default :
       //This is corrupt data
       break;
   }
-} else {
-  //Code for no data received yet
+
+
 }
 
-
 @Override
-
-    public void periodic() {
+public void periodic() {
 
     SmartDashboard.putBoolean("Auto Enabled", DriverStation.isAutonomousEnabled());
     SmartDashboard.putBoolean("Teleop Enabled", DriverStation.isTeleopEnabled());
@@ -42,6 +48,9 @@ if (!gameData.isEmpty())
     
     SmartDashboard.putString("Game Specific Message ", DriverStation.getGameSpecificMessage());
     SmartDashboard.putBoolean("Hub Active", isHubActive());
+
+    SmartDashboard.putString("Auto winner", autoWinner());
+
     }
   
   //private void setupDefaultDashboard()
@@ -115,5 +124,5 @@ public boolean isHubActive() {
 }
 
 }
-    
+}  
 
