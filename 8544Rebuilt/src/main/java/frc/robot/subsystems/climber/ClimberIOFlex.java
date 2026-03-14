@@ -36,8 +36,8 @@ public class ClimberIOFlex implements ClimberIO {
     private final CANcoderConfiguration cancoderConfig;
 
     // Converts from Cancoder position 0 to N rotations to the hook rotations
-    public final double encoderToHookPositionRatio = 2.0; // TODO tune!!
-    public final double hookPositionToEncoderPositionRatio = 1.0 / encoderToHookPositionRatio;
+    public final double hookPositionToEncoderPositionRatio = 2.0; // TODO tune!!
+    public final double encoderToHookPositionRatio = 1.0 / hookPositionToEncoderPositionRatio;
 
   public ClimberIOFlex(int canId, int encoderCanId) {
     motorController = new SparkFlex(canId, MotorType.kBrushless);
@@ -49,13 +49,19 @@ public class ClimberIOFlex implements ClimberIO {
               .withSensorDirection(SensorDirectionValue.Clockwise_Positive) // TODO?
         );
    // cancoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinusHalf;
-
     cancoder.getConfigurator().apply(cancoderConfig);
 
+    // Spark flex controller defaults to counter clockwise positive rotation of the shaft.
+    // Counter clockwise motion of the motor will cause the hooks, due to pulley, to bring the
+    // hooks in towards the front of the robot. Since zero will be over the shooter and
+    // the encoder is set to positive clockwise spin, the spark flex will need "inverted" voltage.
+    // The motor will spin Clockwise with positive voltage that will be extend the hooks out from the
+    // robot.
     motorConfig = new SparkFlexConfig();
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig.smartCurrentLimit(stallLimit);
     motorConfig.voltageCompensation(nominalVoltage);
+    motorConfig.inverted(true); // Clockwise positive voltage rotation
     motorConfig.softLimit.forwardSoftLimitEnabled(false);
     motorConfig.softLimit.reverseSoftLimitEnabled(false);
 

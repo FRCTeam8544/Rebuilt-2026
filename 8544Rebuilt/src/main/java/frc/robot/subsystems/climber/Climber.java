@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climber;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -17,10 +18,16 @@ public class Climber extends SubsystemBase {
   private final ClimberIO climberIO;
   private final ClimberIOInputsAutoLogged climberInputs = new ClimberIOInputsAutoLogged();
 
-  private final double minPositionLimit = 0;   // Rotations
-  private final double maxPositionLimit = 2.5; // Rotations TODO!!!
+  // These limits are hook position
+  private final double minHookPositionLimit = 0;   // Rotations
+  private final double maxHookPositionLimit = .75; // Rotations TODO!!!
 
 
+  public BooleanSupplier isClimbingSupplier =
+    () -> {
+      return Math.abs(climberInputs.velocity) > 1.0;
+    };
+    
   // Zero faces to the front of robot
   // Positive towards the rear of the robot
   public DoubleSupplier positionSupplier =
@@ -60,26 +67,27 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putBoolean("Climber Brake Enabled", false);
   }
 
-  public void runArmToPosition(double rotations) {
-      if (rotations > maxPositionLimit) {
-        rotations = maxPositionLimit;
+  public void runHookToPosition(double rotations) {
+      if (rotations > maxHookPositionLimit) {
+        rotations = maxHookPositionLimit;
       }
-      else if (rotations < minPositionLimit) {
-        rotations = minPositionLimit;
+      else if (rotations < minHookPositionLimit) {
+        rotations = minHookPositionLimit;
       }
+
       climberInputs.voltageSetPoint = 0.0;
       climberInputs.positionSetPoint = (float) rotations;
 
       climberIO.setPosition(climberInputs.position);
   }
 
-  public void holdArmPosition() {
+  public void holdHookPosition() {
     climberInputs.voltageSetPoint = 0.0;
     climberInputs.positionSetPoint = climberInputs.position;
     climberIO.setPosition(climberInputs.positionSetPoint);
   }
 
-  public void runArmOpenLoop(double duty) {
+  public void runOpenLoop(double duty) {
     double adjustedDuty = duty;
     if (adjustedDuty > 1.0)
     {
