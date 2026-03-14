@@ -6,6 +6,9 @@ public interface ClimberIO {
 
   @AutoLog
   public static class ClimberIOInputs {
+    // Controls
+    public boolean motorBrakeEnabled = true;
+
     // Inputs
     public boolean connected = false;
 
@@ -38,4 +41,6 @@ public interface ClimberIO {
   public default void setPosition(double rotations) {}
 
   public default void setVoltage(double volts) {}
+
+  public default void setBrakeMode(boolean enable) {}
 }

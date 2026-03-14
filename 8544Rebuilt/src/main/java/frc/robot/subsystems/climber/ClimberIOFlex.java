@@ -12,9 +12,13 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import frc.robot.Constants;
+import frc.robot.util.SparkUtil;
 
 public class ClimberIOFlex implements ClimberIO {
 
+  
+    private static final int configAttempts = 5;
+    
     private static final double nominalVoltage = Constants.NeoVortex.nominalVoltage;
     private static final double nominalFF = Constants.NeoVortex.nominalFF;
     private static final double Ks = 0.120;
@@ -59,6 +63,20 @@ public class ClimberIOFlex implements ClimberIO {
     motorController.configure(motorConfig, 
                               com.revrobotics.ResetMode.kResetSafeParameters,
                               com.revrobotics.PersistMode.kPersistParameters);
+  }
+
+  public void setBrakeMode(boolean enable) {
+    if (enable) {
+      motorConfig.idleMode(IdleMode.kBrake);
+    }
+    else {
+      motorConfig.idleMode(IdleMode.kCoast);
+    }
+
+    motorController.configure(
+          motorConfig,
+          com.revrobotics.ResetMode.kResetSafeParameters,
+          com.revrobotics.PersistMode.kNoPersistParameters);
   }
 
   public void updateInputs(ClimberIOInputs inOutData) {

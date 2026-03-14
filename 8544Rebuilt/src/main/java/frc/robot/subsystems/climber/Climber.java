@@ -95,6 +95,13 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Climber Position", climberInputs.position);
     SmartDashboard.putNumber("Climber Setpoint", climberInputs.positionSetPoint);
     SmartDashboard.putNumber("Climber Motor Temp", climberInputs.motorTemperature);
+
+    boolean oldBrakeMode = climberInputs.motorBrakeEnabled;
+    climberInputs.motorBrakeEnabled = 
+      SmartDashboard.getBoolean("Climber Brake Enabled", climberInputs.motorBrakeEnabled);
+    if (oldBrakeMode != climberInputs.motorBrakeEnabled) {
+      climberIO.setBrakeMode(climberInputs.motorBrakeEnabled);
+    }
   }
 
 
@@ -103,6 +110,8 @@ private void setupDefaultDashboard()
   SmartDashboard.setDefaultNumber("Climber Position", climberInputs.position);
   SmartDashboard.setDefaultNumber("Climber SetPoint", climberInputs.positionSetPoint);
   SmartDashboard.setDefaultNumber("Climber Motor Temp", climberInputs.motorTemperature);
+
+  SmartDashboard.setDefaultBoolean("Climber Brake Enabled", climberInputs.motorBrakeEnabled);
 }
 
 }
