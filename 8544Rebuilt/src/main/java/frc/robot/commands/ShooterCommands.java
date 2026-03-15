@@ -131,7 +131,7 @@ public class ShooterCommands {
     SlewRateLimiter voltageLimiter = new SlewRateLimiter(
                                         Math.abs(maxBrakeVoltage) / breakApplyTimeSeconds); 
     return Commands.sequence(
-        // "Stop" Pidd control
+        // "Stop" Pid control
         Commands.runOnce(
         () -> {
               shooter.stopMotors();
