@@ -59,8 +59,19 @@ public class ShooterCommands {
         shooter);
     }
 
+    public static Command runFlywheel(Shooter shooter,
+                                      DoubleSupplier rpmSetPoint
+                                      )
+    {
+        return Commands.run(
+            () -> {
+                 shooter.runAtRpm(rpmSetPoint.getAsDouble());
+            },
+            shooter);
+    }
+
     public static Command buttonShoot( Shooter shooter,
-                                        DoubleSupplier distanceSupplier,
+                                        DoubleSupplier rpmByDistanceSupplier,
                                         BooleanSupplier AutoToggleSupplier,
                                        Trigger shootTrigger,
                                        Trigger rpmAdjustDown,
@@ -71,8 +82,8 @@ public class ShooterCommands {
 
             final int rpmAdjustStep = 100 / 50;
              
-            final double shooterNominalRpm = 3000; //TODO shuffleboard toggle between auto/manual
-            double shooterRpmAuto = distanceSupplier.getAsDouble();
+            final double shooterNominalRpm = 3000;
+            double shooterRpmAuto = rpmByDistanceSupplier.getAsDouble();
 
             // These Rpms are used to tune the flywheel
             //final int shooterNominalRpm = 2720;
@@ -80,8 +91,6 @@ public class ShooterCommands {
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
             boolean FlywheelAutoRPMLocal = AutoToggleSupplier.getAsBoolean();
-
-
 
             if (adjustUp ^ adjustDown)
             {
@@ -97,14 +106,12 @@ public class ShooterCommands {
             if (shootTrigger.getAsBoolean())
             {
                if(FlywheelAutoRPMLocal) { 
-                shooter.runAtRpm(shooterRpmAuto);
+                    shooter.runAtRpm(shooterRpmAuto);
                }
-               else {shooter.runAtRpm(shooterNominalRpm);
+                else {
+                    shooter.runAtRpm(shooterNominalRpm);
+                }
             }
-
-            }
-
-
             else {
                 shooter.stopMotors();
             }
@@ -124,7 +131,7 @@ public class ShooterCommands {
     SlewRateLimiter voltageLimiter = new SlewRateLimiter(
                                         Math.abs(maxBrakeVoltage) / breakApplyTimeSeconds); 
     return Commands.sequence(
-        // "Stop" Pidd control
+        // "Stop" Pid control
         Commands.runOnce(
         () -> {
               shooter.stopMotors();
