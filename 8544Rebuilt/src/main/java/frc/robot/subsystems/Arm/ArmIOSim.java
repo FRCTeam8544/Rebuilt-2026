@@ -8,4 +8,6 @@ public class ArmIOSim {
 
   public void setVoltage(double volts) {}
   public void setPosition(double rotations) {}
+
+  public void setBrakeMode(boolean enable) {}
 }

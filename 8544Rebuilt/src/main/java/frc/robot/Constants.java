@@ -8,12 +8,14 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
   public static final double kNominalVoltage = 12.0;
-
+  public static final double millinewtonsToFootPounds = 0.0002248089;
+  
   public static final class Neo {
     public static final double nominalVoltage = kNominalVoltage;;
     public static final double motorKv = 473;
     public static final double nominalFF = 1.0 / Neo.motorKv;
     public static final double freeSpeedRPM = 5676;
+    public static final double kTorque_mN_per_Amp = 19.57;
   }
 
   public static final class Neo550 {
@@ -29,6 +31,7 @@ public final class Constants {
     public static final double nominalFF = 1.0 / motorKV;
     public static final double maxFreeRpm = 6784;
     public static final double freeSpeedRPM = 6784;
+    public static final double kTorque_mN_per_Amp = 15.46;
   }
 
   public static final class KrakenX60 {
@@ -36,6 +39,7 @@ public final class Constants {
     public static final double motorKV = 505;
     public static final double nominalFF = 1.0 / motorKV;
     public static final double freeSpeedRPM = 5640; // With FOC enabled
+    public static final double kTorque_mN_per_Amp = 19.81;
   }
 
   public static enum Mode {

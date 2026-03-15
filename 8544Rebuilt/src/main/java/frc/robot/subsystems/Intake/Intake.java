@@ -3,6 +3,7 @@ package frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -15,6 +16,12 @@ public class Intake extends SubsystemBase {
  
   public final IntakeIOInputsAutoLogged intakeInputs = new IntakeIOInputsAutoLogged();
   
+
+  public BooleanSupplier isIntaking =
+    () -> {
+      return intakeInputs.velocity > 1.0; // RPM
+    };
+
   public DoubleSupplier intakeRpmSupplier =
     () -> {
       return intakeInputs.velocity;

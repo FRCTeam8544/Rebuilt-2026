@@ -5,19 +5,22 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
   
-  public static final double kArmUpperLimit = 0.8;
-  public static final double kArmLowerLimit = 0.1;
+  // Encoder arm limits in rotations
+  public static final double kArmForwardLimit = 0.78;
+  public static final double kArmReverseLimit = 0.03;
 
-  public static final double kMotorToOutputRatio = 1.0/100.0; // 100 to 1 gearbox
+  public static final double kMotorToOutputRatio = 3.0;
   public static final double kOutputToMotorRatio = 1.0 / kMotorToOutputRatio;
 
   @AutoLog
   public static class ArmIOInputs {
     // Inputs
     public boolean connected = false;
+    public boolean motorBrakeEnabled = false;
+    public boolean manualControlEnabled = false;
 
-    public float velocity = 0.0f;
-    public float position = 0.0f;
+    public double velocity = 0.0f;
+    public double position = 0.0f;
 
     public float motorTemperature = 0.0f;
 
@@ -30,10 +33,13 @@ public interface ArmIO {
     public boolean faultFirmware;
 
     // Outputs
+    public float voltageLimit = 0.0f;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
     public float outputCurrent = 0;
     public float outputVoltage = 0;
+    public float outputPower = 0;
+    public float outputTorque = 0;
 
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
     public double positionSetPoint = 0;
@@ -43,4 +49,6 @@ public interface ArmIO {
 
   public default void setVoltage(double volts) {}
   public default void setPosition(double rotations){}
+
+  public default void setBrakeMode(boolean enable) {}
 }

@@ -1,9 +1,11 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -30,7 +32,21 @@ public class Shooter extends SubsystemBase{
 
    private double tuneShootRpmAdjust = 0.0;
 
+   private double rpmAtSpeedTolerance = 50;
+
    // ---- Suppliers / Triggers ----
+
+   public BooleanSupplier flywheelAtRpmTarget =
+   () -> {
+     if (shooterInputs.flywheelVelocitySetPoint > 0) {
+      return MathUtil.isNear(shooterInputs.flywheelVelocitySetPoint,
+                             shooterInputs.flywheelMeidanVelocity,
+                             rpmAtSpeedTolerance);
+     }
+     else {
+      return false;
+     }
+   };
 
    public DoubleSupplier rpmSetPointSupplier = 
     () -> {
@@ -46,6 +62,13 @@ public class Shooter extends SubsystemBase{
     () -> {
       return Math.max(shooterInputs.leaderMotorTemperature, shooterInputs.followMotorTemperature);
     };
+
+
+  public BooleanSupplier flywheelAutoToggleBooleanSupplier =
+  () -> {
+    return shooterInputs.flywheelAutoRPMToggle;
+
+  };
 
    // Shooter
     public Shooter(ShooterIO shooterIO)
@@ -147,27 +170,29 @@ public class Shooter extends SubsystemBase{
       }
 
       // Scale requested flywheel RPM to shooter motor RPM
-      shooterInputs.voltageSetPoint = 0.0;
       shooterInputs.flywheelVelocitySetPoint = adjustedRpm;
+      shooterInputs.voltageSetPoint = 0.0;
+      
+      // This will decrease the requested motor RPM so that the output flywheel is at the requested rpm.
       final double motorVelocitySetPoint = shooterInputs.flywheelVelocitySetPoint * Flywheel.kOutputToDriveGearRatio;
-
       shooterIO.setVelocity(motorVelocitySetPoint);
     }
-  
+
   public boolean isFlywheelOverspeed() {
-    
+
       // Safety limit RPM
       if (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM) {
         shooterInputs.maxFlywheelSpeedHit = true;
       }
       // After overspeed event, only allow use when flywheel is well below max speed to avoid pulsing the wheel
-      else if ((shooterInputs.maxFlywheelSpeedHit) &&  
+      else if ((shooterInputs.maxFlywheelSpeedHit) &&
                (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM - 500)) {
         shooterInputs.maxFlywheelSpeedHit = false;
       }
 
       return shooterInputs.maxFlywheelSpeedHit;
   }
+
 
   @Override
   public void periodic() {
@@ -181,10 +206,16 @@ public class Shooter extends SubsystemBase{
     SmartDashboard.putNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
     SmartDashboard.putNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
 
+    shooterInputs.flywheelAutoRPMToggle = 
+         SmartDashboard.getBoolean("AutoShootRPMToggle", shooterInputs.flywheelAutoRPMToggle);
   }
 
   private void setupDefaultDashboard()
   {
+    // Dashboard user settings
+    SmartDashboard.setDefaultBoolean("AutoShootRPMToggle", shooterInputs.flywheelAutoRPMToggle);
+
+    // Dashboard display
     SmartDashboard.setDefaultNumber("Shooter RPM", shooterInputs.flywheelVelocity);
     SmartDashboard.setDefaultNumber("Shooter RPM Setpoint", shooterInputs.flywheelVelocitySetPoint);
     SmartDashboard.setDefaultNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Feeder;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -30,6 +31,12 @@ public class Feeder extends SubsystemBase{
     private final double tuneFeedVoltStep = 0.25 / Constants.tickUpdatesPerSecond; // 1/4 volt per second
 
     // --- Suppliers / Triggers ---
+
+    
+  public BooleanSupplier isFeeding =
+    () -> {
+      return feedInputs.wheelVelocity > 1.0; // RPM
+    };
 
    // provide current roller wheel RPM
    public DoubleSupplier rollerRpmSupplier = 
@@ -115,7 +122,7 @@ public class Feeder extends SubsystemBase{
       }
 
       feedInputs.voltageSetPoint = 0.0;
-      feedInputs.velocitySetPoint = adjustedRpm * Flywheel.kOutputToDriveGearRatio;
+      feedInputs.velocitySetPoint = adjustedRpm;
 
       feedIO.setVelocity(feedInputs.velocitySetPoint);
     }
@@ -130,7 +137,7 @@ public class Feeder extends SubsystemBase{
   @Override
   public void periodic() {
     feedIO.updateInputs(feedInputs);
-    Logger.processInputs("Feeder/Feed", feedInputs);
+    Logger.processInputs("Feeder", feedInputs);
     
     
     SmartDashboard.putNumber("Feeder RPM", feedInputs.motorVelocity);

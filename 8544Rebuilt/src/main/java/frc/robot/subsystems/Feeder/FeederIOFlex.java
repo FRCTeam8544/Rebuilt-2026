@@ -60,8 +60,10 @@ public class FeederIOFlex implements FeederIO {
   public void updateInputs(FeedIOInputs inOutData)
   {
     inOutData.connected = true;
-    inOutData.motorVelocity = motorEncoder.getVelocity();
-    inOutData.wheelVelocity = inOutData.motorVelocity * FeedWheel.kDriveToOutputGearRatio;
+
+     // Due to built in encoder scaling the reported motor velocity from REV is already scaled to the wheel velocity
+    inOutData.wheelVelocity = motorEncoder.getVelocity();
+    inOutData.motorVelocity = inOutData.motorVelocity * FeedWheel.kOutputToDriveGearRatio;
     inOutData.motorTemperature = (float) motorController.getMotorTemperature();
 
     // Fault codes
@@ -92,8 +94,6 @@ public class FeederIOFlex implements FeederIO {
 
   @Override
   public void setVoltage(double volts) {
-    //inOutData.(volts);
-//    inOutData.velocitySetPoint(0);
     motorController.setVoltage(volts);
   }
 

@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,7 +18,9 @@ import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.climber.*;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.leds.*;
 import frc.robot.subsystems.shooter.*;
+import frc.robot.subsystems.vision.*;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -45,6 +48,9 @@ public class RobotContainer {
   private final Feeder feeder;
   private final Shooter shooter;
   private final Climber climber;
+  private final Leds leds;
+
+  private final Vision vision;
 
   // Simulation
   private SwerveDriveSimulation driveSimulation = null;
@@ -75,6 +81,12 @@ public class RobotContainer {
   private final Trigger startButtonGoose = new Trigger(goose.start());
   private final Trigger backButtonGoose = new Trigger(goose.back());
 
+  
+
+  private final Trigger isRobotIntaking;
+  private final Trigger isRobotShooting;
+  private final Trigger manualArmOverrideTrigger;
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -85,6 +97,7 @@ public class RobotContainer {
     feeder = new Feeder();
     climber = new Climber();
 
+    
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -97,6 +110,19 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        leds = new Leds(new LedIOCANdle());
+
+        vision =
+            new Vision(
+                drive.robotPoseSupplier,
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(
+                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
+                new VisionIOPhotonVision(
+                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
+                new VisionIOPhotonVision(
+                    VisionConstants.RearModuleB,  VisionConstants.robotToRearModuleB));
+
         break;
 
       case SIM:
@@ -132,6 +158,11 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[1]),
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]));
+        leds = new Leds(new LedIOSim());
+
+        // PhotonVisionSim with 3 cameras exceeds 20ms loop budget; use noop for now
+        vision =
+            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
 
       default:
@@ -145,8 +176,19 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        leds = new Leds(new LedIO() {});
+
+        vision =
+            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
+
+
+    // Bind robot specific triggers, now that all subsystems have been created
+    isRobotShooting = new Trigger(feeder.isFeeding); // Fuel in the air!!
+    isRobotIntaking = new Trigger(intake.isIntaking); // Feed me seamore!
+    manualArmOverrideTrigger = new Trigger(arm.manualControlBooleanSupplier);
+
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -197,7 +239,7 @@ public class RobotContainer {
                 drive,
                 () -> -maverick.getLeftY(),
                 () -> -maverick.getLeftX(),
-                () -> Rotation2d.kZero));
+                vision.getHubRotation()));
 
     // Switch to X pattern when X button is pressed
     maverick.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -214,49 +256,126 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
 
+
+
     // ----- Operator Controls -------
     
-    arm.setDefaultCommand(
-        ArmCommands.openLoopControl(
-            arm,
-            leftBackGoose, // retract arm
-            rightBackGoose // extend arm
-    ));
-    
-    intake.setDefaultCommand(
-        IntakeCommands.openLoopControl(
-            intake,
-            aButtonGoose, // intake fuel
-            yButtonGoose // expel fuel
-    ));
+  
+    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, true),
+     (IntakeCommands.oneButtonControl(intake, true)))
+     .repeatedly()
+     
+     .unless(
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean() ; }
+         )
+
+     );
+
+         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
+     (IntakeCommands.oneButtonControl(intake, false)))
+     .repeatedly()
+     
+     .unless(  
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean()  ; }
+         )
+
+     );
+
+
+
+rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == false  //was true
+)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+
+));
+
+
+leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == false //was true
+)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+));
+
+
+
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
+)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+));
+
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.3)
+.unless(
+    () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
+)
+.finallyDo(
+   () -> {arm.holdPosition();} 
+));
+
+
+
+
+aButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, 0.9)
+.finallyDo(
+   () -> {intake.stopMotors();} 
+));
+yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
+.finallyDo(
+   () -> {intake.stopMotors();} 
+));
+
+
 
     feeder.setDefaultCommand(
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose,      // Reverse feed 
-            dpadLeftTriggerGoose,   // Decrease feed speed
-            dpadRightTriggerGoose   // Increase feed speed
+            bButtonGoose      // Reverse feed
+         //   dpadLeftTriggerGoose,   // Decrease feed speed
+           // dpadRightTriggerGoose   // Increase feed speed
           )
+    
     );
+    
 
+    // Shooter buttons
+    shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
 
-
-    // Calibration only, replace the default shooter command to use
-//    goose.start().whileTrue(ShooterCommands.feedforwardCharacterization(shooter));
- //   goose.start().whileFalse(ShooterCommands.stopMotors(shooter));
-
-    shooter.setDefaultCommand(
+    leftTriggerGoose.onTrue(
         ShooterCommands.buttonShoot(shooter,
-                                    leftTriggerGoose, // Run Shooter flywheel
+                                    vision.AutoFlywheelSpeed,
+                                    shooter.flywheelAutoToggleBooleanSupplier,
+                                    leftTriggerGoose,     // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
+    ).toggleOnFalse(
+        ShooterCommands.gentleStopFlywheel(shooter)
     );
-   
+
+
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose));
+                                           backButtonGoose, startButtonGoose, leds));
+
+    // Status
+    
+    isRobotIntaking.whileTrue(
+       Commands.run( () -> { 
+            leds.setMechanicalState(Leds.MechanicalState.INTAKING); }, leds).
+                finallyDo( () -> { leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
+
+    isRobotShooting.whileTrue(
+       Commands.run( () -> {
+            leds.setMechanicalState(Leds.MechanicalState.SHOOTING); }, leds).
+                finallyDo( () -> { leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
 
   }
 

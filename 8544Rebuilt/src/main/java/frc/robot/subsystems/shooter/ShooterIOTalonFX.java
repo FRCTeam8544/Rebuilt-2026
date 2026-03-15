@@ -11,6 +11,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkBase.Faults;
+
+import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.shooter.Shooter.Flywheel;
@@ -19,20 +23,23 @@ import frc.robot.subsystems.shooter.Shooter.Flywheel;
 
 public class ShooterIOTalonFX implements ShooterIO {
     
+    private MedianFilter rpmMedianFilter = new MedianFilter(5); // Sample window
+
     // Used to sycnronize control requests to the shooter motor paring
-    private static final int kMotorPairControlUpdateTimeSyncHz = 50;
+    private static final int kMotorPairControlUpdateTimeSyncHz = 100; //was 50
 
-    private static final int kStatorCurrentLimit = 50;
+    private static final int kStatorCurrentLimit = 120; //was 50
 
+    private final double boostFeedForwardInAmps = 0.00; // TODO tune this
     // TODO>>>..
     private static final double kMeasuredKv = 680.0 / 60.0; // at 2700ish then convert rps
-    private static final double kV = 0.89;
+    private static final double kV = 0.009; //was 0.89 0.018 0.06
     
-    private static final double kS = 1.74;
-    private static final double kD = 0.1;
-    private static final double kPNominal = 10.0 / 32.1; // 32.1 is target rps of motor
-    private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
-    private static final double kP = kPNominal + kAdjust;
+    private static final double kS = 1.8; // was 1.74
+    private static final double kD = 0.1; //was .1
+    private static final double kPNominal = 10.0 / 56.67; // 32.1 is target rps of motor
+  //  private static final double kAdjust = 1.9; // 1.9... 2.2 too hot
+    private static final double kP = 18.00;//kPNominal; //+ kAdjust; //was .08
     // Raw voltage to RPM
     // 
 
@@ -41,6 +48,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX followTalon;
     private final TalonFXConfiguration followConfig;
 
+    private InterpolatingDoubleTreeMap feedForwardRpmMapping = new InterpolatingDoubleTreeMap();
     private double currentFeedForward = 0.0;
 
     // Leader Control requests
@@ -59,9 +67,9 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Needs motor config time request or something? TODO
     velocityTorqueRequest = new VelocityTorqueCurrentFOC(0.0)
       .withVelocity(0.0)
-      .withSlot(0);
-   //   .withUseTimesync(true)  // Use this with request updateFreq 0 hz
-   //   .withUpdateFreqHz(0); // MotorConfig must have set freq rate to use this.
+      .withSlot(0)
+      .withUseTimesync(true)  // Use this with request updateFreq 0 hz
+      .withUpdateFreqHz(0); // MotorConfig must have set freq rate to use this.
 
     // Use aligned follow request because the follower motor config is inverted already.
     // Even though motor config is already inverted, use the Opposed alignment config to
@@ -84,7 +92,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       .withMotorOutput(
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                                  .withInverted(InvertedValue.CounterClockwise_Positive)
-                              //   .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
+                                 .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
 
     // Closed loop settings for velocity control
@@ -106,10 +114,22 @@ public class ShooterIOTalonFX implements ShooterIO {
       .withMotorOutput(
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                                 .withInverted(InvertedValue.Clockwise_Positive)
-                             //   .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
+                                .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
     followTalon.getConfigurator().apply(followConfig); // Apply follow config
 
+    buildRpmMapping();
+  }
+
+  // Build custom feedforward mapping to account for non-linear kV due to mechanism shake
+  private void buildRpmMapping() {
+
+    feedForwardRpmMapping.put(0.0, 0.0);
+    feedForwardRpmMapping.put(1800.0, 0.0);
+    feedForwardRpmMapping.put(1900.0, boostFeedForwardInAmps);
+    feedForwardRpmMapping.put(2300.0, boostFeedForwardInAmps);
+    feedForwardRpmMapping.put(2400.0, 0.0);
+    feedForwardRpmMapping.put(Constants.KrakenX60.freeSpeedRPM, 0.0);
   }
 
   // Update shooter motor inputs
@@ -123,6 +143,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.followMotorTemperature = (float) followTalon.getDeviceTemp().getValueAsDouble();
     inOutData.maxFlywheelSpeedHit = inOutData.flywheelVelocity > Flywheel.kMaxShooterRPM;
     
+    inOutData.flywheelMeidanVelocity = rpmMedianFilter.calculate(inOutData.flywheelVelocity);
+
     // Fault codes
     inOutData.faultSupplyUnderVoltage = leaderTalon.getFault_Undervoltage().getValue() || followTalon.getFault_Undervoltage().getValue();
     inOutData.faultBridgeBrownout = leaderTalon.getFault_BridgeBrownout().getValue() || followTalon.getFault_BridgeBrownout().getValue();
@@ -138,20 +160,28 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.outputDuty = (float) leaderTalon.getDutyCycle().getValueAsDouble(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) leaderTalon.getTorqueCurrent().getValueAsDouble();
     inOutData.outputVoltage = (float) leaderTalon.getMotorVoltage().getValueAsDouble();
+    inOutData.outputPower = (float) leaderTalon.getMotorVoltage().getValueAsDouble() * leaderTalon.getTorqueCurrent().getValueAsDouble();
 
     inOutData.feedForward = currentFeedForward;
   }
 
-  // Set shooter target motor velocity in RPM, using closed loop current control.
+  // Set shooter target velocity in RPM, using closed loop with feedforward.
   @Override
   public void setVelocity(double rpm) {
 
-    // Todo add arbitrary feedforward to smooth out the loop?
-
-    // Request is already in motor velocity rpm, not flywheel.
-    double adjustedRpm = rpm;
-      
+    // The request is relative to the desired flywheel output rpm.
+    double adjustedRpm = rpm;// OOOPSS!!! double convert Flywheel.kOutputToDriveGearRatio * rpm;
+    /*
+    Raw feed forward style
+    final double flywheelFeedForward = 1.0 / kMeasuredKv; // Measured kV 590 of flywheel
+    final double scaledFeedForward = flywheelFeedForward * rpm + kS;
+    currentFeedForward = scaledFeedForward;
+    closedLoop.setSetpoint(rpm, ControlType.kVelocity,ClosedLoopSlot.kSlot0, currentFeedForward);*/
+    
     velocityTorqueRequest.Velocity = adjustedRpm / 60.0; // CTR uses revolutions per second
+
+    currentFeedForward = feedForwardRpmMapping.get(velocityTorqueRequest.Velocity);
+    velocityTorqueRequest.FeedForward = currentFeedForward;
 
     // Control requests must be sent in pairs to control the leader and follower together.
     leaderTalon.setControl(velocityTorqueRequest);
