@@ -171,8 +171,12 @@ public class RobotContainer {
   {
     // Register commands for Pathplanner
     NamedCommands.registerCommand("AutoRpmShootFuel", new ShootFuelCommand(shooter,feeder,vision.AutoFlywheelSpeed));
-    NamedCommands.registerCommand("FixedRpmCloseShootFuel", new ShootFuelCommand(shooter,feeder, 3000));
+    NamedCommands.registerCommand("CloseShootFuel", new ShootFuelCommand(shooter,feeder, 3000));
+    NamedCommands.registerCommand("IntakeFuel", IntakeCommands.intakeFuel(intake));
+    NamedCommands.registerCommand("DeployHopper", ArmCommands.deployHopper(arm));
+    NamedCommands.registerCommand("RetractHopper", ArmCommands.retractHopper(arm));
 
+    // Add auto routines to the chooser TODO!!
     //autoChooser.addOption(
     //    "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
 
