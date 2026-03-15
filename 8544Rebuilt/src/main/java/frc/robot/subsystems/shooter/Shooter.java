@@ -71,9 +71,9 @@ public class Shooter extends SubsystemBase{
   };
 
    // Shooter
-    public Shooter()
+    public Shooter(ShooterIO shooterIO)
     {
-      this.shooterIO = new ShooterIOTalonFX(leftMotorCanID, rightMotorCanID);
+      this.shooterIO = shooterIO;
 
       setupDefaultDashboard();
     }

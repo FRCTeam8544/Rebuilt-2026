@@ -38,6 +38,10 @@ public interface IntakeIO {
 
     public double positionSetPoint = 0.0; // Position in rotations
     public double voltageSetPoint = 0.0; // Motor voltage, usually not directly controlled
+
+    // Game piece state (populated by sim, default 0/false for real hardware)
+    public int fuelCount = 0;
+    public boolean hasFuel = false;
   }
 
   public default void updateInputs(IntakeIOInputs inOutData) {}

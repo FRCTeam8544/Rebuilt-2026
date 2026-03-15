@@ -58,7 +58,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Follower motor must always use the follow request otherwise hardware will break!!!
     private Follower followRequest;
 
-  ShooterIOTalonFX(int leaderCanId, int followCanId) {
+  public ShooterIOTalonFX(int leaderCanId, int followCanId) {
     
     // Setup common control request objects that will be reused for each loop iteration.
 

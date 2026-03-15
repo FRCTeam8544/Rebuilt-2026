@@ -40,6 +40,9 @@ import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -350,6 +353,29 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return getMaxLinearSpeedMetersPerSec() / DRIVE_BASE_RADIUS;
+  }
+
+  // Maple-sim requires higher steer inertia than TunerConstants default (0.01) to avoid
+  // simulation instability (NaN/zero Rotation2d from excessive steer velocity). See maple-sim #86.
+  private static final double SIM_STEER_INERTIA_KG_M2 = 0.05;
+
+  /** Returns the maple-sim drivetrain simulation configuration. */
+  public static DriveTrainSimulationConfig getMapleSimConfig() {
+    return DriveTrainSimulationConfig.Default()
+        .withRobotMass(Kilograms.of(ROBOT_MASS_KG))
+        .withCustomModuleTranslations(getModuleTranslations())
+        .withGyro(COTS.ofPigeon2())
+        .withSwerveModule(
+            new SwerveModuleSimulationConfig(
+                DCMotor.getKrakenX60Foc(1),
+                DCMotor.getKrakenX60Foc(1),
+                TunerConstants.FrontLeft.DriveMotorGearRatio,
+                TunerConstants.FrontLeft.SteerMotorGearRatio,
+                Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
+                Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
+                Meters.of(TunerConstants.FrontLeft.WheelRadius),
+                KilogramSquareMeters.of(SIM_STEER_INERTIA_KG_M2),
+                WHEEL_COF));
   }
 
   /** Returns an array of module translations. */
