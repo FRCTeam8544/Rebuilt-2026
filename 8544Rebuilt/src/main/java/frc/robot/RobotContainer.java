@@ -154,8 +154,14 @@ public class RobotContainer {
     manualArmOverrideTrigger = new Trigger(arm.manualControlBooleanSupplier);
 
 
+    // Register all NamedCommands BEFORE building auto chooser
+    AutoCommands.registerNamedCommands(arm, intake, shooter, feeder);
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // Code-only test auto for verifying path following
+    autoChooser.addOption("Simple Test Auto (Drive Forward 2m)", AutoCommands.simpleTestAuto());
 
     // Set up SysId routines
     autoChooser.addOption(
