@@ -8,6 +8,8 @@ public interface ArmIO {
   // Encoder arm limits in rotations
   public static final double kArmForwardLimit = 0.78;
   public static final double kArmReverseLimit = 0.03;
+  public static final double kNominalDeployPosition = kArmForwardLimit;
+  public static final double kNominalStowPosition = 0.037;
 
   public static final double kMotorToOutputRatio = 3.0;
   public static final double kOutputToMotorRatio = 1.0 / kMotorToOutputRatio;
@@ -33,7 +35,6 @@ public interface ArmIO {
     public boolean faultFirmware;
 
     // Outputs
-    public float voltageLimit = 0.0f;
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
     public float outputCurrent = 0;

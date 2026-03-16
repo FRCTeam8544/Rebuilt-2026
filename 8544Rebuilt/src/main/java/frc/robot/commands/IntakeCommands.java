@@ -19,14 +19,13 @@ public class IntakeCommands {
         intake);
   }
 
-public static Command runAtDuty(Intake intake, double intakeDuty) {
-return Commands.run(
-  () -> {
-    intake.runOpenLoop(intakeDuty);
+  public static Command runAtDuty(Intake intake, double intakeDuty) {
+    return Commands.run(
+      () -> {
+        intake.runOpenLoop(intakeDuty);
+      },
+      intake).withName("runAtDuty");
   }
-);
-
-}
 
   public static Command openLoopControl(
     Intake intake,
@@ -51,11 +50,19 @@ return Commands.run(
           }
 
         },
-        intake);
+        intake).withName("openLoopControl");
       }
 
+  public static Command intakeFuel(Intake intake) {
+    final double intakeFeedDuty = 0.9;
+    return Commands.run(
+      () -> {
+        intake.runOpenLoop(intakeFeedDuty);
+      },
+      intake).withName("intakeFuel");
+  }
 
-  public static Command closedPositionControl(
+  public static Command closeLoopControl(
       Intake intake,
       Trigger intakeTrigger,
       Trigger expelTrigger) {
@@ -77,35 +84,27 @@ return Commands.run(
           }
 
         },
-        intake);
+        intake).withName("closeLoopControl");
   }
 
-
-    public static Command oneButtonControl(
-      Intake intake,
-      Boolean onebuttonTrigger
-      
-      ) {
+  public static Command oneButtonControl(
+    Intake intake,
+    Boolean onebuttonTrigger
+    ) {
     return Commands.run(
-        () -> {
+      () -> {
 
-          final double intakeFeedDuty = 0.9;
-          boolean oneButtonPressed = onebuttonTrigger;
+        final double intakeFeedDuty = 0.9;
+        boolean oneButtonPressed = onebuttonTrigger;
 
-            if (oneButtonPressed) {
-              intake.runOpenLoop(intakeFeedDuty);
-            } else {
-              intake.stopMotors();
-            }
-          
-        //  else {
-          //  intake.stopMotors();
-          //}
-
-        },
-        intake);
+        if (oneButtonPressed) {
+          intake.runOpenLoop(intakeFeedDuty);
+        } else {
+          intake.stopMotors();
+        }
+      },
+      intake).withName("oneButtonControl");
   }
-
 
 }
 

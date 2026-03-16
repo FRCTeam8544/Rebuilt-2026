@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -13,9 +12,11 @@ import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase{
 
+    final public String AutoShootRPMToggleKeyName = "AutoShootRPMToggle";
+
     // Limit chonker flywheel.. so limit to be safe for now
     public static final class Flywheel {
-      public static final double kMaxShooterRPM = 4000; // Output flywheel, not motor
+      public static final double kMaxShooterRPM = 3700; // Output flywheel, not motor
       public static final double kDriveToOutputGearRatio = 1.4;
       public static final double kOutputToDriveGearRatio = 1.0 / kDriveToOutputGearRatio;
     }
@@ -32,16 +33,18 @@ public class Shooter extends SubsystemBase{
 
    private double tuneShootRpmAdjust = 0.0;
 
-   private double rpmAtSpeedTolerance = 50;
+   private double rpmAtSpeedToleranceUpper = 100;
+   private double rpmAtSpeedToleranceLower = 200;
 
    // ---- Suppliers / Triggers ----
 
    public BooleanSupplier flywheelAtRpmTarget =
    () -> {
      if (shooterInputs.flywheelVelocitySetPoint > 0) {
-      return MathUtil.isNear(shooterInputs.flywheelVelocitySetPoint,
-                             shooterInputs.flywheelMeidanVelocity,
-                             rpmAtSpeedTolerance);
+      double setPoint = shooterInputs.flywheelVelocitySetPoint;
+      double medianVelocity = shooterInputs.flywheelMeidanVelocity;
+      return ( medianVelocity <= setPoint + rpmAtSpeedToleranceUpper ) &&
+             ( medianVelocity >= setPoint - rpmAtSpeedToleranceLower );
      }
      else {
       return false;
@@ -63,12 +66,10 @@ public class Shooter extends SubsystemBase{
       return Math.max(shooterInputs.leaderMotorTemperature, shooterInputs.followMotorTemperature);
     };
 
-
   public BooleanSupplier flywheelAutoToggleBooleanSupplier =
-  () -> {
-    return shooterInputs.flywheelAutoRPMToggle;
-
-  };
+    () -> {
+      return shooterInputs.flywheelAutoRPMToggle;
+    };
 
    // Shooter
     public Shooter(ShooterIO shooterIO)
@@ -139,8 +140,6 @@ public class Shooter extends SubsystemBase{
     }
 
     public void stopMotors() {
-     
-// TODO Add gentle break? or use seperate command?
       shooterInputs.voltageSetPoint = 0.0;
       shooterInputs.flywheelVelocitySetPoint = 0;
       shooterIO.setVoltage(0.0);
@@ -181,7 +180,7 @@ public class Shooter extends SubsystemBase{
   public boolean isFlywheelOverspeed() {
 
       // Safety limit RPM
-      if (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM) {
+      if (shooterInputs.flywheelVelocity > Flywheel.kMaxShooterRPM + 300) {
         shooterInputs.maxFlywheelSpeedHit = true;
       }
       // After overspeed event, only allow use when flywheel is well below max speed to avoid pulsing the wheel
@@ -207,13 +206,13 @@ public class Shooter extends SubsystemBase{
     SmartDashboard.putNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
 
     shooterInputs.flywheelAutoRPMToggle = 
-         SmartDashboard.getBoolean("AutoShootRPMToggle", shooterInputs.flywheelAutoRPMToggle);
+         SmartDashboard.getBoolean(AutoShootRPMToggleKeyName, shooterInputs.flywheelAutoRPMToggle);
   }
 
   private void setupDefaultDashboard()
   {
     // Dashboard user settings
-    SmartDashboard.setDefaultBoolean("AutoShootRPMToggle", shooterInputs.flywheelAutoRPMToggle);
+    SmartDashboard.setDefaultBoolean(AutoShootRPMToggleKeyName, shooterInputs.flywheelAutoRPMToggle);
 
     // Dashboard display
     SmartDashboard.setDefaultNumber("Shooter RPM", shooterInputs.flywheelVelocity);

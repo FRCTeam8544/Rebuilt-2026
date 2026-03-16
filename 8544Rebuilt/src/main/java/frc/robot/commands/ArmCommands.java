@@ -9,31 +9,6 @@ public class ArmCommands {
 
   private ArmCommands() {}
 
-  public static Command openLoopLimitedVoltage(
-    Arm arm,
-    Trigger armInTrigger,
-    Trigger armOutTrigger) {
-      return Commands.run(
-        () -> {
-          final double armExtendDuty = -0.5;
-          final double armRetractDuty = 0.5;
-          boolean extendPressed = armOutTrigger.getAsBoolean();
-          boolean retractPressed = armInTrigger.getAsBoolean();
-          // If and only if one button is pressed at a time
-          if (retractPressed ^ extendPressed) {
-            if (extendPressed) {
-              arm.runOpenLoopLimited(armExtendDuty); // Set Extend Position
-            } else {
-              arm.runOpenLoopLimited(armRetractDuty); // Set Retract Position
-            }
-          }
-          else { 
-            arm.stopOpenLoop();
-          }
-        },
-        arm );
-    }
-
   public static Command openLoopControl(
     Arm arm,
     Trigger armInTrigger,
@@ -58,35 +33,33 @@ public class ArmCommands {
           }
 
         },
-        arm);
+        arm).withName("openLoopControl");
   }
 
   public static Command stopMotors(Arm arm) {
     return Commands.run(
-        () -> {
-          arm.stopMotors();
-        },
-        arm);
+      () -> {
+        arm.stopMotors();
+      },
+      arm).withName("stopMotors");
   }
 
-public static Command runToPosition( Arm arm, double armPosition) {
-return Commands.run (
-() -> {
-  arm.runToPosition(armPosition);
-});
-}
+  public static Command runToPosition( Arm arm, double armPosition) {
+    return Commands.run (
+      () -> {
+        arm.runToPosition(armPosition);
+      },
+      arm).withName("runToPosition");
+  }
 
-public static Command runToVoltage( Arm arm, double armVoltage) {
-return Commands.run (
-() -> {
+  public static Command runToVoltage( Arm arm, double armVoltage) {
+    return Commands.run (
+      () -> {
+        arm.runOpenLoop(armVoltage);
+      },
+      arm).withName("runToVoltage");
+  }
 
-  arm.runOpenLoop(armVoltage);
-}
-
-);
-
-
-}
   public static Command closedPositionControl(
       Arm arm,
       Trigger extendTrigger,
@@ -112,11 +85,10 @@ return Commands.run (
           }
 
           },
-          arm);
+          arm).withName("closedPositionControl");
   }
 
-
-    public static Command oneButtonControl(
+  public static Command oneButtonControl(
       Arm arm,
       Boolean onebuttonTrigger
       ) {
@@ -124,24 +96,44 @@ return Commands.run (
         () -> {
           boolean oneButton = onebuttonTrigger;
 
-          final double extendPosition = 0.78; // 0.8;
-          final double retractPosition = 0.037; //0.2;
+          final double extendPosition = 0.78;
+          final double retractPosition = 0.037;
 
-       
             if (oneButton) {
               arm.runToPosition(extendPosition); // Set Extend Position
             } else {
               arm.runToPosition(retractPosition); // Set Retract Position
             }
-       //   } else { 
-         //   arm.holdPosition();
-        
-        
-          
-
       },
-          arm);
+      arm).withName("oneButtonControl");
   }
+  
+  public static Command deployHopper( Arm arm ) {
+
+    final double extendPosition = ArmIO.kNominalDeployPosition;
+    double deployTimelimit = 2; // seconds
+    return Commands.run(
+    () -> {
+      arm.runToPosition(extendPosition);
+    },
+    arm).withName("deployHopper")
+        .until(arm.armDeployedSupplier)
+        .withTimeout(deployTimelimit);
+  }
+
+  public static Command retractHopper( Arm arm ) {
+    final double retractPosition = ArmIO.kNominalStowPosition;
+    final double retractTimeLimit = 3.0;
+    return Commands.run(
+      () -> {
+        arm.runToPosition(retractPosition);
+      },
+      arm).withName("retractHopper")
+          .until(arm.armRetractedSupplier)
+          .withTimeout(retractTimeLimit);
+  }
+
+
 }
 
 

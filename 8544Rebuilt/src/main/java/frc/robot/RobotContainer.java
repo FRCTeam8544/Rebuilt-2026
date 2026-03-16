@@ -1,9 +1,10 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -85,6 +86,8 @@ public class RobotContainer {
 
   private final Trigger isRobotIntaking;
   private final Trigger isRobotShooting;
+  private final Trigger isRobotClimbing;
+
   private final Trigger manualArmOverrideTrigger;
 
   // Dashboard inputs
@@ -187,12 +190,36 @@ public class RobotContainer {
     // Bind robot specific triggers, now that all subsystems have been created
     isRobotShooting = new Trigger(feeder.isFeeding); // Fuel in the air!!
     isRobotIntaking = new Trigger(intake.isIntaking); // Feed me seamore!
+    isRobotClimbing = new Trigger(climber.isClimbing); // Going up!
+
+    // User configuration triggers
     manualArmOverrideTrigger = new Trigger(arm.manualControlBooleanSupplier);
 
-
-    // Set up auto routines
+    // Register commands for auto and built auto chooser
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    setupForAuto();
 
+    // Configure the button bindings
+    configureButtonBindings();
+  }
+
+  private void setupForAuto()
+  {
+    // Register commands for Pathplanner
+    NamedCommands.registerCommand("AutoRpmShootFuel", new ShootFuelCommand(shooter,feeder,vision.AutoFlywheelSpeed));
+    NamedCommands.registerCommand("CloseShootFuel", new ShootFuelCommand(shooter,feeder, 3000));
+    NamedCommands.registerCommand("IntakeFuel", IntakeCommands.intakeFuel(intake));
+    NamedCommands.registerCommand("DeployHopper", ArmCommands.deployHopper(arm));
+    NamedCommands.registerCommand("RetractHopper", ArmCommands.retractHopper(arm));
+
+    // Add auto routines to the chooser TODO!!
+    //autoChooser.addOption(
+    //    "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+
+  }
+
+  private void setupCharacterizationAutos()
+  {
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -209,8 +236,6 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    // Configure the button bindings
-    configureButtonBindings();
   }
 
   /**
@@ -363,7 +388,7 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
 
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose, leds));
+                                           backButtonGoose, startButtonGoose));
 
     // Status
     
@@ -375,6 +400,11 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
     isRobotShooting.whileTrue(
        Commands.run( () -> {
             leds.setMechanicalState(Leds.MechanicalState.SHOOTING); }, leds).
+                finallyDo( () -> { leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
+
+    isRobotClimbing.whileTrue(
+        Commands.run( () -> {
+            leds.setMechanicalState(Leds.MechanicalState.CLIMBING); }, leds).
                 finallyDo( () -> { leds.setMechanicalState(Leds.MechanicalState.NONE); } ) );
 
   }

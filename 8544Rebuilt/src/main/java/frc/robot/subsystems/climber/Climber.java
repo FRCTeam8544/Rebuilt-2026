@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climber;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -20,7 +21,11 @@ public class Climber extends SubsystemBase {
   private final double minPositionLimit = 0;   // Rotations
   private final double maxPositionLimit = 0.5; // Rotations
 
-  
+  public BooleanSupplier isClimbing =
+    () -> {
+      return climberInputs.velocity > 1.0;
+    };
+
   public DoubleSupplier outputVoltageSupplier = 
     () -> {
       return climberInputs.outputVoltage;
