@@ -163,6 +163,7 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[3]));
         leds = new Leds(new LedIOSim());
 
+        // PhotonVisionSim with 3 cameras exceeds 20ms loop budget; use noop for now
         vision =
             new Vision(
                 drive.robotPoseSupplier,
@@ -381,6 +382,8 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
     ).toggleOnFalse(
         ShooterCommands.gentleStopFlywheel(shooter)
     );
+
+
 
     climber.setDefaultCommand(
         ClimberCommands.openVoltageControl(climber,
