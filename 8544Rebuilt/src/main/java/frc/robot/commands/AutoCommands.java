@@ -43,10 +43,8 @@ public class AutoCommands {
   public static void registerNamedCommands(
       Arm arm, Intake intake, Shooter shooter, Feeder feeder, DoubleSupplier autoFlywheelSpeed) {
     // Shooting commands (spin up + feed + terminate)
-    NamedCommands.registerCommand(
-        "AutoRpmShootFuel", new ShootFuelCommand(shooter, feeder, autoFlywheelSpeed));
-    NamedCommands.registerCommand(
-        "CloseShootFuel", new ShootFuelCommand(shooter, feeder, CLOSE_SHOOT_RPM));
+    NamedCommands.registerCommand("AutoRpmShootFuel", new ShootFuelCommand(shooter, feeder, autoFlywheelSpeed));
+    NamedCommands.registerCommand("CloseShootFuel", new ShootFuelCommand(shooter, feeder, CLOSE_SHOOT_RPM));
 
     // Intake command (terminates via timeout)
     NamedCommands.registerCommand("IntakeFuel", IntakeCommands.intakeFuel(intake));

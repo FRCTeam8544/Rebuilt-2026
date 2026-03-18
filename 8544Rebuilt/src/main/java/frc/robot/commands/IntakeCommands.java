@@ -55,14 +55,11 @@ public class IntakeCommands {
 
   public static Command intakeFuel(Intake intake) {
     final double intakeFeedDuty = 0.9;
-    final double intakeTimeoutSeconds = 3.0;
     return Commands.run(
       () -> {
         intake.runOpenLoop(intakeFeedDuty);
       },
-      intake).withTimeout(intakeTimeoutSeconds)
-        .finallyDo(() -> intake.stopMotors())
-        .withName("intakeFuel");
+      intake).withName("intakeFuel");
   }
 
   public static Command closeLoopControl(

@@ -165,15 +165,7 @@ public class RobotContainer {
 
         // PhotonVisionSim with 3 cameras exceeds 20ms loop budget; use noop for now
         vision =
-            new Vision(
-                drive.robotPoseSupplier,
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB, drive::getPose));
+            new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
         break;
 
       default:

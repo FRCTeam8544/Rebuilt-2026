@@ -3,28 +3,20 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.Feeder.Feeder;
 
 
-/**
- * Spins up the shooter to a target RPM, then feeds fuel once at speed. Terminates after the feeder
- * has run for {@link #FEED_DURATION_SECONDS} once the flywheel reaches its RPM target.
- */
+/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootFuelCommand extends Command {
 
-  private static final double FEED_DURATION_SECONDS = 1.0;
   private final int feederRpmCmd = 300;
 
   private Shooter shooter;
   private Feeder feeder;
   private DoubleSupplier rpmTargetSupplier;
   private BooleanSupplier atRpmBooleanSupplier;
-
-  private boolean fuelFired = false;
-  private double feedStartTimestamp = 0.0;
 
 
   public ShootFuelCommand(Shooter shooter, Feeder feeder,
@@ -52,37 +44,35 @@ public class ShootFuelCommand extends Command {
     setName("ShootingFuelAdjustedRpm");
   }
 
+  // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    fuelFired = false;
-    feedStartTimestamp = 0.0;
-  }
+  public void initialize() {}
 
+  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     shooter.runAtRpm(rpmTargetSupplier.getAsDouble());
-
-    if (atRpmBooleanSupplier.getAsBoolean()) {
-      if (feedStartTimestamp == 0.0) {
-        feedStartTimestamp = Timer.getFPGATimestamp();
-      }
-      feeder.runAtRpm(feederRpmCmd);
-      if (Timer.getFPGATimestamp() - feedStartTimestamp >= FEED_DURATION_SECONDS) {
-        fuelFired = true;
-      }
-    } else {
-      feeder.stopMotors();
+    
+    if (atRpmBooleanSupplier.getAsBoolean())
+    {
+        feeder.runAtRpm(feederRpmCmd);
+    }
+    else
+    {
+        feeder.stopMotors();
     }
   }
 
+  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooter.stopMotors();
-    feeder.stopMotors();
+     shooter.stopMotors();
+     feeder.stopMotors();
   }
 
+  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return fuelFired;
+    return false;
   }
 }
