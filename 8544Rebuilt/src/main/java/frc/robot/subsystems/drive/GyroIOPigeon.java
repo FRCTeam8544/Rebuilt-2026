@@ -22,8 +22,6 @@ public class GyroIOPigeon implements GyroIO {
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = pigeon2.isConnected();
     inputs.yawPosition = pigeon2.getRotation2d();
-    //  Rotation2d.fromDegrees(
-    // pigeon2.getYaw().getValueAsDouble()); // may need to be inverted (line below too)
 
     inputs.yawVelocityRadPerSec =
         Units.degreesToRadians(pigeon2.getAngularVelocityZWorld().getValueAsDouble());
