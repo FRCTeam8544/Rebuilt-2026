@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CenterStart_Outpost_1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "pathName": "Right_HalfMidField_1"
           }
         },
         {
@@ -21,15 +15,34 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "path",
                 "data": {
-                  "waitTime": 5.0
+                  "pathName": "Right_HalfMidField_2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoRpmShootFuel"
+                  "name": "DeployHopper"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeFuel"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Right_HalfMidField_3"
                 }
               }
             ]
@@ -42,13 +55,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CenterStart_Outpost_2"
+                  "pathName": "Right_HalfMidField_4"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "DeployHopper"
+                  "name": "stopIntake"
                 }
               }
             ]
@@ -59,15 +72,15 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "path",
                 "data": {
-                  "waitTime": 3.0
+                  "pathName": "Right_HalfMidField_5"
                 }
               },
               {
-                "type": "path",
+                "type": "wait",
                 "data": {
-                  "pathName": "CenterStart_Outpost_3"
+                  "waitTime": 0.5
                 }
               }
             ]
