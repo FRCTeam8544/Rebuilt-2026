@@ -6,10 +6,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO {
   
   // Encoder arm limits in rotations
-  public static final double kArmForwardLimit = 0.78;
-  public static final double kArmReverseLimit = 0.03;
+  public static final double kArmForwardLimit = 0.74;
+  public static final double kArmReverseLimit = 0.016;
   public static final double kNominalDeployPosition = kArmForwardLimit;
-  public static final double kNominalStowPosition = 0.037;
+  public static final double kNominalStowPosition = 0.021;
 
   public static final double kMotorToOutputRatio = 3.0;
   public static final double kOutputToMotorRatio = 1.0 / kMotorToOutputRatio;
