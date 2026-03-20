@@ -318,7 +318,7 @@ leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 
 
 
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.8)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -326,7 +326,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.3)
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.8)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
