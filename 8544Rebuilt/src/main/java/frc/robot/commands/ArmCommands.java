@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -92,17 +93,28 @@ public class ArmCommands {
       Arm arm,
       Boolean onebuttonTrigger
       ) {
-    return Commands.run(
+        Timer timer = new Timer();
+        return Commands.startRun(
+() -> {
+
+timer.reset();
+
+
+}
+
+      
+    ,
         () -> {
           boolean oneButton = onebuttonTrigger;
 
           final double extendPosition = 0.78;
           final double retractPosition = 0.037;
-
+if (timer.get()<0.5) {
             if (oneButton) {
-              arm.runToPosition(extendPosition); // Set Extend Position
+              arm.runOpenLoop(0.3); // Set Extend Position // arm.runToPosition(extendPosition);
             } else {
-              arm.runToPosition(retractPosition); // Set Retract Position
+              arm.runOpenLoop(-0.3); // Set Retract Position
+            }
             }
       },
       arm).withName("oneButtonControl");

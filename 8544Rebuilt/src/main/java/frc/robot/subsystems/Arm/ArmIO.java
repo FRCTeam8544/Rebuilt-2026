@@ -19,7 +19,7 @@ public interface ArmIO {
     // Inputs
     public boolean connected = false;
     public boolean motorBrakeEnabled = false;
-    public boolean manualControlEnabled = false;
+    public boolean manualControlEnabled = true; //Closed Loop not working
 
     public double velocity = 0.0f;
     public double position = 0.0f;

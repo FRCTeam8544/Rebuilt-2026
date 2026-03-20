@@ -276,22 +276,22 @@ public class RobotContainer {
     // ----- Operator Controls -------
     
   
-    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, true),
+    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, true),
      (IntakeCommands.oneButtonControl(intake, true)))
-     .repeatedly()
+     //.repeatedly()
      
      .unless(
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean() ; }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); } //|| manualArmOverrideTrigger.getAsBoolean() ;
          )
 
      );
 
-         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
+         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, false),
      (IntakeCommands.oneButtonControl(intake, false)))
-     .repeatedly()
+     //.repeatedly()
      
      .unless(  
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean()  ; }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
          )
 
      );
