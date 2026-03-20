@@ -120,7 +120,7 @@ public class RobotContainer {
                 drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
+                    VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
                     VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
                 new VisionIOPhotonVision(
@@ -276,22 +276,22 @@ public class RobotContainer {
     // ----- Operator Controls -------
     
   
-    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, true),
+    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, true),
      (IntakeCommands.oneButtonControl(intake, true)))
-     .repeatedly()
+     //.repeatedly()
      
      .unless(
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean() ; }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); } //|| manualArmOverrideTrigger.getAsBoolean() ;
          )
 
      );
 
-         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
+         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, false),
      (IntakeCommands.oneButtonControl(intake, false)))
-     .repeatedly()
+     //.repeatedly()
      
      .unless(  
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean()  ; }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
          )
 
      );
@@ -318,7 +318,7 @@ leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 
 
 
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.8)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -326,7 +326,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.3)
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.8)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )

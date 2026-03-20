@@ -53,10 +53,10 @@ public class ArmIOMax implements ArmIO {
   //  armMotorConfig.encoder.velocityConversionFactor(3);
 
     // Limits
-    armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
-    armMotorConfig.softLimit.forwardSoftLimit(kArmForwardLimit);
-    armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
-    armMotorConfig.softLimit.reverseSoftLimit(kArmReverseLimit);
+    //armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
+    //armMotorConfig.softLimit.forwardSoftLimit(kArmForwardLimit);
+    //armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+   // armMotorConfig.softLimit.reverseSoftLimit(kArmReverseLimit);
 
     // Signals
     armMotorConfig.signals.absoluteEncoderPositionAlwaysOn(true);
