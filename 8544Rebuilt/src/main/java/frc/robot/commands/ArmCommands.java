@@ -97,7 +97,7 @@ public class ArmCommands {
         return Commands.startRun(
 () -> {
 
-timer.reset();
+timer.restart();
 
 
 }
