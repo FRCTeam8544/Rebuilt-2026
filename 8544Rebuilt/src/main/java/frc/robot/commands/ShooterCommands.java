@@ -73,13 +73,17 @@ public class ShooterCommands {
     public static Command buttonShoot( Shooter shooter,
                                         DoubleSupplier rpmByDistanceSupplier,
                                         BooleanSupplier AutoToggleSupplier,
-                                       Trigger shootTrigger,
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp)
     {
-        return Commands.run(
+        final double maxRpmAdjustPerSecond = 1500;
+        SlewRateLimiter rpmAdjustLimiter = new SlewRateLimiter(maxRpmAdjustPerSecond);
+        
+        return Commands.startRun(
+        // Run once to reset the rate limiter when command starts
+        () -> { rpmAdjustLimiter.reset(0); },
+        // Run until interrupted
         () -> {
-
             final int rpmAdjustStep = 100 / 50;
              
             final double shooterNominalRpm = 3000;
@@ -92,6 +96,7 @@ public class ShooterCommands {
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
             boolean FlywheelAutoRPMLocal = AutoToggleSupplier.getAsBoolean();
 
+            // TODO this adjust logic really should just be inside of the command instead of shooter subsystem
             if (adjustUp ^ adjustDown)
             {
                 if (adjustUp) {
@@ -103,18 +108,19 @@ public class ShooterCommands {
                 }
             }
 
-            if (shootTrigger.getAsBoolean())
-            {
-               if(FlywheelAutoRPMLocal) { 
-                    shooter.runAtRpm(shooterRpmAuto);
-               }
-                else {
-                    shooter.runAtRpm(shooterNominalRpm);
-                }
+            double shooterRpmSetpoint = shooterNominalRpm;
+
+            if(FlywheelAutoRPMLocal) { 
+                shooterRpmSetpoint = shooterRpmAuto;
             }
-            else {
-                shooter.stopMotors();
-            }
+
+            // Use rpmAdjustLimiter to slow down massive swings in the RPM setpoints
+            // No longer commands full shooting RPM (3k!) immediately. The setpoint
+            // will increase over time until it gets to the desired RPM setpoint.
+            // However the limiter should never be set so tight that it limits the
+            // small, 100s of RPM, adjustments made for auto shoot.
+            shooter.runAtRpm(rpmAdjustLimiter.calculate(shooterRpmSetpoint));
+            
         },
         shooter).finallyDo( () -> { shooter.resetShooterDefaultRpm(); 
         }); // reset rpm setpoint of shooter

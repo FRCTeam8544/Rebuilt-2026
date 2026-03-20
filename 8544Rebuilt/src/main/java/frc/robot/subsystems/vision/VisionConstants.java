@@ -47,15 +47,16 @@ public class VisionConstants {
   // Gyro will be offset from this.
   public static Transform3d robotToDriverCam = // Top left Seat Camera
       new Transform3d(
-          Units.inchesToMeters(0),
-          Units.inchesToMeters(14.5),
-          Units.inchesToMeters(30),
+          Units.inchesToMeters(1.5),
+          Units.inchesToMeters(12.5),
+          Units.inchesToMeters(23.75),
           new Rotation3d(0.0, 0, 0));
+
   public static Transform3d robotToFrontAprilCam = // Top right Seat Camera
       new Transform3d(
-          Units.inchesToMeters(0),
-          Units.inchesToMeters(-14.5),
-          Units.inchesToMeters(28),
+          Units.inchesToMeters(0.5),
+          Units.inchesToMeters(-12.5),
+          Units.inchesToMeters(25.75),
           new Rotation3d(0.0, 0, 0));
   public static Transform3d robotToRearModuleA = // Rear Left
       new Transform3d(
