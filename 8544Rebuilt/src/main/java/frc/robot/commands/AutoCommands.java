@@ -12,8 +12,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Feeder.Feeder;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.commands.DriveCommands;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 /** Autonomous command factories and NamedCommand registration for PathPlanner. */
@@ -93,6 +98,22 @@ public class AutoCommands {
    */
   public static Command stopFeeder(Feeder feeder) {
     return Commands.runOnce(() -> feeder.stopMotors(), feeder).withName("AutoStopFeeder");
+  }
+
+  public static Command visonTurnToTarget(Drive drive, Vision vision)
+  {
+    double tolerance = 8.0;
+    return DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> { return 0.0; },
+                () -> { return 0.0; },
+                vision.getHubRotation()).until(
+                  () -> { Rotation2d robotRotation = drive.robotPoseSupplier.get().getRotation();
+                          Rotation2d hubRotation = vision.getHubRotation().get();
+                          double angleDiff = Math.abs(hubRotation.minus(robotRotation).getDegrees());
+                          return angleDiff < tolerance;
+                  }
+                );
   }
 
   /**
