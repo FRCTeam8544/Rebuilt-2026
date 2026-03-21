@@ -121,28 +121,21 @@ if (timer.get()<0.5) {
   }
   
   public static Command deployHopper( Arm arm ) {
-
-    final double extendPosition = ArmIO.kNominalDeployPosition;
-    double deployTimelimit = 2; // seconds
-    return Commands.run(
-    () -> {
-      arm.runOpenLoop(0.7);//(extendPosition);
-    },
-    arm).withName("deployHopper")
-        .until(arm.armDeployedSupplier)
-        .withTimeout(deployTimelimit);
+    double deployTimelimitSeconds = 2;
+    return Commands.runEnd(
+      () -> arm.runOpenLoop(0.7),
+      () -> arm.stopOpenLoop(),
+      arm).withName("deployHopper")
+          .withTimeout(deployTimelimitSeconds);
   }
 
   public static Command retractHopper( Arm arm ) {
-    final double retractPosition = ArmIO.kNominalStowPosition;
-    final double retractTimeLimit = 3.0;
-    return Commands.run(
-      () -> {
-        arm.runOpenLoop(-0.7);//(retractPosition);
-      },
+    final double retractTimeLimitSeconds = 3.0;
+    return Commands.runEnd(
+      () -> arm.runOpenLoop(-0.7),
+      () -> arm.stopOpenLoop(),
       arm).withName("retractHopper")
-          .until(arm.armRetractedSupplier)
-          .withTimeout(retractTimeLimit);
+          .withTimeout(retractTimeLimitSeconds);
   }
 
 
