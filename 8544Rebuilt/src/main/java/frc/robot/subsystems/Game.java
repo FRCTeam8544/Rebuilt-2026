@@ -1,128 +1,89 @@
 package frc.robot.subsystems;
 
 import java.util.Optional;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Subsystem for managing FRC REBUILT 2026 game state and Hub status.
+ */
 public class Game extends SubsystemBase {
 
-private static final String Blue = null;
-private static final String Red = null;
-
-public Game () {
-
-}
-
-
-private Alliance autoWinner() {
-String gameData = DriverStation.getGameSpecificMessage();
-if (!gameData.isEmpty());
-{
-  switch (gameData.charAt(0))
-  {
-    case 'B' :
-      //Alliance.Blue=autoWinner(); 
-      break;
-    case 'R' :
-     //Alliance.Red=autoWinner();
-      break;
-    default :
-      //This is corrupt data
-      break;
-  }
-
-
-}
-
-@Override
-public void periodic() {
-
-    SmartDashboard.putBoolean("Auto Enabled", DriverStation.isAutonomousEnabled());
-    SmartDashboard.putBoolean("Teleop Enabled", DriverStation.isTeleopEnabled());
-    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
-    
-    SmartDashboard.putString("Game Specific Message ", DriverStation.getGameSpecificMessage());
-    SmartDashboard.putBoolean("Hub Active", isHubActive());
-
-    SmartDashboard.putString("Auto winner", autoWinner());
-
+    public Game() {
+        // Elastic dashboard automatically picks up SmartDashboard keys.
     }
-  
-  //private void setupDefaultDashboard()
-  {
-    
-    //set the default setup of the dashboard 
-    
-    //SmartDashboard.setDefaultNumber("", shooterInputs.flywheelVelocity);
-    //SmartDashboard.setDefaultNumber("Shooter RPM", shooterInputs.motorVelocity);
-    //SmartDashboard.setDefaultNumber("Shooter RPM Setpoint", shooterInputs.velocitySetPoint);
-    //SmartDashboard.setDefaultNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
-    //SmartDashboard.setDefaultNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
-  }
-public boolean isHubActive() {
-  Optional<Alliance> alliance = DriverStation.getAlliance();
-  // If we have no alliance, we cannot be enabled, therefore no hub.
-  if (alliance.isEmpty()) {
-    return false;
-  }
-  // Hub is always enabled in autonomous.
-  if (DriverStation.isAutonomousEnabled()) {
-    return true;
-  }
-  // At this point, if we're not teleop enabled, there is no hub.
-  if (!DriverStation.isTeleopEnabled()) {
-    return false;
-  }
 
-  // We're teleop enabled, compute.
-  double matchTime = DriverStation.getMatchTime();
-  String gameData = DriverStation.getGameSpecificMessage();
-  // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
-  if (gameData.isEmpty()) {
-    return true;
-  }
-  boolean redInactiveFirst = false;
-  switch (gameData.charAt(0)) {
-    case 'R' -> redInactiveFirst = true;
-    case 'B' -> redInactiveFirst = false;
-    default -> {
-      // If we have invalid game data, assume hub is active.
-      return true;
+    /**
+     * Gets the color of the alliance whose Hub goes INACTIVE first.
+     * Per 2026 rules, this is the alliance that "won" or performed better in Auto.
+     */
+    private Optional<Alliance> getFirstInactiveAlliance() {
+        String gameData = DriverStation.getGameSpecificMessage();
+        if (gameData != null && !gameData.isEmpty()) {
+            switch (gameData.toUpperCase().charAt(0)) {
+                case 'R': return Optional.of(Alliance.Red);
+                case 'B': return Optional.of(Alliance.Blue);
+            }
+        }
+        return Optional.empty();
     }
-  }
 
-  // Shift was is active for blue if red won auto, or red if blue won auto.
-  boolean shift1Active = switch (alliance.get()) {
-    case Red -> !redInactiveFirst;
-    case Blue -> redInactiveFirst;
-  };
+    /**
+     * Determines if the current robot's alliance Hub is active.
+     */
+    public boolean isHubActive() {
+        Optional<Alliance> ourAlliance = DriverStation.getAlliance();
+        if (ourAlliance.isEmpty()) return false;
 
-  if (matchTime > 130) {
-    // Transition shift, hub is active.
-    return true;
-  } else if (matchTime > 105) {
-    // Shift 1
-    return shift1Active;
-  } else if (matchTime > 80) {
-    // Shift 2
-    return !shift1Active;
-  } else if (matchTime > 55) {
-    // Shift 3
-    return shift1Active;
-  } else if (matchTime > 30) {
-    // Shift 4
-    return !shift1Active;
-  } else {
-    // End game, hub always active.
-    return true;
-  }
+        // Both alliance hubs are active in Auto and Endgame
+        if (DriverStation.isAutonomous()) return true;
+        
+        double matchTime = DriverStation.getMatchTime();
+        if (matchTime <= 30) return true; // Endgame (last 30s)
+
+        // For the first 10s of Teleop (130s-140s remaining), both are active
+        if (matchTime > 130) return true;
+
+        Optional<Alliance> firstInactive = getFirstInactiveAlliance();
+        // If data isn't available yet, assume active to allow scoring
+        if (firstInactive.isEmpty()) return true;
+
+        // Shift logic: 25-second cycles
+        // Shift 1: 130-105s | Shift 2: 105-80s | Shift 3: 80-55s | Shift 4: 55-30s
+        boolean isFirstInactiveShift = (matchTime > 105 && matchTime <= 130) || (matchTime > 55 && matchTime <= 80);
+        
+        boolean weAreTheInactiveAlliance = ourAlliance.get() == firstInactive.get();
+
+        if (isFirstInactiveShift) {
+            return !weAreTheInactiveAlliance;
+        } else {
+            // It's the other shift (2 or 4), so our Hub is active if we were the inactive one in shift 1/3
+            return weAreTheInactiveAlliance;
+        }
+    }
+
+    @Override
+    public void periodic() {
+        boolean active = isHubActive();
+        double matchTime = DriverStation.getMatchTime();
+        
+        // Match state for Elastic Dashboard
+        SmartDashboard.putBoolean("Hub Active", active);
+        SmartDashboard.putString("Hub Status Label", active ? "HUB ACTIVE" : "HUB INACTIVE");
+        SmartDashboard.putNumber("Match Time", matchTime);
+
+        // Auto Winner Logic and Display
+        Optional<Alliance> winner = getFirstInactiveAlliance();
+        String winnerStr = winner.isPresent() ? winner.get().toString() : "Waiting for FMS...";
+        SmartDashboard.putString("Auto Winner (Inactive First)", winnerStr);
+
+        // Feedback for the drive team on remaining shift time
+        double shiftTimeRemaining = 0;
+        if (matchTime > 30 && matchTime <= 130) {
+            shiftTimeRemaining = (matchTime - 30) % 25;
+        }
+        SmartDashboard.putNumber("Current Shift Time Remaining", shiftTimeRemaining);
+    }
 }
-
-}
-}  
-
