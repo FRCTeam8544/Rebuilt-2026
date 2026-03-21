@@ -95,6 +95,25 @@ public class AutoCommands {
     return Commands.runOnce(() -> feeder.stopMotors(), feeder).withName("AutoStopFeeder");
   }
 
+  /*public static Command autoVisionAim(Drive drive, ) {
+
+    double angleTolerance = 8.0;
+
+    return Commands.run(null, null)
+    
+    // Lock to 0° when A button is held
+    maverick
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -maverick.getLeftY(),
+                () -> -maverick.getLeftX(),
+                vision.getHubRotation()));
+
+
+  }*/
+
   /**
    * Creates a simple test auto that drives forward 2 meters in a straight line. This is a code-only
    * auto for verifying PathPlanner path following works without requiring any .path or .auto files.

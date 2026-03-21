@@ -4,6 +4,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Feeder.*;
 
 import java.util.Vector;
+import java.util.function.DoubleSupplier;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -70,7 +72,9 @@ public class FeederCommands {
 
     public static Command buttonFeed( Feeder feeder,
                                        Trigger feedTrigger,
-                                       Trigger reversefeedTrigger
+                                       Trigger reversefeedTrigger,
+                                       BooleanSupplier rpmAtTargetSupplier,
+                                       BooleanSupplier rpmTargetToggleSupplier
                                        //Trigger feedAdjustDown,
                                        //Trigger feedAdjustUp
                                        )
@@ -100,8 +104,10 @@ public class FeederCommands {
                     currentRpmAdjust.add(newFeedRpm);
                 }
             } */ 
+if(rpmTargetToggleSupplier.getAsBoolean() == false) {
 
-            if (feedTrigger.getAsBoolean())
+
+            if (feedTrigger.getAsBoolean()  )
             {
                 double rpm = nominalRpm + currentRpmAdjust.firstElement().doubleValue();
                 if (reversefeedTrigger.getAsBoolean()) {
@@ -114,6 +120,22 @@ public class FeederCommands {
             else {
                 feeder.stopMotors();
             }
+    }
+
+
+         else {   if (feedTrigger.getAsBoolean() && rpmAtTargetSupplier.getAsBoolean()   )
+            {
+                double rpm = nominalRpm + currentRpmAdjust.firstElement().doubleValue();
+                if (reversefeedTrigger.getAsBoolean()) {
+                    feeder.runAtRpm(rpm * reverseRpmFactor);
+                }
+                else {
+                    feeder.runAtRpm(rpm);
+                }
+            }
+            else {
+                feeder.stopMotors();
+            }  }
         },
         feeder);
     }

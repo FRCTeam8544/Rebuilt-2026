@@ -318,7 +318,7 @@ leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 
 
 
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.8)
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -326,7 +326,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.8)
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.8)
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -1.0) //max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -352,7 +352,9 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose      // Reverse feed
+            bButtonGoose,
+            shooter.flywheelAtRpmTarget,
+            shooter.flywheelAutoToggleBooleanSupplier      // Reverse feed
          //   dpadLeftTriggerGoose,   // Decrease feed speed
            // dpadRightTriggerGoose   // Increase feed speed
           )

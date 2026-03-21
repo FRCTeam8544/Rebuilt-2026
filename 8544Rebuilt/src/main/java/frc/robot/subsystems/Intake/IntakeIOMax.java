@@ -20,7 +20,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class IntakeIOMax implements IntakeIO {
 
-  private static final int kStallLimit = 30;
+  private static final int kStallLimit = 45; //was 30 but need more power
 
   private final SparkMax rollerMotorController;
 

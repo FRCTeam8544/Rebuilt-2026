@@ -94,7 +94,7 @@ public class IntakeCommands {
     return Commands.run(
       () -> {
 
-        final double intakeFeedDuty = 0.9;
+        final double intakeFeedDuty = 1.0; //full speed
         boolean oneButtonPressed = onebuttonTrigger;
 
         if (oneButtonPressed) {
