@@ -111,9 +111,9 @@ timer.restart();
           final double retractPosition = 0.037;
 if (timer.get()<0.5) {
             if (oneButton) {
-              arm.runOpenLoop(0.3); // Set Extend Position // arm.runToPosition(extendPosition);
+              arm.runOpenLoop(0.9); // Set Extend Position // arm.runToPosition(extendPosition);
             } else {
-              arm.runOpenLoop(-0.3); // Set Retract Position
+              arm.runOpenLoop(-0.9); // Set Retract Position
             }
             }
       },
@@ -126,7 +126,7 @@ if (timer.get()<0.5) {
     double deployTimelimit = 2; // seconds
     return Commands.run(
     () -> {
-      arm.runToPosition(extendPosition);
+      arm.runOpenLoop(0.7);//(extendPosition);
     },
     arm).withName("deployHopper")
         .until(arm.armDeployedSupplier)
@@ -138,7 +138,7 @@ if (timer.get()<0.5) {
     final double retractTimeLimit = 3.0;
     return Commands.run(
       () -> {
-        arm.runToPosition(retractPosition);
+        arm.runOpenLoop(-0.7);//(retractPosition);
       },
       arm).withName("retractHopper")
           .until(arm.armRetractedSupplier)
