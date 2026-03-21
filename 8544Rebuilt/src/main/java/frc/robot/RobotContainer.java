@@ -81,7 +81,6 @@ public class RobotContainer {
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
   private final Trigger backButtonGoose = new Trigger(goose.back());
-
   
 
   private final Trigger isRobotIntaking;
@@ -274,7 +273,27 @@ public class RobotContainer {
 
 
     // ----- Operator Controls -------
-    
+    startButtonGoose.toggleOnTrue(
+        
+ShooterCommands.buttonShoot(shooter,
+                                    vision.AutoFlywheelSpeed,
+                                    shooter.flywheelAutoToggleBooleanSupplier,
+                                    dpadDownTriggerGoose, // Decrease flywheel speed
+                                    dpadUpTriggerGoose    // Increase flywheel speed
+                                  )//.repeatedly()//.unless(aButtonGoose)
+
+    );
+
+    backButtonGoose.toggleOnTrue(
+
+        ShooterCommands.gentleStopFlywheel(shooter)
+
+    );
+
+
+
+
+
   
     dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, true),
      (IntakeCommands.oneButtonControl(intake, true)))
@@ -372,15 +391,15 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    ).toggleOnFalse(
-        ShooterCommands.gentleStopFlywheel(shooter)
-    );
+    );//.toggleOnFalse(
+       // ShooterCommands.gentleStopFlywheel(shooter)
+   // );
 
 
 
-    climber.setDefaultCommand(
-        ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose));
+   // climber.setDefaultCommand(
+     //   ClimberCommands.openVoltageControl(climber,
+       //                                    backButtonGoose, startButtonGoose));
 
     // Status
     

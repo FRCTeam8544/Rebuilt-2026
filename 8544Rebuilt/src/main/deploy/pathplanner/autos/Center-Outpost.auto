@@ -30,9 +30,15 @@
           }
         },
         {
-          "type": "deadline",
+          "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "DeployHopper"
+                }
+              },
               {
                 "type": "wait",
                 "data": {
@@ -42,20 +48,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "DeployHopper"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Center_Outpost_2"
+                  "name": "stopIntake"
                 }
               }
             ]
