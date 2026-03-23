@@ -42,13 +42,26 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.25
+                  "waitTime": 0.2
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "stopIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center_Outpost_2"
                 }
               }
             ]
