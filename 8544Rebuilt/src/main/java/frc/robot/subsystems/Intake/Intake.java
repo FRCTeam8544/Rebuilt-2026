@@ -2,55 +2,44 @@ package frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.Intake.*;
 
-
-import static edu.wpi.first.units.Units.Rotations;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
 
-  public static final double kMaxIntakeRPM = 2000; //100:1 gearbox
+  public static final int intakeCanId = 28;
+  public final IntakeIO intakeIO;
+ 
+  public final IntakeIOInputsAutoLogged intakeInputs = new IntakeIOInputsAutoLogged();
+  
 
+  public BooleanSupplier isIntaking =
+    () -> {
+      return intakeInputs.velocity > 1.0; // RPM
+    };
 
-  public static final int armCanId = 27;
-  public static final int feedCanId = 28;
+  public DoubleSupplier intakeRpmSupplier =
+    () -> {
+      return intakeInputs.velocity;
+    };
 
-  public final IntakeIO intakeArmIO;
-  public final IntakeIOInputsAutoLogged intakeArmInputs = new IntakeIOInputsAutoLogged();
+  public DoubleSupplier intakeRpmSetPoint = 
+    () -> {
+      return intakeInputs.velocitySetPoint;
+    };
 
-  private final IntakeFeedIO intakeFeedIO;
-  private final IntakeFeedIOInputsAutoLogged intakeFeedInputs = new IntakeFeedIOInputsAutoLogged();
-
-  public Intake() {
-    this.intakeArmIO = new IntakeIOMax(armCanId);
-    this.intakeFeedIO = new IntakeFeedIOMax(feedCanId);
+  public Intake(IntakeIO intakeIO) {
+    this.intakeIO = intakeIO;
   }
 
-  public void runArmOpenLoop(double duty) {
-    
-    final double forwardLimit = 0.95; // Zero is "straight up" 870
-    final double backwardLimit = 0.07; // Stow position
+  // Open loop control
 
+  public void runOpenLoop(double duty) {
     double adjustedDuty = duty;
-    adjustedDuty = Math.min(adjustedDuty, 1.0);
-    adjustedDuty = Math.max(adjustedDuty, -1.0);
-
-    intakeArmInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
-    intakeArmInputs.positionSetPoint = 0.0;
-
-    //if ((intakeArmInputs.position < forwardLimit) ||
-      //  (intakeArmInputs.position > backwardLimit) ) {
-      intakeArmIO.setVoltage(intakeArmInputs.voltageSetPoint);
-   // }
-  }
-
-  public void runFeedOpenLoop(double duty) {
-    double adjustedDuty = duty;
-  //  adjustedDuty = Math.min(adjustedDuty, 1.0);
-    //adjustedDuty = Math.max(adjustedDuty, -1.0);
     if (duty > 1.0) {
       adjustedDuty = 1.0;
     }
@@ -58,46 +47,33 @@ public class Intake extends SubsystemBase {
       adjustedDuty = -1.0;
     }
 
-    intakeFeedInputs.voltageSetPoint = adjustedDuty * Constants.Neo.nominalVoltage;
-    intakeFeedInputs.velocitySetPoint = 0.0;
+    intakeInputs.voltageSetPoint = adjustedDuty * Constants.kNominalVoltage;
+    intakeInputs.velocitySetPoint = 0.0;
 
-    intakeFeedIO.setVoltage(intakeFeedInputs.voltageSetPoint);
-  }
-
-  public void runIntakeArm(double rotations) {
-    intakeArmInputs.positionSetPoint = rotations;
-    intakeArmInputs.voltageSetPoint = 0.0;
-    intakeArmIO.setPosition(intakeArmInputs.positionSetPoint);
-  } 
-
-  public void runIntakeFeed(double rpm) {
-    intakeFeedInputs.velocitySetPoint = rpm;
-    intakeFeedIO.setVelocity(intakeFeedInputs.velocitySetPoint);
-  }
-  
-  public void stopFeed() {
-    intakeFeedInputs.voltageSetPoint = 0;
-    intakeFeedInputs.velocitySetPoint = 0;
-    intakeFeedIO.setVoltage(0);
-    //intakeFeedIO.setVelocity(intakeFeedInputs.velocitySetPoint);
-  }
-
-  public void holdArmPosition() {
-    intakeArmInputs.positionSetPoint = intakeArmInputs.position;
-    intakeArmIO.setPosition(intakeArmInputs.position);
+    intakeIO.setVoltage(intakeInputs.voltageSetPoint);
   }
 
   public void stopOpenLoop() {
-    intakeArmIO.setVoltage(0);
-    intakeFeedIO.setVoltage(0);
+    runOpenLoop(0);
+  }
+
+  // Closed loop control 
+
+  public void runAtRpm(double rpm) {
+    intakeInputs.velocitySetPoint = rpm;
+    intakeInputs.voltageSetPoint = 0.0;
+    intakeIO.setVelocity(intakeInputs.velocitySetPoint);
+  }
+  
+  public void stopMotors() {
+    intakeInputs.voltageSetPoint = 0;
+    intakeInputs.velocitySetPoint = 0;
+    intakeIO.setVoltage(0);
   }
 
   @Override
   public void periodic() {
-    intakeArmIO.updateInputs(intakeArmInputs);
-    intakeFeedIO.updateInputs(intakeFeedInputs);
-    Logger.processInputs("Intake/Arm", intakeArmInputs);
-    Logger.processInputs("Intake/Feed", intakeFeedInputs);
-    
+    intakeIO.updateInputs(intakeInputs);
+    Logger.processInputs("Intake", intakeInputs);
   }
 }

@@ -1,18 +1,19 @@
 package frc.robot.commands;
 
+import frc.robot.Constants;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.vision.*;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,44 +21,21 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ShooterCommands {
 
-    private static final double DEADBAND = 0.1;
-    private static final double FF_START_DELAY = 2.0; // Secs
-    private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
 
     private ShooterCommands() {}
-
-    private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
-        // Apply deadband
-        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-        Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
-
-        // Square magnitude for more precise control
-        linearMagnitude = linearMagnitude * linearMagnitude;
-
-        // Return new linear velocity
-        return new Pose2d(Translation2d.kZero, linearDirection)
-            .transformBy(new Transform2d(linearMagnitude, 0.0, Rotation2d.kZero))
-            .getTranslation();
-    }
 
     public static Command stopMotors(Shooter shooter) {
         return Commands.run(
         () -> {
-                shooter.stopFeed();
-                shooter.stopShooter();
+                shooter.stopMotors();
             },
             shooter);
     }
 
-    // Use this command to tune Ks by increasing voltage until the flywheel
-    // begins to slightly turn, then back off a bit.
-    // This term will be used in the PID with feedforward control later.
+    // Use this command to tune do basic flywheel control
     public static Command openVoltageControl(Shooter shooter,
-                                         Trigger feedTrigger,
                                          Trigger increaseVoltTrigger,
-                                         Trigger decreaseVoltTrigger,
-                                         Trigger increaseFeedVoltageTrigger,
-                                         Trigger decreaseFeedVoltageTrigger)
+                                         Trigger decreaseVoltTrigger)
     {
         return Commands.run(
         () -> {
@@ -76,126 +54,119 @@ public class ShooterCommands {
                 }
             }
             
-            boolean increaseFeedVolt = increaseFeedVoltageTrigger.getAsBoolean();
-            boolean decreaseFeedVolt = decreaseFeedVoltageTrigger.getAsBoolean();
-            if (increaseFeedVolt ^ decreaseFeedVolt) {
-                if (increaseFeedVoltageTrigger.getAsBoolean())
-                {
-                    shooter.tuneIncreaseFeedVoltage();
-                }
-                else
-                {
-                    shooter.tuneDecreaseFeedVoltage();
-                }
-            }
-
-            shooter.runShooterOpenLoop();
-            //shooter.runShooter(3000);
-            
-            if (feedTrigger.getAsBoolean())
-            {
-                shooter.runFeedOpenLoop();
-            }
-            else {
-                shooter.runFeedOpenLoop(0.0);
-            }
+            shooter.runOpenLoop();
         },
         shooter);
     }
 
-    public static Command buttonShoot( Shooter shooter,
-                                       Trigger shootTrigger,
-                                       Trigger feedTrigger,
-                                       Trigger rpmAdjustDown,
-                                       Trigger rpmAdjustUp,
-                                       Trigger feedAdjustDown,
-                                       Trigger feedAdjustUp,
-                                       Trigger resetShooterDefaults)
+    public static Command runFlywheel(Shooter shooter,
+                                      DoubleSupplier rpmSetPoint
+                                      )
     {
         return Commands.run(
-        () -> {
+            () -> {
+                 shooter.runAtRpm(rpmSetPoint.getAsDouble());
+            },
+            shooter);
+    }
 
-            final int feedNominalRpm = 300;
-            final int rpmAdjustStep = 5;
-            final int shooterNominalRpm = 3000;
+    public static Command buttonShoot( Shooter shooter,
+                                        DoubleSupplier rpmByDistanceSupplier,
+                                        BooleanSupplier AutoToggleSupplier,
+                                       Trigger rpmAdjustDown,
+                                       Trigger rpmAdjustUp)
+    {
+        final double maxRpmAdjustPerSecond = 1500;
+        SlewRateLimiter rpmAdjustLimiter = new SlewRateLimiter(maxRpmAdjustPerSecond);
+        
+        return Commands.startRun(
+        // Run once to reset the rate limiter when command starts
+        () -> { rpmAdjustLimiter.reset(0); },
+        // Run until interrupted
+        () -> {
+            final int rpmAdjustStep = 100 / 50;
+             
+            final double shooterNominalRpm = 3000;
+            double shooterRpmAuto = rpmByDistanceSupplier.getAsDouble();
+
+            // These Rpms are used to tune the flywheel
+            //final int shooterNominalRpm = 2720;
+           // final double shooterLowNominalRpm = 337.5;
             boolean adjustUp = rpmAdjustUp.getAsBoolean();
             boolean adjustDown = rpmAdjustDown.getAsBoolean();
+            boolean FlywheelAutoRPMLocal = AutoToggleSupplier.getAsBoolean();
 
-           /// if (!resetShooterDefaults.getAsBoolean())
+            // TODO this adjust logic really should just be inside of the command instead of shooter subsystem
+            if (adjustUp ^ adjustDown)
             {
-                if (adjustUp ^ adjustDown)
+                if (adjustUp) {
+                    shooter.shooterRpmAdjust(rpmAdjustStep);
+                }
+                else
                 {
-                    if (adjustUp) {
-                        //shooter.shooterRpmAdjust(rpmAdjustStep);
-                        shooter.tuneIncreaseShootVoltage();
-                    }
-                    else
-                    {
-                        //shooter.shooterRpmAdjust(-rpmAdjustStep);
-                        shooter.tuneDecreaseShootVoltage();
-                    }
-                }
-            }
-          //  else {
-             //   shooter.resetShooterDefaultVoltage();
-             //   shooter.resetFeedDefaultRpm();
-        //    }
-
-            if (shootTrigger.getAsBoolean())
-            {
-                shooter.runShooterOpenLoop();
-            }
-            else {
-                shooter.stopShooter();
-            }
-
-            boolean feedAdjUp = feedAdjustUp.getAsBoolean();
-            boolean feedAdjDown = feedAdjustDown.getAsBoolean();
-            if (feedAdjDown ^ feedAdjUp) {
-                if (feedAdjUp) {
-                    shooter.tuneIncreaseFeedVoltage();
-                    //shooter.feedRpmAdjust(rpmAdjustStep);
-                }
-                else {
-                    shooter.tuneDecreaseFeedVoltage();
-                   //shooter.feedRpmAdjust(-rpmAdjustStep);
+                    shooter.shooterRpmAdjust(-rpmAdjustStep);
                 }
             }
 
-            if (feedTrigger.getAsBoolean())
-            {
-               // shooter.runFeed(feedNominalRpm);
-                shooter.runFeedOpenLoop();
+            double shooterRpmSetpoint = shooterNominalRpm;
+
+            if(FlywheelAutoRPMLocal) { 
+                shooterRpmSetpoint = shooterRpmAuto;
             }
-            else {
-                shooter.stopFeed();
-            }
+
+            // Use rpmAdjustLimiter to slow down massive swings in the RPM setpoints
+            // No longer commands full shooting RPM (3k!) immediately. The setpoint
+            // will increase over time until it gets to the desired RPM setpoint.
+            // However the limiter should never be set so tight that it limits the
+            // small, 100s of RPM, adjustments made for auto shoot.
+            shooter.runAtRpm(rpmAdjustLimiter.calculate(shooterRpmSetpoint));
+            
         },
-        shooter);
+        shooter).finallyDo( () -> { shooter.resetShooterDefaultRpm(); 
+        }); // reset rpm setpoint of shooter
+    
     } 
 
-  /*  public static Command joystickVoltsShoot( Shooter shooter, 
-                                    DoubleSupplier x_LeftSupplier, DoubleSupplier y_LeftSupplier,
-                                    DoubleSupplier x_RightSupplier, DoubleSupplier y_RightSupplier ) {
-        return Commands.run(
+  public static Command gentleStopFlywheel(Shooter shooter)
+  {
+    double breakDisableRpm = 500; // Below this RPM friction will take the wheel to zero
+    double maxBrakeVoltage = -2.0; // Must be negative: Maximum voltage to apply to stop the flywheel over time
+    double breakApplyTimeSeconds = 1; // Time to full breaking power
+    double breakTimeoutSeconds = 10.0; // Time limit to break the wheel
+    // Limit voltage rate change over time aka gentle breaking
+    SlewRateLimiter voltageLimiter = new SlewRateLimiter(
+                                        Math.abs(maxBrakeVoltage) / breakApplyTimeSeconds); 
+    return Commands.sequence(
+        // "Stop" Pid control
+        Commands.runOnce(
         () -> {
-            
-            // Get shooter linear velocity
-            Translation2d shootLinearVelocity =
-            getLinearVelocityFromJoysticks(x_RightSupplier.getAsDouble(), y_RightSupplier.getAsDouble());              
-            shooter.runShooterOpenLoop(shootLinearVelocity.getY());
-            
-            // Get feed linear velocity
-            Translation2d feedLinearVelocity =
-            getLinearVelocityFromJoysticks(x_LeftSupplier.getAsDouble(), y_LeftSupplier.getAsDouble());
-             
-            shooter.runFeedOpenLoop(feedLinearVelocity.getY());
-          
+              shooter.stopMotors();
+              voltageLimiter.reset(0); // Start braking at zero volts
+            }),
+        Commands.run(
+        () -> {
+            if (shooter.flywheelRpmSupplier.getAsDouble() > breakDisableRpm) {
+                double duty = voltageLimiter.calculate(maxBrakeVoltage) / Constants.kNominalVoltage;
+                shooter.runOpenLoop(duty);
+            }
+            else {
+                shooter.stopMotors();
+            }
         },
-        shooter);
-    }*/
+        shooter).finallyDo( () -> { shooter.stopMotors(); }) // Ensure flywheel stops under all conditions
+    ).withTimeout(breakTimeoutSeconds).withName("Braking");
+  }
 
-    
+  // Default, not running the flywheel state
+  public static Command idleFlywheel(Shooter shooter)
+  {
+    return Commands.run(
+        () -> {
+            shooter.stopMotors();
+        },
+        shooter).withName("Idle");
+  }
+
   /**
    * Measures the velocity feedforward constants for the shooter motors.
    *
@@ -206,6 +177,9 @@ public class ShooterCommands {
     List<Double> voltageSamples = new LinkedList<>();
     
     Timer timer = new Timer();
+
+    final double FF_START_DELAY = 2.0; // Secs
+    final double FF_RAMP_RATE = 0.1; // Volts/Sec
 
     return Commands.sequence(
         // Reset data
@@ -218,7 +192,7 @@ public class ShooterCommands {
         // Warmup
         Commands.run(
                 () -> {
-                  shooter.runShooterOpenLoop(0.0);
+                  shooter.runOpenLoop(0.0);
                 },
                 shooter)
             .withTimeout(FF_START_DELAY),
@@ -229,9 +203,9 @@ public class ShooterCommands {
         // Accelerate and gather data
         Commands.run(
                 () -> {
-                  if (shooter.getFlywheelVelocityRPM() < Shooter.Flywheel.kMaxShooterRPM) {
+                  if (!shooter.isFlywheelOverspeed()) {
                     double voltage = timer.get() * FF_RAMP_RATE;
-                    shooter.runShooterOpenLoop(voltage / 12.0);
+                    shooter.runOpenLoop(voltage / Constants.kNominalVoltage);
                     velocitySamples.add(shooter.getShooterFFCharacterizationVelocity());
                     voltageSamples.add(voltage);
                   }
