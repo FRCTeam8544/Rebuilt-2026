@@ -13,6 +13,8 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Feeder.Feeder;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.vision.*;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -94,25 +96,34 @@ public class AutoCommands {
   public static Command stopFeeder(Feeder feeder) {
     return Commands.runOnce(() -> feeder.stopMotors(), feeder).withName("AutoStopFeeder");
   }
-
-  /*public static Command autoVisionAim(Drive drive, ) {
+/* 
+  public static Command autoVisionAim(Drive drive, Vision vision, Rotation2d rotation2d ) {
 
     double angleTolerance = 8.0;
 
-    return Commands.run(null, null)
-    
-    // Lock to 0° when A button is held
-    maverick
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
+    return Commands.run(
+      () -> 
+                DriveCommands.joystickDriveAtAngle(
                 drive,
                 () -> -maverick.getLeftY(),
                 () -> -maverick.getLeftX(),
                 vision.getHubRotation()));
+    
+    
+   // );
+    
+    // Lock to 0° when A button is held
+  //  maverick
+    //    .a()
+     //   .whileTrue(
+      //      DriveCommands.joystickDriveAtAngle(
+       //         drive,
+        //        () -> -maverick.getLeftY(),
+         //       () -> -maverick.getLeftX(),
+          //      vision.getHubRotation()));
 
 
-  }*/
+  }//*/
 
   /**
    * Creates a simple test auto that drives forward 2 meters in a straight line. This is a code-only

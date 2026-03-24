@@ -273,7 +273,8 @@ public class RobotContainer {
 
 
     // ----- Operator Controls -------
-    startButtonGoose.toggleOnTrue(
+    
+/*     startButtonGoose.toggleOnTrue(
         
 ShooterCommands.buttonShoot(shooter,
                                     vision.AutoFlywheelSpeed,
@@ -282,13 +283,13 @@ ShooterCommands.buttonShoot(shooter,
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )//.repeatedly()//.unless(aButtonGoose)
 
-    );
+    ); */
 
     backButtonGoose.toggleOnTrue(
 
         ShooterCommands.gentleStopFlywheel(shooter)
 
-    );
+    ); 
 
 
 
@@ -391,15 +392,15 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    );//.toggleOnFalse(
+  //  ).toggleOnFalse(
        // ShooterCommands.gentleStopFlywheel(shooter)
-   // );
+    );
 
 
 
-   // climber.setDefaultCommand(
-     //   ClimberCommands.openVoltageControl(climber,
-       //                                    backButtonGoose, startButtonGoose));
+    climber.setDefaultCommand(
+        ClimberCommands.openVoltageControl(climber,
+                                           backButtonGoose, startButtonGoose));
 
     // Status
     
