@@ -367,7 +367,6 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
         ShooterCommands.buttonShoot(shooter,
                                     vision.AutoFlywheelSpeed,
                                     shooter.flywheelAutoToggleBooleanSupplier,
-                                    leftTriggerGoose,     // Run Shooter flywheel
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
