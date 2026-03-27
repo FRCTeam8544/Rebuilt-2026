@@ -120,7 +120,7 @@ public class RobotContainer {
                 drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
+                    VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
                     VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
                 new VisionIOPhotonVision(
