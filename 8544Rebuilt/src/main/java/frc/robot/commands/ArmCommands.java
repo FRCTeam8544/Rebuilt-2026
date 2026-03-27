@@ -111,9 +111,9 @@ timer.restart();
           final double retractPosition = 0.037;
 if (timer.get()<0.5) {
             if (oneButton) {
-              arm.runOpenLoop(0.3); // Set Extend Position // arm.runToPosition(extendPosition);
+              arm.runOpenLoop(0.9); // Set Extend Position // arm.runToPosition(extendPosition);
             } else {
-              arm.runOpenLoop(-0.3); // Set Retract Position
+              arm.runOpenLoop(-0.9); // Set Retract Position
             }
             }
       },
@@ -121,28 +121,21 @@ if (timer.get()<0.5) {
   }
   
   public static Command deployHopper( Arm arm ) {
-
-    final double extendPosition = ArmIO.kNominalDeployPosition;
-    double deployTimelimit = 2; // seconds
-    return Commands.run(
-    () -> {
-      arm.runToPosition(extendPosition);
-    },
-    arm).withName("deployHopper")
-        .until(arm.armDeployedSupplier)
-        .withTimeout(deployTimelimit);
+    double deployTimelimitSeconds = 2;
+    return Commands.runEnd(
+      () -> arm.runOpenLoop(0.7),
+      () -> arm.stopOpenLoop(),
+      arm).withName("deployHopper")
+          .withTimeout(deployTimelimitSeconds);
   }
 
   public static Command retractHopper( Arm arm ) {
-    final double retractPosition = ArmIO.kNominalStowPosition;
-    final double retractTimeLimit = 3.0;
-    return Commands.run(
-      () -> {
-        arm.runToPosition(retractPosition);
-      },
+    final double retractTimeLimitSeconds = 3.0;
+    return Commands.runEnd(
+      () -> arm.runOpenLoop(-0.7),
+      () -> arm.stopOpenLoop(),
       arm).withName("retractHopper")
-          .until(arm.armRetractedSupplier)
-          .withTimeout(retractTimeLimit);
+          .withTimeout(retractTimeLimitSeconds);
   }
 
 

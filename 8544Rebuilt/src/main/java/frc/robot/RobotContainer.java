@@ -81,7 +81,6 @@ public class RobotContainer {
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
   private final Trigger backButtonGoose = new Trigger(goose.back());
-
   
 
   private final Trigger isRobotIntaking;
@@ -275,6 +274,27 @@ public class RobotContainer {
 
     // ----- Operator Controls -------
     
+/*     startButtonGoose.toggleOnTrue(
+        
+ShooterCommands.buttonShoot(shooter,
+                                    vision.AutoFlywheelSpeed,
+                                    shooter.flywheelAutoToggleBooleanSupplier,
+                                    dpadDownTriggerGoose, // Decrease flywheel speed
+                                    dpadUpTriggerGoose    // Increase flywheel speed
+                                  )//.repeatedly()//.unless(aButtonGoose)
+
+    ); */
+
+    backButtonGoose.toggleOnTrue(
+
+        ShooterCommands.gentleStopFlywheel(shooter)
+
+    ); 
+
+
+
+
+
   
     dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, true),
      (IntakeCommands.oneButtonControl(intake, true)))
@@ -318,7 +338,7 @@ leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 
 
 
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.8)
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -326,7 +346,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.8)
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.8)
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -1.0) //max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -352,7 +372,9 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose      // Reverse feed
+            bButtonGoose,
+            shooter.flywheelAtRpmTarget,
+            shooter.flywheelAutoToggleBooleanSupplier      // Reverse feed
          //   dpadLeftTriggerGoose,   // Decrease feed speed
            // dpadRightTriggerGoose   // Increase feed speed
           )
@@ -370,8 +392,8 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    ).toggleOnFalse(
-        ShooterCommands.gentleStopFlywheel(shooter)
+  //  ).toggleOnFalse(
+       // ShooterCommands.gentleStopFlywheel(shooter)
     );
 
 
