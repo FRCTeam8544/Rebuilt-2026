@@ -196,7 +196,11 @@ public class RobotContainer {
     manualArmOverrideTrigger = new Trigger(arm.manualControlBooleanSupplier);
 
     // Register all NamedCommands BEFORE building auto chooser
-    AutoCommands.registerNamedCommands(arm, intake, shooter, feeder, vision.AutoFlywheelSpeed);
+    AutoCommands.registerNamedCommands(arm, intake, shooter, feeder, 
+                                       vision.AutoFlywheelSpeed,  // Provide the target flywheel speed for robot pose
+                                       () -> { return drive.getRotation(); }, // Provide field relative robot rotation
+                                       () -> { return vision.getHubRotation().get(); } // Provide field rotation to aim at the hub
+                                       );
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

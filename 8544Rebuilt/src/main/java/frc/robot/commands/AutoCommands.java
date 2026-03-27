@@ -5,8 +5,12 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Arm.Arm;
@@ -19,6 +23,9 @@ import frc.robot.commands.DriveCommands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
+import org.dyn4j.geometry.Rotation;
 import org.littletonrobotics.junction.Logger;
 
 /** Autonomous command factories and NamedCommand registration for PathPlanner. */
@@ -46,7 +53,10 @@ public class AutoCommands {
    * @param autoFlywheelSpeed vision-based RPM supplier for distance-adjusted shots
    */
   public static void registerNamedCommands(
-      Arm arm, Intake intake, Shooter shooter, Feeder feeder, DoubleSupplier autoFlywheelSpeed) {
+      Arm arm, Intake intake, Shooter shooter, Feeder feeder, 
+      DoubleSupplier autoFlywheelSpeed,
+      Supplier<Rotation2d> robotRotationSupplier,
+      Supplier<Rotation2d> hubRotationSupplier) {
     // Shooting commands (spin up + feed + terminate)
     NamedCommands.registerCommand("AutoRpmShootFuel", new ShootFuelCommand(shooter, feeder, autoFlywheelSpeed));
     NamedCommands.registerCommand("CloseShootFuel", new ShootFuelCommand(shooter, feeder, CLOSE_SHOOT_RPM));
@@ -62,6 +72,13 @@ public class AutoCommands {
     NamedCommands.registerCommand("stopIntake", stopIntake(intake));
     NamedCommands.registerCommand("stopShooter", stopShooter(shooter));
     NamedCommands.registerCommand("stopFeeder", stopFeeder(feeder));
+
+    // Lock the robot to aim at the hub until the unlock command is given or the command is interupted
+    NamedCommands.registerCommand("lockRotationToHub", lockRotationToTarget(robotRotationSupplier, hubRotationSupplier));
+    NamedCommands.registerCommand("unlockRotation", unlockRotation());
+
+    // Turn the robot to face the hub, end when the robot has finished rotating
+    NamedCommands.registerCommand("turnToHub", turnToHub(robotRotationSupplier, hubRotationSupplier));
   }
 
   /**
@@ -100,20 +117,65 @@ public class AutoCommands {
     return Commands.runOnce(() -> feeder.stopMotors(), feeder).withName("AutoStopFeeder");
   }
 
-  public static Command visonTurnToTarget(Drive drive, Vision vision)
-  {
-    double tolerance = 8.0;
-    return DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> { return 0.0; },
-                () -> { return 0.0; },
-                vision.getHubRotation()).until(
-                  () -> { Rotation2d robotRotation = drive.robotPoseSupplier.get().getRotation();
-                          Rotation2d hubRotation = vision.getHubRotation().get();
-                          double angleDiff = Math.abs(hubRotation.minus(robotRotation).getDegrees());
-                          return angleDiff < tolerance;
+  public static Command lockRotationToTarget(
+      Supplier<Rotation2d> robotSupplier,
+      Supplier<Rotation2d> targetSupplier) {
+    
+    final double ANGLE_KP = 5.0;
+    final double ANGLE_KD = 0.4;
+    final double ANGLE_MAX_VELOCITY = 8.0;
+    final double ANGLE_MAX_ACCELERATION = 20.0;
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    return Commands.startRun(
+        () -> { 
+                // Reset PID controller when command starts
+                angleController.reset(robotSupplier.get().getRadians());
+        
+                // Register angle feedback supplier to turn the robot to the target
+                PPHolonomicDriveController.overrideRotationFeedback(
+                  () -> {
+                          // Calculate angular speed
+                          double omega =
+                          angleController.calculate(
+                            robotSupplier.get().getRadians(), 
+                            targetSupplier.get().getRadians());
+                          return omega;
                   }
                 );
+              },
+        // NOOP to keep the command going to give the robot time to find the target rotation
+        () -> {   }
+      ).handleInterrupt( () -> { PPHolonomicDriveController.clearRotationFeedbackOverride(); } );
+  }
+
+  // Stop following the target rotation - Instant command
+  public static Command unlockRotation()
+  {
+    return Commands.runOnce( () -> { PPHolonomicDriveController.clearRotationFeedbackOverride(); } );
+  }
+
+  // This command runs until the robot is aimed at the hub
+  public static Command turnToHub(Supplier<Rotation2d> robotRotation,
+                                  Supplier<Rotation2d> targetRotation)
+
+  {
+    final double turnToleranceDegrees = 3.0;
+    return AutoCommands.lockRotationToTarget(robotRotation, targetRotation)
+          .until( () -> { 
+            Rotation2d robot = robotRotation.get();
+            Rotation2d target = targetRotation.get();
+            double angleDiff = Math.abs( target.minus(robot).getDegrees() );
+            return angleDiff < turnToleranceDegrees;
+          } ).finallyDo(  () -> { PPHolonomicDriveController.clearRotationFeedbackOverride(); } );
   }
 
   /**
