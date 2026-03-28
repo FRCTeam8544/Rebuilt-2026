@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,6 +23,7 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.leds.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.Game;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -50,7 +52,7 @@ public class RobotContainer {
   private final Shooter shooter;
   private final Climber climber;
   private final Leds leds;
-
+private final Game game;
   private final Vision vision;
 
   // Simulation
@@ -90,6 +92,8 @@ public class RobotContainer {
 
   private final Trigger manualArmOverrideTrigger;
 
+  private final Trigger shakeWhenTimeToShoot;
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -99,6 +103,7 @@ public class RobotContainer {
     arm = new Arm();
     feeder = new Feeder();
     climber = new Climber();
+    game = new Game();
 
     
     switch (Constants.currentMode) {
@@ -191,7 +196,7 @@ public class RobotContainer {
     isRobotShooting = new Trigger(feeder.isFeeding); // Fuel in the air!!
     isRobotIntaking = new Trigger(intake.isIntaking); // Feed me seamore!
     isRobotClimbing = new Trigger(climber.isClimbing); // Going up!
-
+    shakeWhenTimeToShoot = new Trigger(game.isShiftChangeSupplier);
     // User configuration triggers
     manualArmOverrideTrigger = new Trigger(arm.manualControlBooleanSupplier);
 
@@ -381,7 +386,9 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
                                            backButtonGoose, startButtonGoose));
 
     // Status
-    
+    shakeWhenTimeToShoot.whileTrue(
+    Commands.run( () -> {goose.setRumble(RumbleType.kBothRumble,0.3);} )
+    );
     isRobotIntaking.whileTrue(
        Commands.run( () -> { 
             leds.setMechanicalState(Leds.MechanicalState.INTAKING); }, leds).

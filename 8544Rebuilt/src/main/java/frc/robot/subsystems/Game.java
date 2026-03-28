@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import java.nio.channels.NonWritableChannelException;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,7 +13,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * Subsystem for managing FRC REBUILT 2026 game state and Hub status.
  */
 public class Game extends SubsystemBase {
-
+private boolean isShiftChange = false; 
+    public BooleanSupplier isShiftChangeSupplier = 
+    () -> {
+return isShiftChange;
+    };
+   
+ // }
     public Game() {
         // Elastic dashboard automatically picks up SmartDashboard keys.
     }
@@ -68,7 +77,7 @@ public class Game extends SubsystemBase {
     public void periodic() {
         boolean active = isHubActive();
         double matchTime = DriverStation.getMatchTime();
-        
+       boolean isShiftChange = getFirstInactiveAlliance() != null;
         // Match state for Elastic Dashboard
         SmartDashboard.putBoolean("Hub Active", active);
         SmartDashboard.putString("Hub Status Label", active ? "HUB ACTIVE" : "HUB INACTIVE");
@@ -84,6 +93,8 @@ public class Game extends SubsystemBase {
         if (matchTime > 30 && matchTime <= 130) {
             shiftTimeRemaining = (matchTime - 30) % 25;
         }
-        SmartDashboard.putNumber("Current Shift Time Remaining", shiftTimeRemaining);
+        SmartDashboard.putNumber("Current Shift Remaining", shiftTimeRemaining);
+
+        
     }
 }
