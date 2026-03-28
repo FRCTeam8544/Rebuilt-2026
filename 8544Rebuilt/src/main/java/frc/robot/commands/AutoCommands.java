@@ -13,6 +13,8 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Feeder.Feeder;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.vision.*;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 

@@ -71,6 +71,11 @@ public class Shooter extends SubsystemBase{
       return shooterInputs.flywheelAutoRPMToggle;
     };
 
+    //  public BooleanSupplier flywheelRPMTargetToggleBooleanSupplier =
+    //() -> {
+    //  return shooterInputs.flywheelAutoRPMToggle;
+    //};
+
    // Shooter
     public Shooter(ShooterIO shooterIO)
     {
@@ -204,6 +209,7 @@ public class Shooter extends SubsystemBase{
     
     SmartDashboard.putNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
     SmartDashboard.putNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
+    SmartDashboard.putBoolean("Shooter at speed", flywheelAtRpmTarget.getAsBoolean());
 
     shooterInputs.flywheelAutoRPMToggle = 
          SmartDashboard.getBoolean(AutoShootRPMToggleKeyName, shooterInputs.flywheelAutoRPMToggle);
@@ -219,6 +225,7 @@ public class Shooter extends SubsystemBase{
     SmartDashboard.setDefaultNumber("Shooter RPM Setpoint", shooterInputs.flywheelVelocitySetPoint);
     SmartDashboard.setDefaultNumber("Shooter Leader Temp", shooterInputs.leaderMotorTemperature);
     SmartDashboard.setDefaultNumber("Shooter Follow Temp", shooterInputs.followMotorTemperature);
+      SmartDashboard.setDefaultBoolean("Shooter at speed", flywheelAtRpmTarget.getAsBoolean());
   }
 
 }

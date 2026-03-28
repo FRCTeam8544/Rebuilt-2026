@@ -53,10 +53,10 @@ public class ArmIOMax implements ArmIO {
   //  armMotorConfig.encoder.velocityConversionFactor(3);
 
     // Limits
-    armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
-    armMotorConfig.softLimit.forwardSoftLimit(kArmForwardLimit);
-    armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
-    armMotorConfig.softLimit.reverseSoftLimit(kArmReverseLimit);
+    //armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
+    //armMotorConfig.softLimit.forwardSoftLimit(kArmForwardLimit);
+    //armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+   // armMotorConfig.softLimit.reverseSoftLimit(kArmReverseLimit);
 
     // Signals
     armMotorConfig.signals.absoluteEncoderPositionAlwaysOn(true);
@@ -111,7 +111,9 @@ public class ArmIOMax implements ArmIO {
     inOutData.velocity = (float) armEncoder.getVelocity();
     inOutData.position = (float) armEncoder.getPosition();
     inOutData.motorTemperature = (float) armMotorController.getMotorTemperature();
-
+    inOutData.reverseHardLimit =  armMotorController.getReverseLimitSwitch().isPressed();
+    inOutData.forwardHardLimit = armMotorController.getForwardLimitSwitch().isPressed();
+    
     // Fault codes
     Faults armFaults = armMotorController.getFaults();
     inOutData.faultCan = armFaults.can;
