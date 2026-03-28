@@ -51,6 +51,7 @@ public class VisionConstants {
           Units.inchesToMeters(12.5),
           Units.inchesToMeters(23.75),
           new Rotation3d(0.0, 0, 0));
+
   public static Transform3d robotToFrontAprilCam = // Top right Seat Camera
       new Transform3d(
           Units.inchesToMeters(0.5),
