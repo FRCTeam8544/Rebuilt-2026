@@ -81,7 +81,8 @@ public class RobotContainer {
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
   private final Trigger backButtonGoose = new Trigger(goose.back());
-  
+  private final Trigger rightBackGoosePID = new Trigger(goose.rightBumper());
+  private final Trigger leftBackGoosePID = new Trigger(goose.leftBumper());
 
   private final Trigger isRobotIntaking;
   private final Trigger isRobotShooting;
@@ -316,7 +317,7 @@ ShooterCommands.buttonShoot(shooter,
 
 
 
-rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
+rightBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.037)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == false  //was true
 )
@@ -326,7 +327,7 @@ rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
 ));
 
 
-leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
+leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == false //was true
 )

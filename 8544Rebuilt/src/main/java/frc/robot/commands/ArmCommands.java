@@ -55,7 +55,7 @@ public class ArmCommands {
 
   public static Command runToVoltage( Arm arm, double armVoltage) {
     return Commands.run (
-      () -> {
+      () -> {            // Duty, not voltage!
         arm.runOpenLoop(armVoltage);
       },
       arm).withName("runToVoltage");
