@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * Subsystem for managing FRC REBUILT 2026 game state and Hub status.
  */
 public class Game extends SubsystemBase {
- private final Trigger shakeWhenTimeToShoot;
+ private final boolean shakeWhenTimeToShoot;
 private boolean isShiftChange = false; 
     public BooleanSupplier isShiftChangeSupplier = 
     () -> {
@@ -23,7 +23,7 @@ return isShiftChange;
    
  // }
     public Game() {
-        // Elastic dashboard automatically picks up SmartDashboard keys.
+        shakeWhenTimeToShoot = false;
     }
 
     /**
@@ -81,13 +81,15 @@ return true;
     }
 else if (55> matchTime && matchTime>52) {
 return true;
-
-else if (33> matchTime && matchTime > 30) {
+}
+else if(33> matchTime && matchTime > 30) {
     return true;
 
 }
-
+else {
+    return false;
 }
+
 }
 
 private boolean determineShakeOnWin() {
@@ -97,6 +99,9 @@ private boolean determineShakeOnWin() {
     }
     else if (55>matchTime && matchTime>52){
         return true;
+    }
+    else {
+        return false;
     }
 }
     @Override
