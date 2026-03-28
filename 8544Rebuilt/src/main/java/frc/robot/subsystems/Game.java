@@ -8,11 +8,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * Subsystem for managing FRC REBUILT 2026 game state and Hub status.
  */
 public class Game extends SubsystemBase {
+ private final Trigger shakeWhenTimeToShoot;
 private boolean isShiftChange = false; 
     public BooleanSupplier isShiftChangeSupplier = 
     () -> {
@@ -72,12 +74,44 @@ return isShiftChange;
             return weAreTheInactiveAlliance;
         }
     }
+private boolean determineShakeOnLoss() {
+ double matchTime = DriverStation.getMatchTime();
+    if ( 77< matchTime && 80 > matchTime){
+return true;
+    }
+else if (55> matchTime && matchTime>52) {
+return true;
 
+else if (33> matchTime && matchTime > 30) {
+    return true;
+
+}
+
+}
+}
+
+private boolean determineShakeOnWin() {
+    double matchTime = DriverStation.getMatchTime();
+    if (105>matchTime && matchTime>102) {
+    return true;
+    }
+    else if (55>matchTime && matchTime>52){
+        return true;
+    }
+}
     @Override
     public void periodic() {
         boolean active = isHubActive();
         double matchTime = DriverStation.getMatchTime();
-       boolean isShiftChange = getFirstInactiveAlliance() != null;
+        Alliance autowinner = getFirstInactiveAlliance().orElse(Alliance.Blue);
+        
+        if (autowinner == DriverStation.getAlliance().orElse(Alliance.Blue)) {
+        shakeWhenTimeToShoot = determineShakeOnWin();
+        }
+        else {
+            shakeWhenTimeToShoot = determineShakeOnLoss();
+        }
+
         // Match state for Elastic Dashboard
         SmartDashboard.putBoolean("Hub Active", active);
         SmartDashboard.putString("Hub Status Label", active ? "HUB ACTIVE" : "HUB INACTIVE");
