@@ -33,6 +33,8 @@ public interface ArmIO {
     public boolean faultGateDriver;
     public boolean faultEscEeprom;
     public boolean faultFirmware;
+    public boolean forwardHardLimit;
+    public boolean reverseHardLimit;
 
     // Outputs
     public float busVoltage = 0;

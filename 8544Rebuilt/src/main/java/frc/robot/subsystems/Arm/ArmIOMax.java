@@ -111,7 +111,9 @@ public class ArmIOMax implements ArmIO {
     inOutData.velocity = (float) armEncoder.getVelocity();
     inOutData.position = (float) armEncoder.getPosition();
     inOutData.motorTemperature = (float) armMotorController.getMotorTemperature();
-
+    inOutData.reverseHardLimit =  armMotorController.getReverseLimitSwitch().isPressed();
+    inOutData.forwardHardLimit = armMotorController.getForwardLimitSwitch().isPressed();
+    
     // Fault codes
     Faults armFaults = armMotorController.getFaults();
     inOutData.faultCan = armFaults.can;

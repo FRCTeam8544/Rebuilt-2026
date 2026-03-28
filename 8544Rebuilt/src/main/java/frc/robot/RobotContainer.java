@@ -285,11 +285,9 @@ ShooterCommands.buttonShoot(shooter,
 
     ); */
 
-    backButtonGoose.toggleOnTrue(
-
-        ShooterCommands.gentleStopFlywheel(shooter)
-
-    ); 
+   // xButtonGoose.toggleOnTrue(
+        //ShooterCommands.gentleStopFlywheel(shooter)
+//    ); 
 
 
 
@@ -392,8 +390,8 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-  //  ).toggleOnFalse(
-       // ShooterCommands.gentleStopFlywheel(shooter)
+    ).toggleOnFalse(
+        ShooterCommands.gentleStopFlywheel(shooter)
     );
 
 

@@ -104,6 +104,8 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Position Setpoint", armInputs.positionSetPoint);
     SmartDashboard.putNumber("Arm Volts Setpoint", armInputs.voltageSetPoint);
     SmartDashboard.putNumber("Arm Motor Temp", armInputs.motorTemperature);
+    SmartDashboard.putBoolean("Forward Hard Limit Reached", armInputs.forwardHardLimit);
+    SmartDashboard.putBoolean("Reverse Hard Limit Reached", armInputs.reverseHardLimit);
     
     // Controls
     boolean oldBrakeState = armInputs.motorBrakeEnabled;

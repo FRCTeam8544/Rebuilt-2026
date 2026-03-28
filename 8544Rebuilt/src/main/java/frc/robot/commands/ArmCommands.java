@@ -93,29 +93,24 @@ public class ArmCommands {
       Arm arm,
       Boolean onebuttonTrigger
       ) {
-        Timer timer = new Timer();
-        return Commands.startRun(
-() -> {
 
-timer.restart();
+        return Commands.run(
 
-
-}
 
       
-    ,
+    
         () -> {
           boolean oneButton = onebuttonTrigger;
 
           final double extendPosition = 0.78;
           final double retractPosition = 0.037;
-if (timer.get()<0.5) {
+
             if (oneButton) {
               arm.runOpenLoop(0.9); // Set Extend Position // arm.runToPosition(extendPosition);
             } else {
               arm.runOpenLoop(-0.9); // Set Retract Position
             }
-            }
+            
       },
       arm).withName("oneButtonControl");
   }
