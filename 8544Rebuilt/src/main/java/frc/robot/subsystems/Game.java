@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * Subsystem for managing FRC REBUILT 2026 game state and Hub status.
  */
 public class Game extends SubsystemBase {
- private final boolean shakeWhenTimeToShoot;
+private boolean shakeWhenTimeToShoot;
 private boolean isShiftChange = false; 
     public BooleanSupplier isShiftChangeSupplier = 
     () -> {
@@ -76,7 +76,7 @@ return isShiftChange;
     }
 private boolean determineShakeOnLoss() {
  double matchTime = DriverStation.getMatchTime();
-    if ( 77< matchTime && 80 > matchTime){
+    if ( 80> matchTime && matchTime>77){
 return true;
     }
 else if (55> matchTime && matchTime>52) {
