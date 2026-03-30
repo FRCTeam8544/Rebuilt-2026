@@ -68,9 +68,9 @@ public class ArmIOMax implements ArmIO {
         .positionWrappingEnabled(false)
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // Position control
-        .p(4, ClosedLoopSlot.kSlot0) //was 5
+        .p(0.0, ClosedLoopSlot.kSlot0) //was 4
         .i(0.00000, ClosedLoopSlot.kSlot0)
-        .d(0.3, ClosedLoopSlot.kSlot0); //0.00001
+        .d(0.0, ClosedLoopSlot.kSlot0); //0.3
 
     
     // armMotorConfig.closedLoop.feedForward.kS(kS);

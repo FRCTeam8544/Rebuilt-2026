@@ -315,7 +315,7 @@ ShooterCommands.buttonShoot(shooter,
 
      );
 
-
+/*  //PID randomly turns on in Manual Mode
 
 rightBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.037)
 .unless(
@@ -334,10 +334,10 @@ leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 .finallyDo(
    () -> {arm.holdPosition();} 
 ));
+*/
 
 
-
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.5)// max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -345,7 +345,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -1.0) //max speed
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.5) //max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -397,9 +397,9 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
 
 
 
-    climber.setDefaultCommand(
-        ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose));
+  //  climber.setDefaultCommand(
+  //      ClimberCommands.openVoltageControl(climber,
+   //                                        backButtonGoose, startButtonGoose));
 
     // Status
     
