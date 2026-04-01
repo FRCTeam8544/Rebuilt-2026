@@ -16,8 +16,8 @@ public class LedIOCANdle implements LedIO {
 
     // External LED strip only: skip the 8 onboard CANdle LEDs (indices 0–7)
     private static final int LED_START = 8;
-    // 100 external LEDs starting at index 8
-    private static final int LED_END = 107;
+    // 160 external LEDs starting at index 8
+    private static final int LED_END = 167;
 
     private final CANdle candle;
 

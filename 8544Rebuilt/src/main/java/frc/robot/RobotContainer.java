@@ -83,8 +83,8 @@ private final Game game;
   private final Trigger dpadRightTriggerGoose = new Trigger(goose.povRight());
   private final Trigger startButtonGoose = new Trigger(goose.start());
   private final Trigger backButtonGoose = new Trigger(goose.back());
-
-  
+  private final Trigger rightBackGoosePID = new Trigger(goose.rightBumper());
+  private final Trigger leftBackGoosePID = new Trigger(goose.leftBumper());
 
   private final Trigger isRobotIntaking;
   private final Trigger isRobotShooting;
@@ -125,7 +125,7 @@ private final Game game;
                 drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
+                    VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
                     VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
                 new VisionIOPhotonVision(
@@ -280,30 +280,49 @@ private final Game game;
 
     // ----- Operator Controls -------
     
+/*     startButtonGoose.toggleOnTrue(
+        
+ShooterCommands.buttonShoot(shooter,
+                                    vision.AutoFlywheelSpeed,
+                                    shooter.flywheelAutoToggleBooleanSupplier,
+                                    dpadDownTriggerGoose, // Decrease flywheel speed
+                                    dpadUpTriggerGoose    // Increase flywheel speed
+                                  )//.repeatedly()//.unless(aButtonGoose)
+
+    ); */
+
+   // xButtonGoose.toggleOnTrue(
+        //ShooterCommands.gentleStopFlywheel(shooter)
+//    ); 
+
+
+
+
+
   
-    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, true),
+    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, true),
      (IntakeCommands.oneButtonControl(intake, true)))
-     .repeatedly()
+     //.repeatedly()
      
      .unless(
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean() ; }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); } //|| manualArmOverrideTrigger.getAsBoolean() ;
          )
 
      );
 
-         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(ArmCommands.oneButtonControl(arm, false),
+         dpadRightTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, false),
      (IntakeCommands.oneButtonControl(intake, false)))
-     .repeatedly()
+     //.repeatedly()
      
      .unless(  
-            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean() || manualArmOverrideTrigger.getAsBoolean()  ; }
+            ()-> { return leftBackGoose.getAsBoolean() || rightBackGoose.getAsBoolean(); }
          )
 
      );
 
+/*  //PID randomly turns on in Manual Mode
 
-
-rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
+rightBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.037)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == false  //was true
 )
@@ -313,17 +332,17 @@ rightBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.037)
 ));
 
 
-leftBackGoose.whileTrue(ArmCommands.runToPosition(arm, 0.78)
+leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == false //was true
 )
 .finallyDo(
    () -> {arm.holdPosition();} 
 ));
+*/
 
 
-
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.5)// max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -331,7 +350,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.3)
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.3)
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.5) //max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -357,7 +376,9 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
         FeederCommands.buttonFeed(
             feeder,
             rightTriggerGoose, // Fuel feed roller to shooter flywheel
-            bButtonGoose      // Reverse feed
+            bButtonGoose,
+            shooter.flywheelAtRpmTarget,
+            shooter.flywheelAutoToggleBooleanSupplier      // Reverse feed
          //   dpadLeftTriggerGoose,   // Decrease feed speed
            // dpadRightTriggerGoose   // Increase feed speed
           )
@@ -381,9 +402,9 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
 
 
 
-    climber.setDefaultCommand(
-        ClimberCommands.openVoltageControl(climber,
-                                           backButtonGoose, startButtonGoose));
+  //  climber.setDefaultCommand(
+  //      ClimberCommands.openVoltageControl(climber,
+   //                                        backButtonGoose, startButtonGoose));
 
     // Status
     shakeWhenTimeToShoot.whileTrue(

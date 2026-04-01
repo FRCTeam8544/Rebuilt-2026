@@ -6,10 +6,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO {
   
   // Encoder arm limits in rotations
-  public static final double kArmForwardLimit = 0.78;
-  public static final double kArmReverseLimit = 0.03;
+  public static final double kArmForwardLimit = 0.768;
+  public static final double kArmReverseLimit = 0.016;
   public static final double kNominalDeployPosition = kArmForwardLimit;
-  public static final double kNominalStowPosition = 0.037;
+  public static final double kNominalStowPosition = 0.021;
 
   public static final double kMotorToOutputRatio = 3.0;
   public static final double kOutputToMotorRatio = 1.0 / kMotorToOutputRatio;
@@ -19,7 +19,7 @@ public interface ArmIO {
     // Inputs
     public boolean connected = false;
     public boolean motorBrakeEnabled = false;
-    public boolean manualControlEnabled = false;
+    public boolean manualControlEnabled = true; //Closed Loop not working
 
     public double velocity = 0.0f;
     public double position = 0.0f;
@@ -33,6 +33,8 @@ public interface ArmIO {
     public boolean faultGateDriver;
     public boolean faultEscEeprom;
     public boolean faultFirmware;
+    public boolean forwardHardLimit;
+    public boolean reverseHardLimit;
 
     // Outputs
     public float busVoltage = 0;
