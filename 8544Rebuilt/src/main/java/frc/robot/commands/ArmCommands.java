@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -16,8 +17,8 @@ public class ArmCommands {
       return Commands.run(
         () -> {
 
-          final double armExtendDuty = -0.3;
-          final double armRetractDuty = 0.3;
+          final double armExtendDuty = -0.8;
+          final double armRetractDuty = 0.8;
           boolean extendPressed = armOutTrigger.getAsBoolean();
           boolean retractPressed = armInTrigger.getAsBoolean();
           // If and only if one button is pressed at a time
@@ -54,7 +55,7 @@ public class ArmCommands {
 
   public static Command runToVoltage( Arm arm, double armVoltage) {
     return Commands.run (
-      () -> {
+      () -> {            // Duty, not voltage!
         arm.runOpenLoop(armVoltage);
       },
       arm).withName("runToVoltage");
@@ -92,7 +93,12 @@ public class ArmCommands {
       Arm arm,
       Boolean onebuttonTrigger
       ) {
-    return Commands.run(
+
+        return Commands.run(
+
+
+      
+    
         () -> {
           boolean oneButton = onebuttonTrigger;
 
@@ -100,37 +106,39 @@ public class ArmCommands {
           final double retractPosition = 0.037;
 
             if (oneButton) {
-              arm.runToPosition(extendPosition); // Set Extend Position
+              arm.runOpenLoop(0.9); // Set Extend Position // arm.runToPosition(extendPosition);
             } else {
-              arm.runToPosition(retractPosition); // Set Retract Position
+              arm.runOpenLoop(-0.9); // Set Retract Position
             }
+            
       },
       arm).withName("oneButtonControl");
   }
   
-  public static Command deployHopper( Arm arm ) {
-
-    final double extendPosition = ArmIO.kNominalDeployPosition;
-    double deployTimelimit = 2; // seconds
+  // Use PID control to hold position
+  public static Command holdPosition( Arm arm ) {
     return Commands.run(
-    () -> {
-      arm.runToPosition(extendPosition);
-    },
-    arm).withName("deployHopper")
-        .until(arm.armDeployedSupplier)
-        .withTimeout(deployTimelimit);
+      () -> { arm.holdPosition(); },
+      arm
+    );
+  }
+
+  public static Command deployHopper( Arm arm ) {
+    double deployTimelimitSeconds = 2;
+    return Commands.runEnd(
+      () -> arm.runOpenLoop(0.7),
+      () -> arm.stopOpenLoop(),
+      arm).withName("deployHopper")
+          .withTimeout(deployTimelimitSeconds);
   }
 
   public static Command retractHopper( Arm arm ) {
-    final double retractPosition = ArmIO.kNominalStowPosition;
-    final double retractTimeLimit = 3.0;
-    return Commands.run(
-      () -> {
-        arm.runToPosition(retractPosition);
-      },
+    final double retractTimeLimitSeconds = 3.0;
+    return Commands.runEnd(
+      () -> arm.runOpenLoop(-0.7),
+      () -> arm.stopOpenLoop(),
       arm).withName("retractHopper")
-          .until(arm.armRetractedSupplier)
-          .withTimeout(retractTimeLimit);
+          .withTimeout(retractTimeLimitSeconds);
   }
 
 

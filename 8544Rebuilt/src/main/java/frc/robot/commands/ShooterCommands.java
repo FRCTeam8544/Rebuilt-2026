@@ -76,7 +76,7 @@ public class ShooterCommands {
                                        Trigger rpmAdjustDown,
                                        Trigger rpmAdjustUp)
     {
-        final double maxRpmAdjustPerSecond = 1500;
+        final double maxRpmAdjustPerSecond = 3000;
         SlewRateLimiter rpmAdjustLimiter = new SlewRateLimiter(maxRpmAdjustPerSecond);
         
         return Commands.startRun(
