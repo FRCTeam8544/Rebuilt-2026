@@ -23,7 +23,7 @@ public class Game extends SubsystemBase {
 
     public BooleanSupplier isShiftChangeSupplier = 
         () -> {
-            return isShiftChange;
+            return shakeWhenTimeToShoot; // was isShiftChange
         };
 
     public Game(GameIO gameIO) {
