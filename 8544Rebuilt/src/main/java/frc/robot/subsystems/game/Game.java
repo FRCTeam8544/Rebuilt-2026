@@ -19,11 +19,16 @@ public class Game extends SubsystemBase {
     private final GameIOInputsAutoLogged gameInputOutputs = new GameIOInputsAutoLogged();
 
     private boolean shakeWhenTimeToShoot = false;
-    private boolean isShiftChange = false; 
+   // private boolean isShiftChange = false; 
+
+    public BooleanSupplier isHubActive = 
+        () -> {
+            return gameInputOutputs.isHubActive;
+        }
 
     public BooleanSupplier isShiftChangeSupplier = 
         () -> {
-            return isShiftChange;
+            return gameInputOutputs.shakeWhenTimeToShoot;
         };
 
     public Game(GameIO gameIO) {
