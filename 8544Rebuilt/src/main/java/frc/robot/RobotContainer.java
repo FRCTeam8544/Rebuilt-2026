@@ -20,10 +20,11 @@ import frc.robot.subsystems.Feeder.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.climber.*;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.game.*;
 import frc.robot.subsystems.leds.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.vision.*;
-import frc.robot.subsystems.Game;
+
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -103,12 +104,12 @@ private final Game game;
     arm = new Arm();
     feeder = new Feeder();
     climber = new Climber();
-    game = new Game();
 
     
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        game = new Game(new GameIOFMS());
         intake = new Intake(new IntakeIOMax(Intake.intakeCanId));
         shooter = new Shooter(new ShooterIOTalonFX(Shooter.leftMotorCanID, Shooter.rightMotorCanID));
         drive =
@@ -134,6 +135,8 @@ private final Game game;
         break;
 
       case SIM:
+        game = new Game(new GameIOSim());
+
         // Sim robot, instantiate maple-sim physics simulation
         // Disable ramp colliders so the robot can drive through ramp areas
         SimulatedArena.overrideInstance(new Arena2026Rebuilt(false));
@@ -175,6 +178,7 @@ private final Game game;
 
       default:
         // Replayed robot, disable IO implementations
+        game = new Game(new GameIOSim()); // TODO Fix should be default ctor
         intake = new Intake(new IntakeIO() {});
         shooter = new Shooter(new ShooterIO() {});
         drive =

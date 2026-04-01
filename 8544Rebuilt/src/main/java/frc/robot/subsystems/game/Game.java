@@ -1,6 +1,5 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.game;
 
-import java.nio.channels.NonWritableChannelException;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -8,21 +7,27 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.game.GameIO;
+import frc.robot.subsystems.game.GameIOInputsAutoLogged;
 
 /**
  * Subsystem for managing FRC REBUILT 2026 game state and Hub status.
  */
 public class Game extends SubsystemBase {
-private boolean shakeWhenTimeToShoot;
-private boolean isShiftChange = false; 
+
+    private final GameIO gameIO;
+    private final GameIOInputsAutoLogged gameInputOutputs = new GameIOInputsAutoLogged();
+
+    private boolean shakeWhenTimeToShoot = false;
+    private boolean isShiftChange = false; 
+
     public BooleanSupplier isShiftChangeSupplier = 
-    () -> {
-return isShiftChange;
-    };
-   
- // }
-    public Game() {
+        () -> {
+            return isShiftChange;
+        };
+
+    public Game(GameIO gameIO) {
+        this.gameIO = gameIO;
         shakeWhenTimeToShoot = false;
     }
 
@@ -74,52 +79,54 @@ return isShiftChange;
             return weAreTheInactiveAlliance;
         }
     }
-private boolean determineShakeOnLoss() {
- double matchTime = DriverStation.getMatchTime();
-    if ( 80> matchTime && matchTime>77){
-return true;
-    }
-else if (55> matchTime && matchTime>52) {
-return true;
-}
-else if(33> matchTime && matchTime > 30) {
-    return true;
+        
+    private boolean determineShakeOnLoss() {
+        double matchTime = DriverStation.getMatchTime();
 
-}
-else {
-    return false;
-}
+        if ( 80> matchTime && matchTime>77){
+            return true;
+        }
+        else if (55> matchTime && matchTime>52) {
+            return true;
+        }
+        else if(33> matchTime && matchTime > 30) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
-}
+    private boolean determineShakeOnWin() {
+        double matchTime = DriverStation.getMatchTime();
 
-private boolean determineShakeOnWin() {
-    double matchTime = DriverStation.getMatchTime();
-    if (105>matchTime && matchTime>102) {
-    return true;
+        if (105>matchTime && matchTime>102) {
+            return true;
+        }
+        else if (55>matchTime && matchTime>52){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-    else if (55>matchTime && matchTime>52){
-        return true;
-    }
-    else {
-        return false;
-    }
-}
+
     @Override
     public void periodic() {
-        boolean active = isHubActive();
+        boolean hubActive = isHubActive();
         double matchTime = DriverStation.getMatchTime();
         Alliance autowinner = getFirstInactiveAlliance().orElse(Alliance.Blue);
         
         if (autowinner == DriverStation.getAlliance().orElse(Alliance.Blue)) {
-        shakeWhenTimeToShoot = determineShakeOnWin();
+            shakeWhenTimeToShoot = determineShakeOnWin();
         }
         else {
             shakeWhenTimeToShoot = determineShakeOnLoss();
         }
 
         // Match state for Elastic Dashboard
-        SmartDashboard.putBoolean("Hub Active", active);
-        SmartDashboard.putString("Hub Status Label", active ? "HUB ACTIVE" : "HUB INACTIVE");
+        SmartDashboard.putBoolean("Hub Active", hubActive);
+        SmartDashboard.putString("Hub Status Label", hubActive ? "HUB ACTIVE" : "HUB INACTIVE");
         SmartDashboard.putNumber("Match Time", matchTime);
 
         // Auto Winner Logic and Display
@@ -132,8 +139,28 @@ private boolean determineShakeOnWin() {
         if (matchTime > 30 && matchTime <= 130) {
             shiftTimeRemaining = (matchTime - 30) % 25;
         }
+
         SmartDashboard.putNumber("Current Shift Remaining", shiftTimeRemaining);
 
-        
+        // Populate the logging structure
+        // TODO restructure this later
+        {
+            String gameData = DriverStation.getGameSpecificMessage();
+            if (gameData != null && !gameData.isEmpty()) {
+                gameInputOutputs.connected = true;
+            }
+            else
+            {
+                gameInputOutputs.connected = false;
+            }
+
+            gameInputOutputs.matchTime = matchTime;
+            gameInputOutputs.shiftTimeRemaining = shiftTimeRemaining;
+
+            gameInputOutputs.autoWinner = winnerStr;
+
+            gameInputOutputs.isHubActive = hubActive;
+            gameInputOutputs.shakeWhenTimeToShoot = shakeWhenTimeToShoot;
+        }
     }
 }
