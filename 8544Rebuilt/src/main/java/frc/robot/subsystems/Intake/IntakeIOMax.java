@@ -45,17 +45,17 @@ public class IntakeIOMax implements IntakeIO {
     rollerMotorConfig.encoder.positionConversionFactor(1);
     rollerMotorConfig.encoder.velocityConversionFactor(1);
 
-  /* rollerMotorConfig
+   rollerMotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Velocity control
           .p(0.0001, ClosedLoopSlot.kSlot0) //was 0.0008
           .i(0.00000, ClosedLoopSlot.kSlot0)
           .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
-  */
-    // rollerMotorConfig.closedLoop.feedForward.kS(kS);
-   //  rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
-    //                                          ClosedLoopSlot.kSlot0);
+  
+   //  rollerMotorConfig.closedLoop.feedForward.kS(kS);
+     rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
+         //                                     ClosedLoopSlot.kSlot0();
 
     rollerMotorController.configure(
         rollerMotorConfig,

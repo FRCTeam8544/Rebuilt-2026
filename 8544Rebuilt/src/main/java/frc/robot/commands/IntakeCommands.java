@@ -69,7 +69,7 @@ public class IntakeCommands {
     return Commands.run(
         () -> {
 
-          final double intakeSpeedRpm = 420;
+          final double intakeSpeedRpm = 1120;
           boolean inPressed = intakeTrigger.getAsBoolean();
           boolean outPressed = expelTrigger.getAsBoolean();
           if (inPressed ^ outPressed) {
@@ -94,7 +94,7 @@ public class IntakeCommands {
     return Commands.run(
       () -> {
 
-        final double intakeFeedDuty = 1.0; //full speed
+        final double intakeFeedDuty = 0.8; //full speed (too fast)
         boolean oneButtonPressed = onebuttonTrigger;
 
         if (oneButtonPressed) {

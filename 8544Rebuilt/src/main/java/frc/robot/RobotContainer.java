@@ -355,7 +355,7 @@ rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.5) //max speed
 
 
 
-
+/* 
 aButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, 0.9)
 .finallyDo(
    () -> {intake.stopMotors();} 
@@ -363,8 +363,13 @@ aButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, 0.9)
 yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
 .finallyDo(
    () -> {intake.stopMotors();} 
-));
+)); */
 
+intake.setDefaultCommand(
+    IntakeCommands.closeLoopControl(
+        intake, aButtonGoose, yButtonGoose).finallyDo(
+            () ->
+        intake.stopMotors()));
 
 
     feeder.setDefaultCommand(
