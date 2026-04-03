@@ -7,8 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.game.GameIO;
-import frc.robot.subsystems.game.GameIOInputsAutoLogged;
 
 /**
  * Subsystem for managing FRC REBUILT 2026 game state and Hub status.
@@ -24,11 +22,16 @@ public class Game extends SubsystemBase {
     public BooleanSupplier isHubActive = 
         () -> {
             return gameInputOutputs.isHubActive;
-        }
+        };
 
     public BooleanSupplier isShiftChangeSupplier = 
         () -> {
             return gameInputOutputs.shakeWhenTimeToShoot;
+        };
+
+    public BooleanSupplier isFMSAvailableSupplier = 
+        () -> {
+            return gameInputOutputs.fmsAvailable;
         };
 
     public Game(GameIO gameIO) {
@@ -118,11 +121,15 @@ public class Game extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        gameInputOutputs.fmsAvailable = DriverStation.isFMSAttached();
+        gameInputOutputs.ownAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
         boolean hubActive = isHubActive();
         double matchTime = DriverStation.getMatchTime();
         Alliance autowinner = getFirstInactiveAlliance().orElse(Alliance.Blue);
         
-        if (autowinner == DriverStation.getAlliance().orElse(Alliance.Blue)) {
+        if (autowinner == gameInputOutputs.ownAlliance) {
             shakeWhenTimeToShoot = determineShakeOnWin();
         }
         else {

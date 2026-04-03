@@ -392,7 +392,11 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
 
     // Shooter buttons
     //shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
-    shooter.setDefaultCommand(ShooterCommands.autoIdleFlywheel(shooter, game.isHubActive()));
+    shooter.setDefaultCommand(ShooterCommands.autoIdleFlywheel(shooter, 
+                                                    () -> { return game.isHubActive(); }, 
+                                                    vision.getZoneSupplier(),
+                                                    game.isFMSAvailableSupplier)
+                                                    );
 
     leftTriggerGoose.onTrue(
         ShooterCommands.buttonShoot(shooter,
