@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -55,6 +56,8 @@ public class Vision extends SubsystemBase {
   
   // Field relative angle to turn the robot towards the alliance hub
   private Rotation2d angleToHub = Rotation2d.kZero;
+
+  private boolean inScoringZone = false;
 
   public Vision(Supplier<Pose2d> robotPoseSupplier, VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -216,13 +219,21 @@ public class Vision extends SubsystemBase {
       ShooterAutoSetRPM = Math.max(2000, ShooterAutoSetRPM);
       ShooterAutoSetRPM = Math.min(Shooter.Flywheel.kMaxShooterRPM, ShooterAutoSetRPM);
       
+      // Retrieve current alliance
+      DriverStation.Alliance currentAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
       // Compute angle to hub
-      angleToHub = nav.getAnglefromHub(DriverStation.getAlliance().orElse(Alliance.Blue));
+      angleToHub = nav.getAnglefromHub(currentAlliance);
+
+      // Compute scoring zone
+      inScoringZone = nav.inScoreZoneFlag(currentAlliance);
 
       // Log camera datadata
 
       Logger.recordOutput(
           "Vision/rotationToHub", angleToHub);
+
+      Logger.recordOutput("Vision/inScoringZone", inScoringZone);
 
       Logger.recordOutput(
           "Vision/distanceToHubMeters", distanceToHub );
@@ -290,7 +301,14 @@ public class Vision extends SubsystemBase {
     };
   }
     public DoubleSupplier AutoFlywheelSpeed =
-  () -> {return ShooterAutoSetRPM; 
+  () -> {
+    return ShooterAutoSetRPM; 
   };
 
+  public BooleanSupplier getZoneSupplier() {
+    return () -> {
+      return inScoringZone;
+    };
+   // return nav.inScoringZoneSupplier;
+  }
 }

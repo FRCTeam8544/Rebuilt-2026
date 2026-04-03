@@ -53,9 +53,9 @@ public class ArmIOMax implements ArmIO {
   //  armMotorConfig.encoder.velocityConversionFactor(3);
 
     // Limits
-    //armMotorConfig.softLimit.forwardSoftLimitEnabled(true);
-    //armMotorConfig.softLimit.forwardSoftLimit(kArmForwardLimit);
-    //armMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+    armMotorConfig.softLimit.forwardSoftLimitEnabled(false);
+   // armMotorConfig.softLimit.forwardSoftLimit(kArmForwardLimit);
+    armMotorConfig.softLimit.reverseSoftLimitEnabled(false);
    // armMotorConfig.softLimit.reverseSoftLimit(kArmReverseLimit);
 
     // Signals
@@ -68,9 +68,9 @@ public class ArmIOMax implements ArmIO {
         .positionWrappingEnabled(false)
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // Position control
-        .p(0.0, ClosedLoopSlot.kSlot0) //was 4
+        .p(4.0, ClosedLoopSlot.kSlot0) //was 4
         .i(0.00000, ClosedLoopSlot.kSlot0)
-        .d(0.0, ClosedLoopSlot.kSlot0); //0.3
+        .d(0.3, ClosedLoopSlot.kSlot0); //0.3
 
     
     // armMotorConfig.closedLoop.feedForward.kS(kS);

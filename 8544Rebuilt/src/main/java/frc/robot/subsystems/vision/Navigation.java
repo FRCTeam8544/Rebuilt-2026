@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.filter.MedianFilter;
+
 // import frc.robot.util.LogUtil;
 
 
@@ -11,10 +13,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -34,13 +38,24 @@ public class Navigation {
 
   private Supplier<Pose2d> robotPoseSupplier;
 
-  // Reef data
   private ArrayList<Pose2d> HubfacePoses = new ArrayList<Pose2d>();
   private ArrayList<Rotation2d> HubAngles = new ArrayList<Rotation2d>();
   private ArrayList<Integer> HubTags = new ArrayList<Integer>();
   private Translation2d HubCentroid;
-  Translation2d blueHubCentroid;
-  Translation2d redHubCentroid;
+  private Translation2d blueHubCentroid;
+  private Translation2d redHubCentroid;
+
+  private boolean inScoringZone = false; 
+
+  // Will be one when robot has been in scoring zone for at least the last quarter second
+  // Filter size is in robot loop ticks (20 ms)
+  private MedianFilter inScoringZoneFilter = new MedianFilter(25);
+/*
+  public BooleanSupplier inScoringZoneSupplier =
+      () -> {
+        return inScoringZone;
+      };*/
+
   public DoubleSupplier approachAngleSupplier =
       () -> {
         return bestApproachAngle;
@@ -65,10 +80,6 @@ public class Navigation {
     }
     Translation2d clockVector = HubTargetCentroid.minus(currentPose);
     return clockVector.getAngle();
-
-    // Log summary data
-    // log current pose, selected tag, approach angle
-    // LogUtil.logData("Climber", climberInOutData);
   }
 
 
@@ -84,15 +95,41 @@ public class Navigation {
     } else {
       HubTargetCentroid = redHubCentroid;
     }
-  //  Translation2d distanceVector = HubTargetCentroid.getDistance(currentPose);
-    return HubTargetCentroid.getDistance(currentPose);
 
-    // Log summary data
-    // log current pose, selected tag, approach angle
-    // LogUtil.logData("Climber", climberInOutData);
+    return HubTargetCentroid.getDistance(currentPose);
   }
 
+  public boolean inScoreZoneFlag(DriverStation.Alliance alliance) {
+    final double inZoneValue = 1.0;
+    final double outsideZoneValue = 0.0;
 
+    double robotLocation = robotPoseSupplier.get().getX();
+    boolean inZone = false;
+
+    // Blue is tag 17
+    if (alliance == DriverStation.Alliance.Blue) {
+      double boundary = getTagPose(17).get().getX();
+
+      // Blue Alliance global origin of Zero, Zero
+      inZone = robotLocation < boundary;
+    }
+    else {
+      double boundary = getTagPose(6).get().getX();
+      // Red alliance, robot must be beyond the boundary (blue zero)
+      inZone = robotLocation > boundary;
+    }
+
+    double filterValue = outsideZoneValue;
+    if (inZone) {
+      filterValue = inScoringZoneFilter.calculate(inZoneValue);
+    }
+    else {
+      filterValue = inScoringZoneFilter.calculate(outsideZoneValue);
+    }
+
+    // Filter will be 1.0 when more then half of the window samples are "inZone"
+    return (filterValue == inZoneValue);
+  }
 
 
   // Get the Pose2d for the given tag number if it exists
@@ -109,6 +146,7 @@ public class Navigation {
       return Optional.empty();
     }
   }
+
 
   // Return a field relative rotation that the robot should use to "aim" at a target
   private Rotation2d getBestApproachAngle(Pose2d targetPose) {
@@ -138,9 +176,6 @@ public class Navigation {
 
         HubfacePoses.add(getTagPose(lookupTag).get());
       }
-      // tagOption.ifPresent(thePose -> { xCentroid += thePose.getX();
-      //                                 yCentroid += thePose.getY();
-      //                                tagCount += 1.0; });
     }
 
     if (tagCount > 0.0) {

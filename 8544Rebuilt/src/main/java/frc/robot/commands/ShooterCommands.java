@@ -80,8 +80,8 @@ public class ShooterCommands {
         SlewRateLimiter rpmAdjustLimiter = new SlewRateLimiter(maxRpmAdjustPerSecond);
         
         return Commands.startRun(
-        // Run once to reset the rate limiter when command starts
-        () -> { rpmAdjustLimiter.reset(0); },
+        // Run once to reset the rate limiter to the current RPM when command starts
+        () -> { rpmAdjustLimiter.reset( shooter.flywheelRpmSupplier.getAsDouble()); },
         // Run until interrupted
         () -> {
             final int rpmAdjustStep = 100 / 50;
@@ -165,6 +165,35 @@ public class ShooterCommands {
             shooter.stopMotors();
         },
         shooter).withName("Idle");
+  }
+
+  // If the FMS is active, hub active, and robot is in the scoring zone prepare the flywheel
+  public static Command autoIdleFlywheel(Shooter shooter, 
+                                         BooleanSupplier hubActive,
+                                         BooleanSupplier inScoringZone,
+                                         BooleanSupplier fmsAvailable)
+  {
+    final double activeIdleRpm = 2000;
+    final double maxRpmAdjustPerSecond = 3000;
+    SlewRateLimiter rpmAdjustLimiter = new SlewRateLimiter(maxRpmAdjustPerSecond);
+        
+    return Commands.startRun(
+        () -> {
+            // Reset limiter to the current flywheel RPM
+            rpmAdjustLimiter.reset(shooter.flywheelRpmSupplier.getAsDouble());
+        },
+        () -> {
+            double runAtRpm = 0.0; // Idle flywheel speed
+
+            if (fmsAvailable.getAsBoolean() && hubActive.getAsBoolean() && inScoringZone.getAsBoolean())
+            {
+                runAtRpm = activeIdleRpm;
+            }
+
+            shooter.runAtRpm(rpmAdjustLimiter.calculate(runAtRpm));
+        },
+        shooter)
+        .withName("autoIdleFlywheel");
   }
 
   /**

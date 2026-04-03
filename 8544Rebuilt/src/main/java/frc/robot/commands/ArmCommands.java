@@ -115,6 +115,14 @@ public class ArmCommands {
       arm).withName("oneButtonControl");
   }
   
+  // Use PID control to hold position
+  public static Command holdPosition( Arm arm ) {
+    return Commands.run(
+      () -> { arm.holdPosition(); },
+      arm
+    );
+  }
+
   public static Command deployHopper( Arm arm ) {
     double deployTimelimitSeconds = 2;
     return Commands.runEnd(
