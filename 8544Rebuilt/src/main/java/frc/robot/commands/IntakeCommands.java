@@ -34,7 +34,7 @@ public class IntakeCommands {
       return Commands.run(
         () -> {
 
-          final double intakeFeedDuty = 0.9;
+          final double intakeFeedDuty = -0.9;
 
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
@@ -54,7 +54,7 @@ public class IntakeCommands {
       }
 
   public static Command intakeFuel(Intake intake) {
-    final double intakeFeedDuty = 0.9;
+    final double intakeFeedDuty = -0.9;
     return Commands.run(
       () -> {
         intake.runOpenLoop(intakeFeedDuty);
@@ -98,7 +98,7 @@ public class IntakeCommands {
         boolean oneButtonPressed = onebuttonTrigger;
 
         if (oneButtonPressed) {
-          intake.runOpenLoop(intakeFeedDuty);
+          intake.runOpenLoop(-intakeFeedDuty);
         } else {
           intake.stopMotors();
         }

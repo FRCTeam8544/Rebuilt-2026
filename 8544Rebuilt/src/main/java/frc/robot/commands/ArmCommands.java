@@ -117,8 +117,10 @@ public class ArmCommands {
   
   // Use PID control to hold position
   public static Command holdPosition( Arm arm ) {
-    return Commands.run(
+    return Commands.startRun(
+      () -> { arm.runToPosition(arm.armPositionSupplier.getAsDouble());},
       () -> { arm.holdPosition(); },
+
       arm
     );
   }

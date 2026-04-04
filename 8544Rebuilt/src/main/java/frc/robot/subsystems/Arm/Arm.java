@@ -81,8 +81,8 @@ public class Arm extends SubsystemBase {
 
   public void holdPosition() {
     if (Math.abs(armInputs.velocity) > 0.0) { 
-       armInputs.positionSetPoint = armInputs.position;
-       armIO.setPosition(armInputs.position);
+      // armInputs.positionSetPoint = armInputs.position;
+       armIO.setPosition(armInputs.positionSetPoint);
        // TODO account for velocity to alter set point to be less jerky
     }
     else {

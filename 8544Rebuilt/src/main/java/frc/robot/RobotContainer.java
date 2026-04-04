@@ -295,9 +295,9 @@ ShooterCommands.buttonShoot(shooter,
 
     ); */
 
-   // xButtonGoose.toggleOnTrue(
-        //ShooterCommands.gentleStopFlywheel(shooter)
-//    ); 
+    xButtonGoose.toggleOnTrue(
+        ShooterCommands.gentleStopFlywheel(shooter)
+    ); 
 
 
 
@@ -400,12 +400,12 @@ intake.setDefaultCommand(
     
 
     // Shooter buttons
-    //shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
-    shooter.setDefaultCommand(ShooterCommands.autoIdleFlywheel(shooter, 
-                                                    () -> { return game.isHubActive(); }, 
-                                                    vision.getZoneSupplier(),
-                                                    game.isFMSAvailableSupplier)
-                                                    );
+    shooter.setDefaultCommand(ShooterCommands.idleFlywheel(shooter));
+   // shooter.setDefaultCommand(ShooterCommands.autoIdleFlywheel(shooter, 
+   //                                                 () -> { return game.isHubActive(); }, 
+      //                                              vision.getZoneSupplier(),
+     //                                               game.isFMSAvailableSupplier)
+       //                                             );
 
     leftTriggerGoose.onTrue(
         ShooterCommands.buttonShoot(shooter,
@@ -414,9 +414,9 @@ intake.setDefaultCommand(
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    ).toggleOnFalse(
-        ShooterCommands.gentleStopFlywheel(shooter)
-    );
+    );//.toggleOnFalse(
+       // ShooterCommands.gentleStopFlywheel(shooter)
+    ///);
 
 
 
@@ -425,9 +425,9 @@ intake.setDefaultCommand(
    //                                        backButtonGoose, startButtonGoose));
 
     // Status
-    shakeWhenTimeToShoot.whileTrue(
-    Commands.run( () -> {goose.setRumble(RumbleType.kBothRumble,0.3);} )
-    );
+  //  shakeWhenTimeToShoot.whileTrue(
+    //Commands.run( () -> {goose.setRumble(RumbleType.kBothRumble,0.3);} )
+   // );
     isRobotIntaking.whileTrue(
        Commands.run( () -> { 
             leds.setMechanicalState(Leds.MechanicalState.INTAKING); }, leds).

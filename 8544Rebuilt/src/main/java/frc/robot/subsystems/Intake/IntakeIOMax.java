@@ -38,7 +38,7 @@ public class IntakeIOMax implements IntakeIO {
     rollerMotorConfig.idleMode(IdleMode.kBrake);
     rollerMotorConfig.smartCurrentLimit(kStallLimit);
     rollerMotorConfig.voltageCompensation(Constants.kNominalVoltage);
-    rollerMotorConfig.inverted(true);
+    rollerMotorConfig.inverted(false);
     rollerMotorConfig.softLimit.forwardSoftLimitEnabled(false);
     rollerMotorConfig.softLimit.reverseSoftLimitEnabled(false);
     
@@ -49,12 +49,12 @@ public class IntakeIOMax implements IntakeIO {
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Velocity control
-          .p(0.0001, ClosedLoopSlot.kSlot0) //was 0.0008
+          .p(0.000, ClosedLoopSlot.kSlot0) //was 0.0001
           .i(0.00000, ClosedLoopSlot.kSlot0)
           .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
   
    //  rollerMotorConfig.closedLoop.feedForward.kS(kS);
-     rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
+  //   rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
          //                                     ClosedLoopSlot.kSlot0();
 
     rollerMotorController.configure(
