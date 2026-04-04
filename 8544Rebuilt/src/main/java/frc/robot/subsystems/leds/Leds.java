@@ -11,17 +11,19 @@ public class Leds extends SubsystemBase {
 
     // --- Timing ---
     private static final double STARTUP_DURATION_SECONDS = 30.0;
-    private static final double ENDGAME_TIME_SECONDS = 5.0;
+    private static final double ENDGAME_TIME_SECONDS = 30.0;
 
     // --- Thresholds ---
     private static final double LOW_BATTERY_VOLTAGE_VOLTS = 11.0;
 
-    // --- Animation speeds (Hz) ---
-    private static final double BREATH_SPEED_HZ = 2.0;
-    private static final double STROBE_SLOW_HZ = 5.0;
-    private static final double STROBE_RAPID_HZ = 10.0; // 0.1 s period
-    private static final double WAVE_NORMAL_HZ = 6.0;
-    private static final double WAVE_FAST_HZ = 15.0;
+    // --- Animation speeds (Hz = frames per second) ---
+    // Breath: 1 frame = 1% brightness change, full cycle = 200 frames
+    private static final double BREATH_SPEED_HZ = 150.0; // ~1.3s per cycle
+    private static final double STROBE_SLOW_HZ = 5.0; // 1 frame = on/off toggle
+    private static final double STROBE_RAPID_HZ = 10.0; // 1 frame = on/off toggle
+    // Wave: 1 frame = 1 LED advance, full traversal = 160 frames
+    private static final double WAVE_NORMAL_HZ = 200.0; // ~0.8s per traversal
+    private static final double WAVE_FAST_HZ = 400.0; // ~0.4s per traversal
 
     // --- Colors [R, G, B] ---
     private static final int[] WHITE       = {255, 255, 255};
@@ -96,19 +98,25 @@ public class Leds extends SubsystemBase {
         LedState state = computeState();
         Logger.recordOutput("Leds/State", state.name());
         Logger.recordOutput("Leds/MechanicalState", requestedMechanicalState.name());
+        Logger.recordOutput("Leds/AllianceDetected", DriverStation.getAlliance().isPresent());
+        Logger.recordOutput(
+                "Leds/Alliance", DriverStation.getAlliance().map(Enum::name).orElse("NONE"));
+        Logger.recordOutput(
+                "Leds/InStartup",
+                Timer.getFPGATimestamp() - startupTimestamp < STARTUP_DURATION_SECONDS);
 
         applyAnimation(state);
     }
 
     private LedState computeState() {
-        // 1. Startup — first 30 seconds of robot code running
-        if (Timer.getFPGATimestamp() - startupTimestamp < STARTUP_DURATION_SECONDS) {
-            return LedState.STARTUP;
-        }
-
-        // 2. E-stopped
+        // 1. E-stopped — always highest priority for safety
         if (DriverStation.isEStopped()) {
             return LedState.E_STOPPED;
+        }
+
+        // 2. Startup — first 30 seconds of robot code running
+        if (Timer.getFPGATimestamp() - startupTimestamp < STARTUP_DURATION_SECONDS) {
+            return LedState.STARTUP;
         }
 
         // 3. Disabled sub-states
@@ -170,18 +178,17 @@ public class Leds extends SubsystemBase {
             case DISABLED_RED ->
                 ledIO.setWave(RED[0], RED[1], RED[2], WAVE_NORMAL_HZ);
 
-            case AUTO ->
-                ledIO.setWave(BLUE_PURPLE[0], BLUE_PURPLE[1], BLUE_PURPLE[2], WAVE_FAST_HZ);
+            case AUTO -> {
+                int[] c = getAllianceColor();
+                ledIO.setStrobe(c[0], c[1], c[2], STROBE_SLOW_HZ);
+            }
 
             case TELEOP_DEFAULT ->
-                ledIO.setStrobe(BLUE_PURPLE[0], BLUE_PURPLE[1], BLUE_PURPLE[2], STROBE_RAPID_HZ);
+                ledIO.setWave(BLUE_PURPLE[0], BLUE_PURPLE[1], BLUE_PURPLE[2], WAVE_NORMAL_HZ);
 
             case TELEOP_ENDGAME -> {
-                var alliance = DriverStation.getAlliance();
-                boolean isRed = alliance.isPresent()
-                        && alliance.get() == DriverStation.Alliance.Red;
-                int[] allianceColor = isRed ? RED : BLUE;
-                ledIO.setWave(allianceColor[0], allianceColor[1], allianceColor[2], WAVE_FAST_HZ);
+                int[] c = getAllianceColor();
+                ledIO.setWave(c[0], c[1], c[2], WAVE_FAST_HZ);
             }
 
             case INTAKING ->
@@ -199,5 +206,12 @@ public class Leds extends SubsystemBase {
             case CLIMBING ->
                 ledIO.setStrobe(YELLOW[0], YELLOW[1], YELLOW[2], STROBE_RAPID_HZ);
         }
+    }
+
+    /** Returns RED or BLUE based on the current alliance, defaulting to BLUE. */
+    private static int[] getAllianceColor() {
+        var alliance = DriverStation.getAlliance();
+        boolean isRed = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+        return isRed ? RED : BLUE;
     }
 }
