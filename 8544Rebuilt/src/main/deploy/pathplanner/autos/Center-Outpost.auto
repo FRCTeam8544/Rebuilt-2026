@@ -82,6 +82,12 @@
                 "data": {
                   "pathName": "Center_Outpost_3"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RetractHopper"
+                }
               }
             ]
           }

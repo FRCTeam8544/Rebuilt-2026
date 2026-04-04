@@ -81,6 +81,12 @@
                 "data": {
                   "pathName": "Center_Depot_3"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RetractHopper"
+                }
               }
             ]
           }

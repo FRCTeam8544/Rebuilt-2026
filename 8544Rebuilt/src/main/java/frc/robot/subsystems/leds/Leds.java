@@ -26,12 +26,12 @@ public class Leds extends SubsystemBase {
     private static final double WAVE_FAST_HZ = 400.0; // ~0.4s per traversal
 
     // --- Colors [R, G, B] ---
-    private static final int[] WHITE       = {255, 255, 255};
-    private static final int[] RED         = {255,   0,   0};
+    private static final int[] WHITE       = {150, 150, 150}; //was full brightness
+    private static final int[] RED         = {170,   0,   0};
     private static final int[] BLUE        = {  0,   0, 255};
-    private static final int[] BLUE_PURPLE = {100,   0, 200}; // blue-purple blend
-    private static final int[] ORANGE_RED  = {255,  69,   0}; // CSS OrangeRed
-    private static final int[] GREEN       = {  0, 200,   0};
+    private static final int[] BLUE_PURPLE = {75,   0, 150}; // blue-purple blend
+    private static final int[] ORANGE_RED  = {150,  40,   0}; // CSS OrangeRed
+    private static final int[] GREEN       = {  0, 150,   0};
     private static final int[] YELLOW      = {200, 200,   0};
 
     /**
