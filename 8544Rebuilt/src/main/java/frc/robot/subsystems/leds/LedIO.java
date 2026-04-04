@@ -8,6 +8,9 @@ public interface LedIO {
     public static class LedIOInputs {
         public boolean connected = false;
         public String activeAnimation = "NONE";
+        public int colorR = 0;
+        public int colorG = 0;
+        public int colorB = 0;
     }
 
     /** Updates the set of loggable inputs. */
