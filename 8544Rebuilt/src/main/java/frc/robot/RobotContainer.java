@@ -128,9 +128,12 @@ private final Game game;
                 new VisionIOPhotonVision(
                     VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
-                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
+                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
                 new VisionIOPhotonVision(
-                    VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB));
+                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA)//,
+            //    new VisionIOPhotonVision(
+              //      VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
+              );
 
         break;
 
@@ -304,7 +307,7 @@ ShooterCommands.buttonShoot(shooter,
 
 
   
-    dpadLeftTriggerGoose.toggleOnTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, true),
+    dpadLeftTriggerGoose.onTrue(Commands.parallel(//ArmCommands.oneButtonControl(arm, true),
      (IntakeCommands.oneButtonControl(intake, true)))
      //.repeatedly()
      
@@ -350,7 +353,7 @@ leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 // the default command will start again.
 arm.setDefaultCommand(ArmCommands.holdPosition(arm));
 
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.5)// max speed
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.9)// max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -358,7 +361,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.5)// max speed
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.5) //max speed
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.9) //max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )

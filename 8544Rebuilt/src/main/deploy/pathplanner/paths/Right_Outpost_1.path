@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.437898,
-        "y": 1.559631
+        "x": 2.438,
+        "y": 1.56
       },
       "prevControl": {
-        "x": 2.78731,
-        "y": 1.824616
+        "x": 2.7480853075921208,
+        "y": 1.8700853075921207
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,8 +41,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 48.00000000000001
+    "velocity": 0.0,
+    "rotation": 54.0
   },
   "reversed": false,
   "folder": "Right-Outpost",

@@ -19,7 +19,7 @@ public class Intake extends SubsystemBase {
 
   public BooleanSupplier isIntaking =
     () -> {
-      return intakeInputs.velocity > 1.0; // RPM
+      return Math.abs(intakeInputs.velocity) > 1.0; // RPM
     };
 
   public DoubleSupplier intakeRpmSupplier =
