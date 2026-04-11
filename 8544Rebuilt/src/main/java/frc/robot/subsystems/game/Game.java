@@ -3,6 +3,8 @@ package frc.robot.subsystems.game;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -174,5 +176,7 @@ public class Game extends SubsystemBase {
             gameInputOutputs.isHubActive = hubActive;
             gameInputOutputs.shakeWhenTimeToShoot = shakeWhenTimeToShoot;
         }
+        
+        Logger.processInputs("Game", gameInputOutputs);
     }
 }

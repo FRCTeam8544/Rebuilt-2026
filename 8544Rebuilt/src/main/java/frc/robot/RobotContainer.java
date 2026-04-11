@@ -417,9 +417,9 @@ intake.setDefaultCommand(
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    );//.toggleOnFalse(
-       // ShooterCommands.gentleStopFlywheel(shooter)
-    ///);
+    ).toggleOnFalse(
+        ShooterCommands.gentleStopFlywheel(shooter)
+    );
 
 
 
