@@ -21,7 +21,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class IntakeIOMax implements IntakeIO {
 
   private static final int kStallLimit = 45; //was 30 but need more power
-
+//  private static final double kS = 0.1;
   private final SparkMax rollerMotorController;
 
   private final RelativeEncoder rollerEncoder;
@@ -49,13 +49,13 @@ public class IntakeIOMax implements IntakeIO {
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Velocity control
-          .p(0.000, ClosedLoopSlot.kSlot0) //was 0.0001
+          .p(0.0000, ClosedLoopSlot.kSlot0) //was 0.0001
           .i(0.00000, ClosedLoopSlot.kSlot0)
-          .d(0.000000, ClosedLoopSlot.kSlot0); //0.00001
+          .d(0.0000, ClosedLoopSlot.kSlot0); //0.00001
   
-   //  rollerMotorConfig.closedLoop.feedForward.kS(kS);
-  //   rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
-         //                                     ClosedLoopSlot.kSlot0();
+     //rollerMotorConfig.closedLoop.feedForward.kS(kS, ClosedLoopSlot.kSlot0);
+   //  rollerMotorConfig.closedLoop.feedForward.kV(Constants.Neo.nominalFF);
+          //                                    ClosedLoopSlot.kSlot0();
 
     rollerMotorController.configure(
         rollerMotorConfig,
@@ -87,7 +87,8 @@ public class IntakeIOMax implements IntakeIO {
 
   @Override
   public void setVelocity(double rpm) {
-    closedLoop.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    double arbFeedForward = 0.17; //feedforward for intake (0.17) 
+    closedLoop.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0, arbFeedForward);
   }
 
   @Override

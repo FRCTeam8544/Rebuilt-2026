@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
   public void runAtRpm(double rpm) {
     intakeInputs.velocitySetPoint = rpm;
     intakeInputs.voltageSetPoint = 0.0;
-    intakeIO.setVelocity(intakeInputs.velocitySetPoint);
+    intakeIO.setVelocity(intakeInputs.velocitySetPoint*4);
   }
   
   public void stopMotors() {

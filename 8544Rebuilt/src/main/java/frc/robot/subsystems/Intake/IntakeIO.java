@@ -7,7 +7,7 @@ import frc.robot.Constants;
 
 public interface IntakeIO {
 
-  public static final double kMotorToOutputRatio = 1.0/4.0; // 12 to 1 gearbox
+  public static final double kMotorToOutputRatio = 1.0/4.0; // 4 to 1 gearbox
   public static final double kOutputToMotorRatio = 1.0 / kMotorToOutputRatio;
 
   public static final double kMaxIntakeRPM = Constants.Neo.freeSpeedRPM * kMotorToOutputRatio;

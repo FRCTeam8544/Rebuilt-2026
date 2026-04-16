@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -35,7 +36,6 @@ public class IntakeCommands {
         () -> {
 
           final double intakeFeedDuty = -0.9;
-
           boolean intakeFuel = intakeTrigger.getAsBoolean();
           boolean expelFuel = expelTrigger.getAsBoolean();
           if (intakeFuel ^ expelFuel) {
@@ -65,7 +65,8 @@ public class IntakeCommands {
   public static Command closeLoopControl(
       Intake intake,
       Trigger intakeTrigger,
-      Trigger expelTrigger) {
+      Trigger expelTrigger
+      ) {
     return Commands.run(
         () -> {
 
@@ -91,16 +92,21 @@ public class IntakeCommands {
     Intake intake,
     Boolean onebuttonTrigger
     ) {
-    return Commands.run(
+
+      SlewRateLimiter dutyLimiter = new SlewRateLimiter(1);
+
+    return Commands.startRun(
+      () -> {dutyLimiter.reset(0);},
       () -> {
 
-        final double intakeFeedDuty = 0.8; //full speed (too fast)
+        final double intakeFeedDuty = 0.96; //full speed (too fast)
         boolean oneButtonPressed = onebuttonTrigger;
 
         if (oneButtonPressed) {
-          intake.runOpenLoop(-intakeFeedDuty);
+          intake.runOpenLoop(dutyLimiter.calculate(-intakeFeedDuty));
         } else {
           intake.stopMotors();
+          dutyLimiter.reset(0);
         }
       },
       intake).withName("oneButtonControl");
