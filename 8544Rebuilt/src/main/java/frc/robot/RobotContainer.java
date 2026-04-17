@@ -128,10 +128,10 @@ private final Game game;
                 new VisionIOPhotonVision(
                     VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
-                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
-                new VisionIOPhotonVision(
-                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA)//,
-            //    new VisionIOPhotonVision(
+                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam)//,  //broken camera mount
+               // new VisionIOPhotonVision(
+             //       VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA)//,
+            //    new VisionIOPhotonVision(                                             // not calibrated correctly
               //      VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
               );
 
@@ -353,7 +353,7 @@ leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 // the default command will start again.
 arm.setDefaultCommand(ArmCommands.holdPosition(arm));
 
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.9)// max speed
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -361,7 +361,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.9)// max speed
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.9) //max speed
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -1.0) //max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -380,12 +380,12 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
 .finallyDo(
    () -> {intake.stopMotors();} 
 )); */
-
+/* 
 intake.setDefaultCommand(
     IntakeCommands.closeLoopControl(
         intake, aButtonGoose, yButtonGoose).finallyDo(
             () ->
-        intake.stopMotors()));
+        intake.stopMotors())); */
 
 
     feeder.setDefaultCommand(

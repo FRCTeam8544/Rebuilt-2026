@@ -41,8 +41,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 28.0
+    "velocity": 0.0,
+    "rotation": 34.0
   },
   "reversed": false,
   "folder": "Center-Outpost",
