@@ -39,8 +39,8 @@ public class FeederIOFlex implements FeederIO {
     motorConfig.voltageCompensation(12);
     motorConfig.softLimit.forwardSoftLimitEnabled(false);
     motorConfig.softLimit.reverseSoftLimitEnabled(false);
-    motorConfig.encoder.positionConversionFactor(1/20.0); // 20 to 1 gearbox
-    motorConfig.encoder.velocityConversionFactor(1/20.0); // 20 to 1 gearbox
+    motorConfig.encoder.positionConversionFactor(1/15.0); // 15 to 1 gearbox was 20 to 1
+    motorConfig.encoder.velocityConversionFactor(1/15.0); // 15 to 1 gearbox
 
     motorConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
