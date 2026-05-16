@@ -74,7 +74,7 @@ public class VisionConstants {
 // 20 toe out
 // 15 up
   // Basic filtering thresholds
-  public static double maxAmbiguity = 0.3;
+  public static double maxAmbiguity = 0.2; //was 0.3, PhotonVision suggests 0.2
   public static double maxZError = 0.75;
 
   // Standard deviation baselines, for 1 meter distance and 1 tag

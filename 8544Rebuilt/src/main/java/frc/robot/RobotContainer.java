@@ -128,11 +128,11 @@ private final Game game;
                 new VisionIOPhotonVision(
                     VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
-                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam)//,  //broken camera mount
-               // new VisionIOPhotonVision(
-             //       VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA)//,
-            //    new VisionIOPhotonVision(                                             // not calibrated correctly
-              //      VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
+                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),  //broken camera mount
+                new VisionIOPhotonVision(
+                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
+                new VisionIOPhotonVision(                                             // not calibrated correctly
+                    VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
               );
 
         break;
