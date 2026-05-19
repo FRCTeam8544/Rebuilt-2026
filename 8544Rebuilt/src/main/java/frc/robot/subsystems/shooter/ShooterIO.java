@@ -2,6 +2,8 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.Orchestra;
+
 public interface ShooterIO {
     
   @AutoLog
@@ -39,7 +41,7 @@ public interface ShooterIO {
     public double flywheelVelocitySetPoint = 0.0; // Requested flywheel output RPM
     public double voltageSetPoint= 0.0; // Motor voltage, usually not directly controlled
   }
-
+  public default void addInstruments(Orchestra orchestra){}
   public default void updateInputs(ShooterIOInputs inOutData) {}
   public default void setVelocity(double rpm) {}
   public default void setVoltage(double volts) {}

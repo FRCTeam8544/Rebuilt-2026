@@ -3,6 +3,8 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.Orchestra;
+
 public interface ModuleIO {
   @AutoLog
   public static class ModuleIOInputs {
@@ -39,4 +41,6 @@ public interface ModuleIO {
 
   /** Run the turn motor to the specified rotation. */
   public default void setTurnPosition(Rotation2d rotation) {}
+
+  public default void addInstruments(Orchestra orchestra){}
 }

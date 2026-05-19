@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Arm;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.Faults;
@@ -28,14 +29,14 @@ public class ArmIOMax implements ArmIO {
   private final SparkMax armMotorController;
   private final SparkClosedLoopController closedLoopController;
 
-  private final AbsoluteEncoder armEncoder;
+  private final RelativeEncoder armEncoder;
   private final SparkMaxConfig armMotorConfig;
 
 
   public ArmIOMax(int armCanId) {
     armMotorController = new SparkMax(armCanId, MotorType.kBrushless);
     closedLoopController = armMotorController.getClosedLoopController();
-    armEncoder = armMotorController.getAbsoluteEncoder();
+    armEncoder = armMotorController.getEncoder();
 
     // Spark max defaults to clockwise rotation from viewing the motor shaft with positive voltage
     // Due to the pully assembly from the motor to the arm, clockwise motor rotation will cause

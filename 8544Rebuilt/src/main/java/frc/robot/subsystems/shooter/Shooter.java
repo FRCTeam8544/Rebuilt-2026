@@ -5,6 +5,8 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.Orchestra;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -195,6 +197,11 @@ public class Shooter extends SubsystemBase{
       }
 
       return shooterInputs.maxFlywheelSpeedHit;
+  }
+
+  public void addInstruments(Orchestra orchestra) {
+    shooterIO.addInstruments(orchestra);
+  
   }
 
 

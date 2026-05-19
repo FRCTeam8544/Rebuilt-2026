@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -94,6 +95,7 @@ public class ShooterIOTalonFX implements ShooterIO {
                                  .withInverted(InvertedValue.CounterClockwise_Positive)
                                  .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
+      leaderConfig.Audio.AllowMusicDurDisable = true;
 
     // Closed loop settings for velocity control
     leaderConfig.Slot0
@@ -117,6 +119,7 @@ public class ShooterIOTalonFX implements ShooterIO {
                                 .withControlTimesyncFreqHz(kMotorPairControlUpdateTimeSyncHz)
       );
     followTalon.getConfigurator().apply(followConfig); // Apply follow config
+    followConfig.Audio.AllowMusicDurDisable = true;
 
     buildRpmMapping();
   }
@@ -197,6 +200,12 @@ public class ShooterIOTalonFX implements ShooterIO {
     // Control requests must be sent in pairs to control the leader and follower together.
     leaderTalon.setControl(openLoopRequest);
     followTalon.setControl(followRequest);
+
+  }
+
+  public void addInstruments(Orchestra orchestra) {
+    orchestra.addInstrument(followTalon);
+    orchestra.addInstrument(leaderTalon);
   }
 
 }

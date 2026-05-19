@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -22,8 +23,10 @@ import frc.robot.subsystems.climber.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.game.*;
 import frc.robot.subsystems.leds.*;
+import frc.robot.subsystems.midimusic.Midiorchestra;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.midimusic.*;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -97,6 +100,7 @@ private final Game game;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final Midiorchestra midiorchestra;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -135,6 +139,8 @@ private final Game game;
                     VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
               );
 
+              midiorchestra = new Midiorchestra(shooter, drive); 
+
         break;
 
       case SIM:
@@ -161,6 +167,8 @@ private final Game game;
 
         intake = new Intake(new IntakeIOSim(intakeSimulation));
         shooter = new Shooter(new ShooterIOSim());
+
+        midiorchestra = new Midiorchestra(); 
 
         // Populate fuel on the field at startup
         SimulatedArena.getInstance().resetFieldForAuto();
@@ -195,6 +203,8 @@ private final Game game;
 
         vision =
             new Vision(drive.robotPoseSupplier, drive::addVisionMeasurement, new VisionIO() {});
+
+            midiorchestra = new Midiorchestra(); 
         break;
     }
 
@@ -303,6 +313,15 @@ ShooterCommands.buttonShoot(shooter,
     ); 
 
 
+    aButtonGoose.onTrue(Commands.runOnce(
+    ()-> { midiorchestra.playmusic();}, 
+    midiorchestra
+    ));
+
+    yButtonGoose.onTrue(Commands.runOnce(
+    ()-> { midiorchestra.stopmusic();}, 
+    midiorchestra
+    ));
 
 
 
@@ -351,7 +370,7 @@ leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 // Hold arm position using PID as default command. On button press this command will
 // be interupted and the Arm will move with voltage control. Once button is released
 // the default command will start again.
-arm.setDefaultCommand(ArmCommands.holdPosition(arm));
+arm.setDefaultCommand(ArmCommands.runToVoltage(arm, 0));
 
 leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
 .unless(

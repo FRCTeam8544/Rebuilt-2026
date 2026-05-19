@@ -3,6 +3,7 @@ package frc.robot.subsystems.drive;
 import static frc.robot.util.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANdiConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -91,6 +92,7 @@ public class ModuleIOTalonFXS implements ModuleIO {
     driveConfig.ExternalFeedback.SensorToMechanismRatio = constants.DriveMotorGearRatio;
     driveConfig.CurrentLimits.StatorCurrentLimit = constants.SlipCurrent;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveConfig.Audio.AllowMusicDurDisable = true;
     driveConfig.MotorOutput.Inverted =
         constants.DriveMotorInverted
             ? InvertedValue.Clockwise_Positive
@@ -135,6 +137,7 @@ public class ModuleIOTalonFXS implements ModuleIO {
     turnConfig.MotionMagic.MotionMagicExpo_kV = 0.12 * constants.SteerMotorGearRatio;
     turnConfig.MotionMagic.MotionMagicExpo_kA = 0.1;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+    turnConfig.Audio.AllowMusicDurDisable = true;
     turnConfig.MotorOutput.Inverted =
         constants.SteerMotorInverted
             ? InvertedValue.Clockwise_Positive
@@ -220,6 +223,13 @@ public class ModuleIOTalonFXS implements ModuleIO {
     drivePositionQueue.clear();
     turnPositionQueue.clear();
   }
+
+  public void addInstruments(Orchestra orchestra) {
+    orchestra.addInstrument(driveTalon);
+    orchestra.addInstrument(turnTalon);
+  }
+
+
 
   @Override
   public void setDriveOpenLoop(double output) {
