@@ -96,9 +96,6 @@ public class Game extends SubsystemBase {
         if ( 80> matchTime && matchTime>77){
             return true;
         }
-        else if (55> matchTime && matchTime>52) {
-            return true;
-        }
         else if(33> matchTime && matchTime > 30) {
             return true;
         }
