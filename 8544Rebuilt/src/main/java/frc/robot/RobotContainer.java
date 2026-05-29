@@ -351,7 +351,7 @@ leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 // Hold arm position using PID as default command. On button press this command will
 // be interupted and the Arm will move with voltage control. Once button is released
 // the default command will start again.
-arm.setDefaultCommand(ArmCommands.holdPosition(arm));
+arm.setDefaultCommand(ArmCommands.runToVoltage(arm,0));
 
 leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
 .unless(
