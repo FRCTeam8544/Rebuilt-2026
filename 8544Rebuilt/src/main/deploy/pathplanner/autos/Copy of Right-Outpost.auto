@@ -75,30 +75,50 @@
                 "data": {
                   "pathName": "Right_Outpost_3"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RetractHopper"
-                }
               }
             ]
           }
         },
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "AutoRpmShootFuel"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 3.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "RetractHopper"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "wait",
+                "type": "deadline",
                 "data": {
-                  "waitTime": 5.0
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "AutoRpmShootFuel"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 8.0
+                      }
+                    }
+                  ]
                 }
               }
             ]
