@@ -125,12 +125,12 @@ private final Game game;
             new Vision(
                 drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(
-                    VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
+             //   new VisionIOPhotonVision(
+            //        VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
                     VisionConstants.DriverCam, VisionConstants.robotToDriverCam),  //broken camera mount
-                new VisionIOPhotonVision(
-                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
+               // new VisionIOPhotonVision(
+                 //   VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
                 new VisionIOPhotonVision(                                             // not calibrated correctly
                     VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
               );

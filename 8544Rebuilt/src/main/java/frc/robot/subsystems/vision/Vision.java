@@ -226,7 +226,7 @@ public class Vision extends SubsystemBase {
 
       // Compute angle to hub
       angleToHub = nav.getAnglefromHub(currentAlliance);
-      angleToHub = Rotation2d.fromDegrees(angleToHubFilter.calculate(angleToHub.getDegrees()));
+    //  angleToHub = Rotation2d.fromDegrees(angleToHubFilter.calculate(angleToHub.getDegrees()));
 
       // Compute scoring zone
       inScoringZone = nav.inScoreZoneFlag(currentAlliance);

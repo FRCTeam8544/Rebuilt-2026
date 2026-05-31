@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right_Outpost_1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "pathName": "Center_Outpost_1"
           }
         },
         {
@@ -52,9 +46,22 @@
                 }
               },
               {
+                "type": "named",
+                "data": {
+                  "name": "stopIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
                 "type": "path",
                 "data": {
-                  "pathName": "Right_Outpost_2"
+                  "pathName": "Center_Outpost_2"
                 }
               }
             ]
@@ -67,13 +74,13 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 2.0
+                  "waitTime": 3.0
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right_Outpost_3"
+                  "pathName": "Center_Outpost_3"
                 }
               }
             ]
@@ -115,7 +122,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 8.0
+                        "waitTime": 7.0
                       }
                     }
                   ]
