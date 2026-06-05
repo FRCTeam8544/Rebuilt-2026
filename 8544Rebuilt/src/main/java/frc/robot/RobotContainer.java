@@ -125,14 +125,14 @@ private final Game game;
             new Vision(
                 drive.robotPoseSupplier,
                 drive::addVisionMeasurement,
+             //   new VisionIOPhotonVision(
+            //        VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
                 new VisionIOPhotonVision(
-                    VisionConstants.FrontRightCam, VisionConstants.robotToFrontAprilCam),
-                new VisionIOPhotonVision(
-                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),
-                new VisionIOPhotonVision(
-                    VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA)//,
-            //    new VisionIOPhotonVision(
-              //      VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
+                    VisionConstants.DriverCam, VisionConstants.robotToDriverCam),  //broken camera mount
+               // new VisionIOPhotonVision(
+                 //   VisionConstants.RearModuleA, VisionConstants.robotToRearModuleA),
+                new VisionIOPhotonVision(                                             // not calibrated correctly
+                    VisionConstants.RearModuleB, VisionConstants.robotToRearModuleB)
               );
 
         break;
@@ -351,9 +351,9 @@ leftBackGoosePID.whileTrue(ArmCommands.runToPosition(arm, 0.78)
 // Hold arm position using PID as default command. On button press this command will
 // be interupted and the Arm will move with voltage control. Once button is released
 // the default command will start again.
-arm.setDefaultCommand(ArmCommands.holdPosition(arm));
+arm.setDefaultCommand(ArmCommands.runToVoltage(arm,0));
 
-leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.9)// max speed
+leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 1.0)// max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -361,7 +361,7 @@ leftBackGoose.whileTrue(ArmCommands.runToVoltage(arm, 0.9)// max speed
    () -> {arm.holdPosition();} 
 ));
 
-rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -0.9) //max speed
+rightBackGoose.whileTrue(ArmCommands.runToVoltage(arm, -1.0) //max speed
 .unless(
     () -> !manualArmOverrideTrigger.getAsBoolean() == true //was false
 )
@@ -380,12 +380,12 @@ yButtonGoose.whileTrue(IntakeCommands.runAtDuty(intake, -0.9)
 .finallyDo(
    () -> {intake.stopMotors();} 
 )); */
-
+/* 
 intake.setDefaultCommand(
     IntakeCommands.closeLoopControl(
         intake, aButtonGoose, yButtonGoose).finallyDo(
             () ->
-        intake.stopMotors()));
+        intake.stopMotors())); */
 
 
     feeder.setDefaultCommand(
@@ -417,8 +417,8 @@ intake.setDefaultCommand(
                                     dpadDownTriggerGoose, // Decrease flywheel speed
                                     dpadUpTriggerGoose    // Increase flywheel speed
                                   )
-    ).toggleOnFalse(
-        ShooterCommands.gentleStopFlywheel(shooter)
+   // ).toggleOnFalse(
+     //   ShooterCommands.gentleStopFlywheel(shooter)
     );
 
 

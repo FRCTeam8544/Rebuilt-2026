@@ -18,6 +18,7 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -56,6 +57,7 @@ public class Vision extends SubsystemBase {
   
   // Field relative angle to turn the robot towards the alliance hub
   private Rotation2d angleToHub = Rotation2d.kZero;
+  private MedianFilter angleToHubFilter = new MedianFilter(6);
 
   private boolean inScoringZone = false;
 
@@ -224,6 +226,7 @@ public class Vision extends SubsystemBase {
 
       // Compute angle to hub
       angleToHub = nav.getAnglefromHub(currentAlliance);
+    //  angleToHub = Rotation2d.fromDegrees(angleToHubFilter.calculate(angleToHub.getDegrees()));
 
       // Compute scoring zone
       inScoringZone = nav.inScoreZoneFlag(currentAlliance);

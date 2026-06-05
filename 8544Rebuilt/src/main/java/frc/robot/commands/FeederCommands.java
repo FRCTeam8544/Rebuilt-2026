@@ -79,7 +79,7 @@ public class FeederCommands {
                                        //Trigger feedAdjustUp
                                        )
     {
-        final double nominalRpm = 300; // Wheel RPM request
+        final double nominalRpm = 480; // Wheel RPM request nominal is 452, but PID undershoots
         final double reverseRpmFactor = -0.5; // Reverse half speed
         final double rpmStep = 20.0 / Constants.tickUpdatesPerSecond;
 

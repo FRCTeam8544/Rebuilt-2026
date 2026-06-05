@@ -156,9 +156,10 @@ public class ShooterIOTalonFX implements ShooterIO {
     inOutData.faultStatorCurrentLimitFollowMotor = followTalon.getFault_StatorCurrLimit().getValue();
 
     // Outputs
-    inOutData.busVoltage = (float) leaderTalon.getSupplyCurrent().getValueAsDouble();
+    inOutData.busVoltage = (float) leaderTalon.getSupplyVoltage().getValueAsDouble();
     inOutData.outputDuty = (float) leaderTalon.getDutyCycle().getValueAsDouble(); // -1 to 1 percent applied of bus voltage
     inOutData.outputCurrent = (float) leaderTalon.getTorqueCurrent().getValueAsDouble();
+    inOutData.supplyCurrent = (float) leaderTalon.getSupplyCurrent().getValueAsDouble();
     inOutData.outputVoltage = (float) leaderTalon.getMotorVoltage().getValueAsDouble();
     inOutData.outputPower = (float) leaderTalon.getMotorVoltage().getValueAsDouble() * leaderTalon.getTorqueCurrent().getValueAsDouble();
 

@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right_Outpost_1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "pathName": "Center_Outpost_1"
           }
         },
         {
@@ -52,9 +46,22 @@
                 }
               },
               {
+                "type": "named",
+                "data": {
+                  "name": "stopIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
                 "type": "path",
                 "data": {
-                  "pathName": "Right_Outpost_2"
+                  "pathName": "Center_Outpost_2"
                 }
               }
             ]
@@ -73,32 +80,52 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right_Outpost_3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RetractHopper"
+                  "pathName": "Center_Outpost_3"
                 }
               }
             ]
           }
         },
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "AutoRpmShootFuel"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "RetractHopper"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "wait",
+                "type": "deadline",
                 "data": {
-                  "waitTime": 5.0
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "AutoRpmShootFuel"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 7.0
+                      }
+                    }
+                  ]
                 }
               }
             ]

@@ -34,6 +34,7 @@ public interface ShooterIO {
     public float busVoltage = 0;
     public float outputDuty = 0; // -1 to 1 percent applied of bus voltage
     public float outputCurrent = 0;
+    public float supplyCurrent = 0;
     public float outputVoltage = 0;
     public double outputPower = 0;
     public double flywheelVelocitySetPoint = 0.0; // Requested flywheel output RPM

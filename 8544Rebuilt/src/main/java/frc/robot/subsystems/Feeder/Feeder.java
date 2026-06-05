@@ -16,7 +16,7 @@ public class Feeder extends SubsystemBase{
     // Feed is feed through a 20 to 1 gearbox, but the speed is monitored through the internal
     // encoder
     public static final class FeedWheel {
-      public static final double kDriveToOutputGearRatio = 1.0 / 20.0;
+      public static final double kDriveToOutputGearRatio = 1.0 / 15.0;  //was 1/20
       public static final double kOutputToDriveGearRatio = 1.0 / kDriveToOutputGearRatio;
       public static final double kMaxFeedRPM = Constants.NeoVortex.freeSpeedRPM * kDriveToOutputGearRatio;
     }
