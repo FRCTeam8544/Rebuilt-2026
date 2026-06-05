@@ -86,7 +86,7 @@ public class ShooterCommands {
         () -> {
             final int rpmAdjustStep = 100 / 50;
              
-            final double shooterNominalRpm = 3000;
+            final double shooterNominalRpm = 1725;//was 3000
             double shooterRpmAuto = rpmByDistanceSupplier.getAsDouble();
 
             // These Rpms are used to tune the flywheel
