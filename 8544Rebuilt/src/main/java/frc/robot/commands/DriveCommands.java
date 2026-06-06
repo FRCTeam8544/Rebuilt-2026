@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.Arm.ArmIOInputsAutoLogged;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
 
@@ -24,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -181,7 +184,7 @@ public class DriveCommands {
     //TODO add Y axis control
 
 
-
+ final DriveCommandsIOInputsAutoLogged driveCommandLog = new DriveCommandsIOInputsAutoLogged();
 
     // Construct command
     return Commands.run(
@@ -197,7 +200,8 @@ public class DriveCommands {
 
               // Calculate X speed
                double xdistance = distanceControllerX.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
-                 
+               driveCommandLog.xPID = xdistance;
+                Logger.processInputs("XPIDposition", driveCommandLog );
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =  //insert pid output here
