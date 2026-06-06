@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.Vision;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -27,6 +29,11 @@ public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 7.0;  // angular velocity was 5
   private static final double ANGLE_KD = 0.4;
+  private static final double DISTANCE_KP = 0.4; //CHANGE VALUES
+  private static final double DISTANCE_KD = 0.4;
+  private static final double DISTANCE_MAX_VELOCITY = 2.0;
+  private static final double DISTANCE_MAX_ACCELERATION = 2.0;
+  private static final double DISTANCE_SETPOINT = 2.0; //should be in meters
   private static final double ANGLE_MAX_VELOCITY = 9.0; //was 8
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -142,6 +149,84 @@ public class DriveCommands {
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
+
+
+
+
+  public static Command joystickDriveFollow(
+      Drive drive,
+      Vision vision,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Rotation2d> rotationSupplier) {
+
+    // Create angle PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+// Create distance PID controller
+
+    ProfiledPIDController distanceControllerX =
+        new ProfiledPIDController(
+            DISTANCE_KP,
+            0.0,
+            DISTANCE_KD,
+            new TrapezoidProfile.Constraints(DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
+    distanceControllerX.enableContinuousInput(-10, 10);
+    //TODO add Y axis control
+
+
+
+
+    // Construct command
+    return Commands.run(
+            () -> {
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+              // Calculate angular speed
+              double omega =
+                  angleController.calculate(
+                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+
+              // Calculate X speed
+               double xdistance = distanceControllerX.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
+                 
+
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =  //insert pid output here
+                  new ChassisSpeeds(
+                      xdistance * drive.getMaxLinearSpeedMetersPerSec(), //was  linearVelocity.getX()
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation()));
+            },
+            drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+
+
+
+
+
+
 
   /**
    * Measures the velocity feedforward constants for the drive motors.
