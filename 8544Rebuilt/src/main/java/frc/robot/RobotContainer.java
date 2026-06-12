@@ -268,6 +268,16 @@ private final Game game;
                 () -> -maverick.getLeftX(),
                 vision.getHubRotation()));
 
+// Follow behind AprilTag with set distance
+    maverick
+        .y()
+        .whileTrue(
+            DriveCommands.joystickDriveFollow(
+                drive, vision,
+                () -> -maverick.getLeftY(),
+                () -> -maverick.getLeftX(),
+                vision.getHubRotation()));
+
     // Switch to X pattern when X button is pressed
     maverick.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
