@@ -185,7 +185,7 @@ public class DriveCommands {
             0.0,
             DISTANCE_KD,
             new TrapezoidProfile.Constraints(DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
-   // distanceControllerX.enableContinuousInput(-10, 10);
+    distanceControllerX.enableContinuousInput(-1, 1);
     //TODO add Y axis control
 
 
@@ -206,7 +206,15 @@ public class DriveCommands {
               // Calculate X speed
                double xdistance = -distanceControllerX.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
                driveCommandLog.xPID = xdistance;
+               driveCommandLog.xPIDGoalPosition = distanceControllerX.getGoal().position;
+               driveCommandLog.xPIDGoalVelocity = distanceControllerX.getGoal().velocity;
+               driveCommandLog.xPIDSetpointPosition = distanceControllerX.getSetpoint().position;
+               driveCommandLog.xPIDSetpointVelocity = distanceControllerX.getSetpoint().velocity;
+               driveCommandLog.xPIDPositionTolerance = distanceControllerX.getPositionTolerance();
+               driveCommandLog.xPIDVelocityTolerance = distanceControllerX.getVelocityTolerance();
                 Logger.processInputs("XPIDposition", driveCommandLog );
+        
+
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =  //insert pid output here
@@ -226,8 +234,12 @@ public class DriveCommands {
             },
             drive)
 
-        // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        // Reset angle PID controller when command starts
+        .beforeStarting(() -> { angleController.reset(drive.getRotation().getRadians());
+                        distanceControllerX.reset(0);  }
+        
+        );
+
   }
 
 
