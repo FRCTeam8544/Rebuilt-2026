@@ -37,8 +37,10 @@ public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 7.0;  // angular velocity was 5
   private static final double ANGLE_KD = 0.4;
-  private static final double DISTANCE_KP = 0.1; //CHANGE VALUES
-  private static final double DISTANCE_KD = 0.0;
+  private static final double DISTANCEX_KP = 0.1; //CHANGE VALUES
+  private static final double DISTANCEX_KD = 0.0;
+  private static final double DISTANCEY_KP = 0.1; //CHANGE VALUES
+  private static final double DISTANCEY_KD = 0.0;
   private static final double DISTANCE_MAX_VELOCITY = 2.0;
   private static final double DISTANCE_MAX_ACCELERATION = 1.0;
   private static final double DISTANCE_SETPOINT = 2.0; //should be in meters
@@ -181,12 +183,20 @@ public class DriveCommands {
 
     ProfiledPIDController distanceControllerX =
         new ProfiledPIDController(
-            DISTANCE_KP,
+            DISTANCEX_KP,
             0.0,
-            DISTANCE_KD,
+            DISTANCEX_KD,
             new TrapezoidProfile.Constraints(DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
     distanceControllerX.enableContinuousInput(-1, 1);
     //TODO add Y axis control
+
+    //    ProfiledPIDController distanceControllerY =
+     //   new ProfiledPIDController(
+      //      DISTANCEY_KP,
+       //     0.0,
+        //    DISTANCEY_KD,
+         //   new TrapezoidProfile.Constraints(DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
+    //distanceControllerX.enableContinuousInput(-1, 1);
 
 
  final DriveCommandsIOInputsAutoLogged driveCommandLog = new DriveCommandsIOInputsAutoLogged();
@@ -205,6 +215,11 @@ public class DriveCommands {
 
               // Calculate X speed
                double xdistance = -distanceControllerX.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
+
+               //Calculate Y speed
+          //     double ydistance = distanceControllerY.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
+
+               //Logging
                driveCommandLog.xPID = xdistance;
                driveCommandLog.xPIDGoalPosition = distanceControllerX.getGoal().position;
                driveCommandLog.xPIDGoalVelocity = distanceControllerX.getGoal().velocity;
