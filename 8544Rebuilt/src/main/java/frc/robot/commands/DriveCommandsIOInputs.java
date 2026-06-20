@@ -8,6 +8,7 @@ public class DriveCommandsIOInputs {
 public double xPID = 0.0f;
 
 public double xPIDOutput = 0.0f;
+public double yPIDOutput = 0.0f;
 
 public double xPIDGoalPosition = 0.0f;
 public double xPIDGoalVelocity = 0.0f;

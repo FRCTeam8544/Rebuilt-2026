@@ -297,6 +297,7 @@ public class Vision extends SubsystemBase {
     };
   }
 
+
     public Supplier<Double> getHubDistance() {
 
     return () -> {

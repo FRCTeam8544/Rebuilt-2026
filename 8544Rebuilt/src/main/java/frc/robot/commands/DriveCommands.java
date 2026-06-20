@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Arm.ArmIOInputsAutoLogged;
 import frc.robot.commands.DriveCommandsIOInputsAutoLogged;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.Navigation;
 import frc.robot.subsystems.vision.Vision;
 
 import java.text.DecimalFormat;
@@ -39,13 +40,13 @@ public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 7.0;  // angular velocity was 5
   private static final double ANGLE_KD = 0.4;
-  private static final double DISTANCEX_KP = 0.3; //CHANGE VALUES
-  private static final double DISTANCEX_KD = 0.0;
-  private static final double DISTANCEY_KP = 0.1; //CHANGE VALUES
+  private static final double DISTANCEX_KP = 0.4; //CHANGE VALUES
+  private static final double DISTANCEX_KD = 0.05;
+  private static final double DISTANCEY_KP = 0.0007; //CHANGE VALUES
   private static final double DISTANCEY_KD = 0.0;
   private static final double DISTANCE_MAX_VELOCITY = 2.0;
   private static final double DISTANCE_MAX_ACCELERATION = 1.0;
-  private static final double DISTANCE_SETPOINT = 2.0; //should be in meters
+  private static final double DISTANCE_SETPOINT = 3.0; //should be in meters
   private static final double ANGLE_MAX_VELOCITY = 9.0; //was 8
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -168,6 +169,7 @@ public class DriveCommands {
   public static Command joystickDriveFollow(
       Drive drive,
       Vision vision,
+      Navigation navigation,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
@@ -192,13 +194,13 @@ public class DriveCommands {
     distanceControllerX.enableContinuousInput(-1, 1);
     //TODO add Y axis control
 
-    //    ProfiledPIDController distanceControllerY =
-     //   new ProfiledPIDController(
-      //      DISTANCEY_KP,
-       //     0.0,
-        //    DISTANCEY_KD,
-         //   new TrapezoidProfile.Constraints(DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
-    //distanceControllerX.enableContinuousInput(-1, 1);
+        ProfiledPIDController distanceControllerY =
+        new ProfiledPIDController(
+            DISTANCEY_KP,
+            0.0,
+            DISTANCEY_KD,
+            new TrapezoidProfile.Constraints(DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
+    distanceControllerY.enableContinuousInput(-1, 1);
 
 
 
@@ -219,7 +221,7 @@ public class DriveCommands {
                double xdistance = -distanceControllerX.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
 
                //Calculate Y speed
-          //     double ydistance = distanceControllerY.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
+               double ydistance = distanceControllerY.calculate(drive.getPose().getY(), navigation.getTagPose(26).get().getY());
 
                //Logging
                driveCommandLog.xPIDOutput = xdistance * drive.getMaxLinearSpeedMetersPerSec();
@@ -230,6 +232,7 @@ public class DriveCommands {
                driveCommandLog.xPIDSetpointVelocity = distanceControllerX.getSetpoint().velocity;
                driveCommandLog.xPIDPositionTolerance = distanceControllerX.getPositionTolerance();
                driveCommandLog.xPIDVelocityTolerance = distanceControllerX.getVelocityTolerance();
+               driveCommandLog.yPIDOutput = ydistance * drive.getMaxLinearSpeedMetersPerSec();
                 Logger.processInputs("XPIDposition", driveCommandLog );
         
 
@@ -238,7 +241,7 @@ public class DriveCommands {
               ChassisSpeeds speeds =  //insert pid output here
                   new ChassisSpeeds(
                       xdistance * drive.getMaxLinearSpeedMetersPerSec(), //was  linearVelocity.getX()
-                      linearVelocity.getY() * 0, //drive.getMaxLinearSpeedMetersPerSec(),
+                      ydistance * drive.getMaxLinearSpeedMetersPerSec(),
                       omega *0
                       );
               boolean isFlipped =
@@ -255,7 +258,8 @@ public class DriveCommands {
 
         // Reset angle PID controller when command starts
         .beforeStarting(() -> { angleController.reset(drive.getRotation().getRadians());
-                        distanceControllerX.reset(0);  }
+                        distanceControllerX.reset(0);
+                     distanceControllerY.reset(0);  }
         
         );
 

@@ -55,6 +55,7 @@ public class RobotContainer {
   private final Leds leds;
 private final Game game;
   private final Vision vision;
+  private final Navigation navigation;
 
   // Simulation
   private SwerveDriveSimulation driveSimulation = null;
@@ -119,6 +120,10 @@ private final Game game;
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+                navigation = 
+        new Navigation(drive.robotPoseSupplier);
+
+
         leds = new Leds(new LedIOCANdle());
 
         vision =
@@ -139,6 +144,7 @@ private final Game game;
 
       case SIM:
         game = new Game(new GameIOSim());
+
 
         // Sim robot, instantiate maple-sim physics simulation
         // Disable ramp colliders so the robot can drive through ramp areas
@@ -172,6 +178,9 @@ private final Game game;
                 new ModuleIOSim(driveSimulation.getModules()[1]),
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]));
+
+                navigation = 
+        new Navigation(drive.robotPoseSupplier);
         leds = new Leds(new LedIOSim());
 
         // PhotonVisionSim with 3 cameras exceeds 20ms loop budget; use noop for now
@@ -191,6 +200,9 @@ private final Game game;
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+                navigation = 
+        new Navigation(drive.robotPoseSupplier);
         leds = new Leds(new LedIO() {});
 
         vision =
@@ -273,7 +285,7 @@ private final Game game;
         .y()
         .whileTrue(
             DriveCommands.joystickDriveFollow(
-                drive, vision,
+                drive, vision, navigation,
                 () -> -maverick.getLeftY(),
                 () -> -maverick.getLeftX(),
                 vision.getHubRotation()));

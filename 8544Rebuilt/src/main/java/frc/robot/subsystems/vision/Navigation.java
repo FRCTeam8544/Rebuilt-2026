@@ -133,7 +133,7 @@ public class Navigation {
 
 
   // Get the Pose2d for the given tag number if it exists
-  private Optional<Pose2d> getTagPose(int tagNumber) {
+  public Optional<Pose2d> getTagPose(int tagNumber) {
     Optional<Pose3d> tagOption = VisionConstants.aprilTagLayout.getTagPose(tagNumber);
     if (tagOption.isPresent()) {
       Pose2d thePose =
