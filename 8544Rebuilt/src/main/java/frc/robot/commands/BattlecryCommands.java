@@ -29,15 +29,16 @@ public class BattlecryCommands {
     public static Command scream(Shooter shooter,
                                  Feeder feeder)
     {
+        SlewRateLimiter limiter = new SlewRateLimiter(3500);
         return Commands.run(
 
         () -> {
             // Lock out the feeder while screaming
 
-            shooter.runAtRpm(Shooter.Flywheel.kMaxShooterRPM);
+            shooter.runAtRpm(limiter.calculate(Shooter.Flywheel.kMaxShooterRPM));
             
         },
-        shooter).finallyDo( () -> { shooter.runOpenLoop(0); });
+        shooter).finallyDo( () -> { shooter.runOpenLoop(0); limiter.reset(0); });
     }
 
 
