@@ -319,7 +319,8 @@ ShooterCommands.buttonShoot(shooter,
                                   )//.repeatedly()//.unless(aButtonGoose)
 
     ); */
-
+    startButtonGoose.whileTrue( BattlecryCommands.scream(shooter, feeder));
+    
     xButtonGoose.toggleOnTrue(
         ShooterCommands.gentleStopFlywheel(shooter)
     ); 
