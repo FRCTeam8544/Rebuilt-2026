@@ -34,10 +34,12 @@ import org.littletonrobotics.junction.Logger;
 
 
 public class DriveCommands {
+  
+  private static final DriveCommandsIOInputsAutoLogged driveCommandLog = new DriveCommandsIOInputsAutoLogged();
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 7.0;  // angular velocity was 5
   private static final double ANGLE_KD = 0.4;
-  private static final double DISTANCEX_KP = 0.1; //CHANGE VALUES
+  private static final double DISTANCEX_KP = 0.3; //CHANGE VALUES
   private static final double DISTANCEX_KD = 0.0;
   private static final double DISTANCEY_KP = 0.1; //CHANGE VALUES
   private static final double DISTANCEY_KD = 0.0;
@@ -199,7 +201,7 @@ public class DriveCommands {
     //distanceControllerX.enableContinuousInput(-1, 1);
 
 
- final DriveCommandsIOInputsAutoLogged driveCommandLog = new DriveCommandsIOInputsAutoLogged();
+
 
     // Construct command
     return Commands.run(
@@ -220,6 +222,7 @@ public class DriveCommands {
           //     double ydistance = distanceControllerY.calculate(vision.getHubDistance().get().doubleValue(), DISTANCE_SETPOINT);
 
                //Logging
+               driveCommandLog.xPIDOutput = xdistance * drive.getMaxLinearSpeedMetersPerSec();
                driveCommandLog.xPID = xdistance;
                driveCommandLog.xPIDGoalPosition = distanceControllerX.getGoal().position;
                driveCommandLog.xPIDGoalVelocity = distanceControllerX.getGoal().velocity;
@@ -235,8 +238,9 @@ public class DriveCommands {
               ChassisSpeeds speeds =  //insert pid output here
                   new ChassisSpeeds(
                       xdistance * drive.getMaxLinearSpeedMetersPerSec(), //was  linearVelocity.getX()
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
+                      linearVelocity.getY() * 0, //drive.getMaxLinearSpeedMetersPerSec(),
+                      omega *0
+                      );
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
