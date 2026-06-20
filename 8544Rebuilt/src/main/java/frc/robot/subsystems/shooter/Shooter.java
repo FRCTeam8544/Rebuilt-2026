@@ -16,7 +16,7 @@ public class Shooter extends SubsystemBase{
 
     // Limit chonker flywheel.. so limit to be safe for now
     public static final class Flywheel {
-      public static final double kMaxShooterRPM = 3700; // Output flywheel, not motor
+      public static final double kMaxShooterRPM = 3900; // Output flywheel, not motor
       public static final double kDriveToOutputGearRatio = 1.4;
       public static final double kOutputToDriveGearRatio = 1.0 / kDriveToOutputGearRatio;
     }
