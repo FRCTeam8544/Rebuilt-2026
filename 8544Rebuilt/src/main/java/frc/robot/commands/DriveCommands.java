@@ -241,8 +241,8 @@ public class DriveCommands {
               ChassisSpeeds speeds =  //insert pid output here
                   new ChassisSpeeds(
                       xdistance * drive.getMaxLinearSpeedMetersPerSec(), //was  linearVelocity.getX()
-                      ydistance * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega *0
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),  //no y control
+                      omega * 0  //multiply by 0 to disable angle control
                       );
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
