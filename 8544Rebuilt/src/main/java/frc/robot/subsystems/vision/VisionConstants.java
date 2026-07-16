@@ -56,7 +56,7 @@ public class VisionConstants {
       new Transform3d(
           Units.inchesToMeters(0.5),
           Units.inchesToMeters(-12.5),
-          Units.inchesToMeters(25.75),
+          Units.inchesToMeters(23.75), // taller mount was 25.75
           new Rotation3d(0.0, 0, 0));
   public static Transform3d robotToRearModuleA = // Rear Left
       new Transform3d(
